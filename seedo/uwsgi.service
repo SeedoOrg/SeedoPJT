@@ -1,0 +1,14 @@
+[Unit]
+Description=uWSGI service
+After=network.target
+
+[Service]
+UID = deploy
+GID = deploy
+WorkingDirectory = /home/ubuntu/SeedoPJT/seedo
+ExecStart= /home/ubuntu/SeedoPJT/venv/bin/uwsgi --ini  /home/ubuntu/SeedoPJT/seedo/uwsgi.ini
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
