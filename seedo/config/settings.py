@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "sensor",
     "navigation",
     "walking_mode",
+    'ocr',
 ]
 
 MIDDLEWARE = [
@@ -157,10 +158,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "qna", "static"),
     os.path.join(BASE_DIR, "navigation", "static"),
 ]  # 프로젝트 수준의 static 디렉토리
-
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 # Default primary key field type
