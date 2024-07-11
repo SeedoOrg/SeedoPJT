@@ -5,6 +5,7 @@ import os
 import urllib.parse
 import urllib.request
 from pathlib import Path
+from common.decorators import token_required
 
 import cv2
 import environ
@@ -33,6 +34,9 @@ environ.Env.read_env(env_file=env_path)
 CLIENT_ID = env("NAVER_TTS_CLIENT_ID")
 SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
 
+#@token_required
+def index(request):
+    return render(request, "walking_mode/test.html")
 
 # tts api
 def naver_tts(text):
@@ -79,7 +83,7 @@ def determine_position(x_center):
 
 
 class ImageUploadView(View):
-    template_name = "test2.html"
+    template_name = "test.html"
 
     def get(self, request):
         return render(request, self.template_name)
