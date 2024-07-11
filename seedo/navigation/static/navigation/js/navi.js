@@ -11,7 +11,6 @@ let startLocation, startMarker;
 let endLocation, endMarker;
 let currentLocation, currentMarker;
 
-
 async function ttsAlert(text) {
   var csrftoken = getCookie("csrftoken");
   try {
@@ -43,11 +42,10 @@ async function ttsAlert(text) {
 }
 
 // 기존 alert 함수를 불러올때 ttsAlert 함수 호출
-window.alert = function(text) {
+window.alert = function (text) {
   ttsAlert(text); // TTS 변환 함수 호출
   window.alert = ttsAlert; // alert 함수를 다시 TTS 함수로 설정하여 중복 호출 방지
 };
-
 
 function initMap() {
   map = new Tmapv2.Map("map", {
@@ -234,7 +232,7 @@ async function checkRoute(currentLocation) {
   }
 }
 function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 function getDistanceToPolyline(point, pathCoordinates) {
   var minDistance = Infinity;
