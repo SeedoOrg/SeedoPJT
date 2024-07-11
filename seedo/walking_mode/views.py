@@ -173,7 +173,7 @@ class ImageUploadView(View):
 
     @classmethod
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter):
-        frame_per_audio = 5
+        frame_per_audio = 6
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
         _obstacles = [0, 1, 2, 3, 4, 5, 11, 12]
@@ -190,7 +190,7 @@ class ImageUploadView(View):
         # 모델 2개 순회
         for i, model in enumerate([model_od, model_seg]):
             names = model.model.names
-            [OD_CLS_KR, SEG_CLS_KR][i]
+            names_kr = [OD_CLS_KR, SEG_CLS_KR][i]
             results = model.track(img, persist=True)
             boxes = results[0].boxes.xyxy.cpu()
             clss = results[0].boxes.cls.cpu().tolist()
@@ -211,7 +211,6 @@ class ImageUploadView(View):
                     x_loc = get_x_loc(x1, w)
                     y_loc = get_y_loc(y1, h, threshold=4)
                     distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
-
                     if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
                         annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
                         annotator.visioneye(box, start_point)
@@ -220,7 +219,7 @@ class ImageUploadView(View):
                         cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
 
                         # 음성안내를 위한 객체 정보 추가
-                        history.append({"dist": distance, "dir": x_loc, "cls": names[int(cls)]})
+                        history.append({"dist": distance, "dir": x_loc, "cls": names_kr[int(cls)]})
 
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
             history = pd.DataFrame(history)
