@@ -5,6 +5,7 @@ import os
 import urllib.parse
 import urllib.request
 from pathlib import Path
+from common.decorators import token_required
 
 import cv2
 import environ
