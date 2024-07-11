@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "navigation",
     "walking_mode",
     "storages",
+    "ocr",
 ]
 
 MIDDLEWARE = [
