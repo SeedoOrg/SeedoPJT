@@ -4,10 +4,10 @@
     <title>Home</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script>
-      const MAX_CONCURRENT_REQUESTS = 3; // 동시에 처리될 수 있는 최대 요청 수
-      let activeRequests = 0; // 현재 처리 중인 요청 수
-      let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐
-      let isPlaying = false; // 현재 오디오가 재생 중인지 여부
+      const MAX_CONCURRENT_REQUESTS = 3; // 동시에 처리될 수 있는 최대 요청 수.,,,
+      let activeRequests = 0; // 현재 처리 중인 요청 수``
+      let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐,
+      let isPlaying = false; // 현재 오디오가 재생 중인지 여부,
 
       async function sendCameraImage(imageData) {
         try {
@@ -81,6 +81,7 @@
 
         async function maybeSendCameraImage() {
           if (recording && activeRequests < MAX_CONCURRENT_REQUESTS) {
+            console.log(activeRequests);
             activeRequests++; // 새로운 요청을 시작하기 전에 activeRequests를 증가
             const imageData = captureImage(video, canvas);
             sendCameraImage(imageData);
