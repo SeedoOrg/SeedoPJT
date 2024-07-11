@@ -25,3 +25,7 @@ Pillow==10.4.0
 ultralytics==8.2.50
 
 opencv-python==4.10.0.84
+
+boto3==1.34.143
+
+s3transfer==0.10.2
