@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_delete, pre_save
@@ -6,6 +8,17 @@ from django.dispatch import receiver
 User = get_user_model()
 
 # Create your models here.
+
+
+def upload_to(instance, filename):
+    # Split the file name and extension
+    base, ext = os.path.splitext(filename)
+    # Generate the new file name with the primary key
+    if instance.id:
+        new_filename = f"{base}_{instance.id}{ext}"
+    else:
+        new_filename = f"{base}_tmp{ext}"
+    return os.path.join("record/videos/", new_filename)
 
 
 class Condition(models.Model):
@@ -20,8 +33,27 @@ class Accident(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     accident_date = models.DateField(auto_now_add=True)
     accident_time = models.TimeField(auto_now_add=True)
-    accident_video = models.FileField(upload_to="record/videos/")
+    accident_video = models.FileField(upload_to=upload_to)
     accident_location = models.TextField(null=False)
+
+    def save(self, *args, **kwargs):
+        # Check if the instance is new by checking if it has an id
+        is_new = self._state.adding
+        temp_video_file = self.accident_video
+
+        # Temporarily save the file to a temporary location
+        self.accident_video = None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            # Rename the file with the primary key
+            new_file_name = upload_to(self, temp_video_file.name)
+            self.accident_video = temp_video_file
+            self.accident_video.name = new_file_name
+            # Save again to update the file path
+            super().save(update_fields=["accident_video"])
+        else:
+            super().save(*args, **kwargs)
 
 
 # Signal handlers

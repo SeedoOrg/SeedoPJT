@@ -17,7 +17,7 @@ async function sendSensorData(sensorData) {
     });
 
     const result = await response.json();
-    console.log("Prediction:", result.prediction);
+    //console.log('Prediction:', result.prediction);
 
     // Play sound if prediction changes from 0 to 1
     if (previousPrediction[0] === 0 && result.prediction[0] === 1) {
