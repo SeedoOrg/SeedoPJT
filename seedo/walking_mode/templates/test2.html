@@ -6,7 +6,7 @@
     {% load static %}
     <script src="{% static 'sensor/js/sensor.js' %}"></script>
     <script>
-      const MAX_CONCURRENT_REQUESTS = 3; // 동시에 처리될 수 있는 최대 요청 수
+      const MAX_CONCURRENT_REQUESTS = 1; // 동시에 처리될 수 있는 최대 요청 수
       let activeRequests = 0; // 현재 처리 중인 요청 수
       let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐
       let isPlaying = false; // 현재 오디오가 재생 중인지 여부
@@ -89,10 +89,10 @@
         let canvas = document.getElementById("canvas");
         let mediaRecorder;
         let recordedChunks = [];
-        const streamFrameRate = 20;
-        const maxChunks = 20 * 6 * 10; // Assuming a frameRate of 1 chunk per second for 1 minute
+        const streamFrameRate = 30;
+        const maxChunks = 2; // Assuming a frameRate of 1 chunk per second for 1 minute
         let lastSaveTime = 0;
-        const saveInterval = 3000 * 5; // 30 seconds in milliseconds
+        const saveInterval = 1000 * 60; // milliseconds
         var csrftoken = getCookie("csrftoken");
 
         async function maybeSendCameraImage() {
@@ -122,15 +122,26 @@
               // Set up MediaRecorder
               mediaRecorder = new MediaRecorder(stream);
               mediaRecorder.ondataavailable = function (event) {
-                if (event.data.size > 0) {
-                  recordedChunks.push(event.data);
-                  // Remove older chunks if exceeding the maxChunks limit
-                  if (recordedChunks.length > maxChunks) {
-                    console.log(recordedChunks.length);
-                    recordedChunks.splice(0, recordedChunks.length - maxChunks);
-                    console.log(recordedChunks.length);
+                return new Promise((resolve, reject) => {
+                  if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                    // Remove older chunks if exceeding the maxChunks limit
+                    if (recordedChunks.length > maxChunks) {
+                      recordedChunks.splice(0, recordedChunks.length - maxChunks);
+                    }
                   }
-                }
+                  resolve();
+                })
+                  .then(() => {
+                    // Start recording again
+                    if (recording) {
+                      mediaRecorder.start();
+                      console.log("Recording constraint and Recording restarted");
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Error during ondataavailable processing:", error);
+                  });
               };
               mediaRecorder.start();
             })
@@ -139,9 +150,9 @@
             });
 
           setInterval(maybeSendCameraImage, 1000 / frameRate);
-          setInterval(observePredictionChange, 1000 / frameRate);
-          //setInterval(constraintRecordedChunks, 1000 / frameRate);
-          setInterval(handlePrediction, 500 * 5);
+          setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
+          setInterval(observePredictionChange, 1000 / streamFrameRate);
+          setInterval(handlePrediction, 1000 * 60);
         }
 
         function stopRecording() {
@@ -175,8 +186,23 @@
                 if (currentText === "Prediction: 1") {
                   const currentTime = Date.now();
                   if (currentTime - lastSaveTime >= saveInterval) {
-                    saveRecordedChunks();
                     lastSaveTime = currentTime;
+                    new Promise((resolve, reject) => {
+                      try {
+                        constraintRecordedChunks();
+                        setTimeout(() => {
+                          resolve();
+                        }, 50);
+                      } catch (error) {
+                        reject(error);
+                      }
+                    })
+                      .then(() => {
+                        return saveRecordedChunks();
+                      })
+                      .catch((error) => {
+                        console.error("Error during constraint or save:", error);
+                      });
                   }
                 }
               }
@@ -186,75 +212,54 @@
           const observer = new MutationObserver(callback);
           observer.observe(targetNode, config);
         }
-        /*
-        function constraintRecordedChunks() {
-          mediaRecorder.stop();
-          mediaRecorder.onstop = async function () {
-            mediaRecorder.ondataavailable = function (event) {
-              if (event.data.size > 0) {
-                recordedChunks.push(event.data);
-                // Remove older chunks if exceeding the maxChunks limit
-                if (recordedChunks.length > maxChunks) {
-                  recordedChunks.splice(0, recordedChunks.length - maxChunks);
-                }
-              }
-            };
-          };
 
-          mediaRecorder.start();
+        function constraintRecordedChunks() {
+          if (mediaRecorder.state !== "inactive") {
+            mediaRecorder.stop();
+          }
         }
-        */
 
         async function saveRecordedChunks() {
-          mediaRecorder.stop();
+          if (!recording) {
+            return;
+          }
+          if (recordedChunks.length > 0) {
+            const recordedBlob = new Blob(recordedChunks, {
+              type: "video/mp4",
+            });
+            const videoFile = new File([recordedBlob], "video.mp4", {
+              type: "video/mp4",
+            });
 
-          mediaRecorder.onstop = async function () {
-            if (recordedChunks.length > 0) {
-              const recordedBlob = new Blob(recordedChunks, {
-                type: "video/mp4",
-              });
-              const videoFile = new File([recordedBlob], "video.mp4", {
-                type: "video/mp4",
-              });
+            // Prepare form data
+            const formData = new FormData();
+            formData.append("accident_location", "currentPosition"); // Replace with actual location data
+            formData.append("video_file", videoFile);
 
-              console.log(videoFile);
-              // Prepare form data
-              const formData = new FormData();
-              // formData.append('user_id', 'dummy_id'); // Replace with actual user ID
-              formData.append("accident_location", "currentPosition"); // Replace with actual location data
-              formData.append("video_file", videoFile);
-
-              for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-              }
-
-              try {
-                const response = await fetch("../record/accident/save_accident/", {
-                  method: "POST",
-                  body: formData,
-                  headers: {
-                    "X-CSRFToken": csrftoken,
-                  },
-                });
-
-                const data = await response.json();
-
-                if (data.status === "success") {
-                  console.log("Recorded chunk saved successfully");
-                } else {
-                  console.error("Error saving recorded chunk");
-                }
-              } catch (error) {
-                console.error("Error:", error);
-              } finally {
-                // Start recording again
-                if (recording) {
-                  mediaRecorder.start();
-                }
-                console.log("Recording restarted");
-              }
+            for (let [key, value] of formData.entries()) {
+              console.log(key, value);
             }
-          };
+
+            try {
+              const response = await fetch("../record/accident/save_accident/", {
+                method: "POST",
+                body: formData,
+                headers: {
+                  "X-CSRFToken": csrftoken,
+                },
+              });
+
+              const data = await response.json();
+
+              if (data.status === "success") {
+                console.log("Recorded chunk saved successfully");
+              } else {
+                console.error("Error saving recorded chunk");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+            }
+          }
         }
 
         document.getElementById("start-camera").addEventListener("click", startRecording);
