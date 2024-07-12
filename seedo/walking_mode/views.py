@@ -14,6 +14,7 @@ from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
+from PIL import ImageFont
 from ultralytics import YOLO
 from ultralytics.utils.plotting import Annotator, colors
 
@@ -53,9 +54,27 @@ CLIENT_ID = env("NAVER_TTS_CLIENT_ID")
 SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
 
 
+# 한글 폰트
+font_dir = "/usr/share/fonts/truetype/nanum/"
+os.listdir(font_dir)
+font_file = font_dir + "NanumGothic.ttf"
+FONT = ImageFont.truetype(font_file)
+
+
 # @token_required
 def index(request):
     return render(request, "walking_mode/test2.html")
+
+
+# 한글 표시 구현에 따른 기존 visioneye 메서드(cv2 ver.) 비호환에 따른 보완 메서드(PIL ver.) 추가
+def visioneye_pil(self, box, center_point, color=(235, 219, 11), pin_color=(255, 0, 255)):
+    center_bbox = int((box[0] + box[2]) / 2), int(box[3])
+    self.draw.ellipse((center_point[0] - self.tf, center_point[1] - self.tf, center_point[0] + self.tf, center_point[1] + self.tf), fill=pin_color)
+    self.draw.ellipse((center_bbox[0] - self.tf, center_bbox[1] - self.tf, center_bbox[0] + self.tf, center_bbox[1] + self.tf), fill=color)
+    self.draw.line([center_point, center_bbox], fill=color, width=self.tf)
+
+
+Annotator.visioneye_pil = visioneye_pil
 
 
 # tts api
@@ -193,7 +212,8 @@ class ImageUploadView(View):
         od_classes = []
         seg_classes = []
 
-        annotator = Annotator(img, line_width=2)
+        annotator = Annotator(img, line_width=3, example=str("가나다"), font=font_file)  # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
+        annotator.tf = max(annotator.lw - 1, 1)
         txt_color, txt_background = ((0, 0, 0), (255, 255, 255))
 
         detected_obstacle = False  # 객체가 탐지되었는지 확인하는 플래그
@@ -204,17 +224,17 @@ class ImageUploadView(View):
             names_kr = [OD_CLS_KR, SEG_CLS_KR][i]
             results = model.track(img, persist=True)
             boxes = results[0].boxes.xyxy.cpu()
-            clss = results[0].boxes.cls.cpu().tolist()
+            clss = results[0].boxes.cls.int().cpu().tolist()
 
             # 만약 객체가 탐지 됐다면
             if results[0].boxes.id is not None:
                 track_ids = results[0].boxes.id.int().cpu().tolist()
                 for box, track_id, cls in zip(boxes, track_ids, clss):
                     if i == 0:  # Object Detection
-                        od_classes.append(names[int(cls)])
+                        od_classes.append(names[cls])
                     elif i == 1:  # Segmentation
-                        seg_classes.append(names[int(cls)])
-                    if (int(cls) in _obstacles) and i == 1:
+                        seg_classes.append(names[cls])
+                    if (cls in _obstacles) and i == 1:
                         continue
                     detected_obstacle = True
 
@@ -223,14 +243,18 @@ class ImageUploadView(View):
                     y_loc = get_y_loc(y1, h, threshold=4)
                     distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
                     if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
-                        annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
-                        annotator.visioneye(box, start_point)
+                        # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
+                        annotator.box_label(
+                            box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc,x_loc-12][x_loc>12]}시", color=colors(cls)
+                        )  # 한글 ver.
+                        # annotator.visioneye(box, start_point)
+                        annotator.visioneye_pil(box, start_point)
                         text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
                         cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
                         cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
 
                         # 음성안내를 위한 객체 정보 추가
-                        history.append({"dist": distance, "dir": x_loc, "cls": names_kr[int(cls)]})
+                        history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
 
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
             print(ImageUploadView.frame_cnt)
