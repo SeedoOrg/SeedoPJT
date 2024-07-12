@@ -2,20 +2,31 @@
 <link rel="stylesheet" href="{% static 'navigation/css/navi.css' %}" />
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script>
+  var startIcon = "{% static 'navigation/img/startIcon.png' %}";
+  var endIcon = "{% static 'navigation/img/endIcon.png' %}";
+</script>
 <script defer src="{% static 'navigation/js/navi.js' %}"></script>
 {% endblock extra_head %} {% block content %}
 <main>
-  <div class="form-container">
-    <label for="startAddress">출발지:</label>
-    <div id="startAddress"></div>
-  </div>
+  <div class="infoContainer">
+    <div class="form-container">
+      <label for="startAddress">출발지</label>
+      <hr />
+      <div id="startAddress"></div>
+    </div>
 
-  <div class="form-container">
-    <label for="endAddress">도착지:</label>
-    <div id="endAddress"></div>
+    <div class="form-container">
+      <label for="endAddress">도착지</label>
+      <hr />
+      <div id="endAddress"></div>
+    </div>
+
+    <div class="naviBtn">
+      <button class="btnInNavi" onclick="findRoute()">경로 찾기</button>
+      <button class="btnInNavi" onclick="stopnavi()">안내 종료</button>
+    </div>
   </div>
-  <button onclick="findRoute()">경로 찾기</button>
-  <button onclick="stopnavi()">안내 종료</button>
 
   <!-- 출발지 목적지 검색 시 맵 좌측에 뜨게 or media 적용해서 상단에 뜨도록 하기 -->
   <div class="startPoint">

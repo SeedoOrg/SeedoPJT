@@ -330,6 +330,7 @@ function addMarker(type) {
     startLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
     startMarker = new Tmapv2.Marker({
       position: startLocation,
+      icon: startIcon,
       map: map,
       title: "출발지",
     });
@@ -337,6 +338,7 @@ function addMarker(type) {
     endLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
     endMarker = new Tmapv2.Marker({
       position: endLocation,
+      icon: endIcon,
       map: map,
       title: "목적지",
     });
@@ -398,7 +400,7 @@ function reverseGeo(lat, lng, callback) {
 
       var address = "새주소 : " + newRoadAddr + "<br/>";
       address += "지번주소 : " + jibunAddr + "<br/>";
-      address += "위경도좌표 : " + lat + ", " + lng;
+      // address += "위경도좌표 : " + lat + ", " + lng;
 
       callback(address);
     },
@@ -494,6 +496,7 @@ function setStart(lat, lon) {
   startLocation = new Tmapv2.LatLng(lat, lon);
   startMarker = new Tmapv2.Marker({
     position: startLocation,
+    icon: startIcon,
     map: map,
     title: "출발지",
   });
@@ -510,6 +513,7 @@ function setEnd(lat, lon) {
   endLocation = new Tmapv2.LatLng(lat, lon);
   endMarker = new Tmapv2.Marker({
     position: endLocation,
+    icon: endIcon,
     map: map,
     title: "목적지",
   });
@@ -723,12 +727,14 @@ function loadRouteFromLocalStorage() {
         // 출발지와 도착지 마커 표시
         var startMarker = new Tmapv2.Marker({
           position: startLatLng,
+          icon: startIcon,
           map: map,
           title: "출발지",
         });
 
         var endMarker = new Tmapv2.Marker({
           position: endLatLng,
+          icon: endIcon,
           map: map,
           title: "도착지",
         });
