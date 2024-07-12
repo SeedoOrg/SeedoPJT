@@ -10,7 +10,7 @@ var currentRouteData = {
   destination: null,
   routeSearchStarted: false,
   currentWaypointIndex: 0,
-  features: []
+  features: [],
 };
 let markerLatLng, infoWindow;
 let startLocation, startMarker;
@@ -229,7 +229,7 @@ function displayRoute(directionsData) {
   });
 
   window.alert = ttsAlert;
-  
+
   // currentRouteData 초기화 확인
   if (currentRouteData.start && currentRouteData.destination) {
     updateRouteStorage(); // Polyline 업데이트 시 로컬 스토리지 업데이트
@@ -715,7 +715,7 @@ function getCurrentLocation2() {
       reject(new Error("Geolocation is not supported by this browser."));
     }
   });
-};
+}
 function updateRouteStorage() {
   // currentRouteData 초기화 확인
   if (!currentRouteData.start || !currentRouteData.destination) {
@@ -728,9 +728,9 @@ function updateRouteStorage() {
     endLocation: [currentRouteData.destination.lng, currentRouteData.destination.lat],
     routeSearchStarted: currentRouteData.routeSearchStarted,
     currentWaypointIndex: currentWaypointIndex,
-    features: currentRouteData.features
+    features: currentRouteData.features,
   };
-  localStorage.setItem('routeData', JSON.stringify(routeData));
+  localStorage.setItem("routeData", JSON.stringify(routeData));
 }
 function loadRouteFromLocalStorage() {
   var routeData = localStorage.getItem("routeData");
@@ -749,7 +749,7 @@ function loadRouteFromLocalStorage() {
         },
         routeSearchStarted: routeData.routeSearchStarted,
         currentWaypointIndex: routeData.currentWaypointIndex || 0,
-        features: routeData.features || []
+        features: routeData.features || [],
       };
 
       if (newRouteData.start.lat && newRouteData.start.lng && newRouteData.destination.lat && newRouteData.destination.lng) {

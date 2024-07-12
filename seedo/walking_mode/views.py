@@ -117,13 +117,13 @@ def make_caption(history):
         dist_str = [f", {dist}미터", ", 멀리"][dist == 20]
         dist_result = []
         for dir, dir_group in dist_group.groupby("dir"):
-            dir_str = f", {[dir,dir-12][dir>12]}시"
+            dir_str = f", {[dir, dir-12][dir > 12]}시"
             dir_result = []
             for cls, cls_group in dir_group.groupby("cls"):
                 cls_str = cls
                 cls_cnt = len(cls_group)
                 if cls_cnt > 1:
-                    cls_str += f" {cls_cnt}{['개','마리'][cls=='강아지']}"
+                    cls_str += f" {cls_cnt}{['개', '마리'][cls == '강아지']}"
                 dir_result.append(cls_str)
             dist_result.append(f"{dir_str} " + " ".join(dir_result))
         result.append(f"{dist_str} " + " ".join(dist_result))
