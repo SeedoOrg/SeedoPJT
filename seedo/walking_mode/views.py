@@ -5,7 +5,6 @@ import os
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from common.decorators import token_required
 
 import cv2
 import environ
@@ -115,7 +114,7 @@ def make_caption(history):
     history = history.sort_values(by=["dist", "dir"])
     result = []
     for dist, dist_group in history.groupby("dist"):
-        dist_str = [f", {dist}미터", ", 멀리"][dist == 25]
+        dist_str = [f", {dist}미터", ", 멀리"][dist == 20]
         dist_result = []
         for dir, dir_group in dist_group.groupby("dir"):
             dir_str = f", {[dir,dir-12][dir>12]}시"
@@ -143,7 +142,6 @@ class ImageUploadView(View):
     def post(self, request):
         od_classes = []
         seg_classes = []
-        tts_audio_base64 = None  # 초기화
         history = []
         pixel_per_meter = 120
 
@@ -174,11 +172,11 @@ class ImageUploadView(View):
 
     @classmethod
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter):
-        frame_per_audio = 6
+        frame_per_audio = 5
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
         _obstacles = [0, 1, 2, 3, 4, 5, 11, 12]
-
+        tts_audio = None
         tts_audio_base64 = None  # 초기화
         od_classes = []
         seg_classes = []
@@ -223,19 +221,15 @@ class ImageUploadView(View):
                         history.append({"dist": distance, "dir": x_loc, "cls": names_kr[int(cls)]})
 
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
+            print(ImageUploadView.frame_cnt)
             history = pd.DataFrame(history)
             tmp = history["dist"]
-            history["dist"] = np.where(
-                tmp > 25,
-                25,  # 멀리
-                np.where(
-                    tmp > 20, 20, np.where(tmp > 15, 15, np.where(tmp > 10, 10, np.where(tmp > 5, 5, tmp.astype(int))))  # 20m  # 15m  # 10m  # 5m
-                ),
-            )  # 가까우면 정수로 내림
+            history["dist"] = np.where(tmp > 20, 20, np.where(tmp > 15, 15, np.where(tmp > 10, 10, np.where(tmp > 5, 5, tmp.astype(int)))))
             msg = make_caption(history)
             tts_audio = naver_tts(msg)
-            if tts_audio:
-                tts_audio_base64 = base64.b64encode(tts_audio).decode("utf-8")
+        if tts_audio:
+            tts_audio_base64 = base64.b64encode(tts_audio).decode("utf-8")
+
         ImageUploadView.frame_cnt += 1
         annotated_image = annotator.result() if detected_obstacle else None
         return od_classes, seg_classes, tts_audio_base64, annotated_image
