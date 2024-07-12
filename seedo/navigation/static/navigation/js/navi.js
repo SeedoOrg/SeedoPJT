@@ -519,12 +519,11 @@ function saveRouteToLocalStorage(startLocation, endLocation) {
   var routeData = {
     startLocation: [startLocation.lng(), startLocation.lat()],
     endLocation: [endLocation.lng(), endLocation.lat()],
-    routeSearchStarted: true // 경로 탐색 상태 표시
+    routeSearchStarted: true, // 경로 탐색 상태 표시
   };
 
   localStorage.setItem("routeData", JSON.stringify(routeData));
 }
-
 
 function sendLocations(startLocation, endLocation) {
   routeSearchStarted = true; // 경로 탐색 시작
@@ -660,7 +659,7 @@ function getCurrentLocation2() {
       reject(new Error("Geolocation is not supported by this browser."));
     }
   });
-};
+}
 function loadRouteFromLocalStorage() {
   var routeData = localStorage.getItem("routeData");
   if (routeData) {
@@ -671,7 +670,7 @@ function loadRouteFromLocalStorage() {
       var newRouteData = {
         start: {
           lat: routeData.startLocation[1],
-          lng: routeData.startLocation[0]
+          lng: routeData.startLocation[0],
         },
         destination: {
           lat: routeData.endLocation[1],
@@ -680,9 +679,7 @@ function loadRouteFromLocalStorage() {
         routeSearchStarted: routeData.routeSearchStarted,
       };
 
-      if (newRouteData.start.lat && newRouteData.start.lng &&
-          newRouteData.destination.lat && newRouteData.destination.lng) {
-
+      if (newRouteData.start.lat && newRouteData.start.lng && newRouteData.destination.lat && newRouteData.destination.lng) {
         var startLatLng = new Tmapv2.LatLng(newRouteData.start.lat, newRouteData.start.lng);
         var endLatLng = new Tmapv2.LatLng(newRouteData.destination.lat, newRouteData.destination.lng);
 

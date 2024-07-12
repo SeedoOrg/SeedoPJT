@@ -18,17 +18,22 @@ async function sendSensorData(sensorData) {
 
     const result = await response.json();
     //console.log('Prediction:', result.prediction);
+    var alertSoundElement = document.getElementById("alert-sound");
 
     // Play sound if prediction changes from 0 to 1
     if (previousPrediction[0] === 0 && result.prediction[0] === 1) {
-      document.getElementById("alert-sound").play();
+      if (alertSoundElement) {
+        alertSoundElement.play();
+      }
       console.log("play");
     }
 
     // Stop sound or play a different sound if prediction changes from 1 to 0
     if (previousPrediction[0] === 0 && result.prediction[0] === 0) {
-      document.getElementById("alert-sound").pause();
-      document.getElementById("alert-sound").currentTime = 0; // Reset sound
+      if (alertSoundElement) {
+        alertSoundElement.pause();
+        alertSoundElement.currentTime = 0;
+      }
       // document.getElementById('stop-sound').play(); // Uncomment if you have a stop sound
     }
 
@@ -67,6 +72,14 @@ document.addEventListener("DOMContentLoaded", function () {
   let sensorDataBuffer = new CircularBuffer(29);
   const frameRate = 30; // frames per second
   let frameticks = 0;
+
+  var walking_mode = localStorage.getItem("walking_mode");
+  if (walking_mode === "true") {
+    startSensoring();
+    console.log("낙상감지를 시작합니다.", walking_mode);
+  } else {
+    console.log("낙상김지가 중지상태입니다.");
+  }
 
   function maybeSendSensorData() {
     if (sensorDataBuffer.getBuffer().length >= 29) {
@@ -176,7 +189,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function startSensoring() {
     sensoring = true;
-    document.getElementById("sensoring-status").textContent = "Sensoring...";
+    var sensoringStatusElement = document.getElementById("sensoring-status");
+
+    if (sensoringStatusElement) {
+      sensoringStatusElement.textContent = "Sensoring...";
+    }
 
     if (window.DeviceMotionEvent) {
       window.addEventListener("devicemotion", updateSensorData);
@@ -201,6 +218,13 @@ document.addEventListener("DOMContentLoaded", function () {
     window.removeEventListener("deviceorientation", updateSensorData);
   }
 
-  document.getElementById("start-sensor").addEventListener("click", startSensoring);
-  document.getElementById("stop-sensor").addEventListener("click", stopSensoring);
+  var startSensorButton = document.getElementById("start-sensor");
+  if (startSensorButton) {
+    startSensorButton.addEventListener("click", startSensoring);
+  }
+
+  var stopSensor = document.getElementById("stop-sensor");
+  if (stopSensor) {
+    stopSensor.addEventListener("click", stopSensoring);
+  }
 });
