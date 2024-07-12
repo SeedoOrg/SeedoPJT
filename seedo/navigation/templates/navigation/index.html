@@ -5,26 +5,33 @@
 <script defer src="{% static 'navigation/js/navi.js' %}"></script>
 {% endblock extra_head %} {% block content %}
 <main>
-  <div class="form-container">
-    <label for="startAddress">출발지:</label>
-    <div id="startAddress"></div>
-  </div>
+  <div class="infoContainer">
+    <div class="form-container">
+      <label for="startAddress">출발지</label>
+      <hr />
+      <div id="startAddress"></div>
+    </div>
 
-  <div class="form-container">
-    <label for="endAddress">도착지:</label>
-    <div id="endAddress"></div>
+    <div class="form-container">
+      <label for="endAddress">도착지</label>
+      <hr />
+      <div id="endAddress"></div>
+    </div>
+
+    <div class="naviBtn">
+      <button class="btnInNavi" onclick="findRoute()">경로 찾기</button>
+      <button class="btnInNavi" onclick="stopnavi()">안내 종료</button>
+    </div>
   </div>
-  <button onclick="findRoute()">경로 찾기</button>
-  <button onclick="stopnavi()">안내 종료</button>
 
   <!-- 출발지 목적지 검색 시 맵 좌측에 뜨게 or media 적용해서 상단에 뜨도록 하기 -->
   <div class="startPoint">
-    <input type="text" class="text_custom" id="startKey" name="startKey" value="" />
+    <input type="text" class="text_custom" id="startKey" name="startKey" placeholder="출발지를 입력해주세요" />
     <button id="startBtn">출발지 검색</button>
   </div>
 
   <div class="endPoint">
-    <input type="text" class="text_custom" id="endKey" name="endKey" value="" />
+    <input type="text" class="text_custom" id="endKey" name="endKey" placeholder="목적지를 입력해주세요" />
     <button id="endBtn">목적지 검색</button>
   </div>
 
