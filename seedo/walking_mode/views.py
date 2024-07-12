@@ -113,17 +113,29 @@ def get_y_loc(y_center, frame_height, threshold=4):
 def make_caption(history):
     history = history.sort_values(by=["dist", "dir"])
     result = []
+
+    # 같은 cls, 같은 dir, dist <= 5인 경우 최솟값을 사용하여 그룹화
+    filtered_history = history[history["dist"] <= 5]
+    grouped = filtered_history.groupby(["cls", "dir"]).agg({"dist": "min", "cls": "size"}).rename(columns={"cls": "count"}).reset_index()
+
+    # 기존 history에서 5m 이하인 것을 제거하고 나머지를 추가
+    remaining_history = history[history["dist"] > 5]
+    history = pd.concat([grouped, remaining_history], ignore_index=True).sort_values(by=["dist", "dir"])
+
     for dist, dist_group in history.groupby("dist"):
         dist_str = [f", {dist}미터", ", 멀리"][dist == 20]
         dist_result = []
         for dir, dir_group in dist_group.groupby("dir"):
-            dir_str = f", {[dir,dir-12][dir>12]}시"
+            dir_str = f", {[dir, dir-12][dir > 12]}시"
             dir_result = []
             for cls, cls_group in dir_group.groupby("cls"):
-                cls_str = cls
-                cls_cnt = len(cls_group)
-                if cls_cnt > 1:
-                    cls_str += f" {cls_cnt}{['개','마리'][cls=='강아지']}"
+                if "count" in cls_group.columns:
+                    cls_str = cls
+                    cls_cnt = int(cls_group["count"].iloc[0])  # count 값을 정수로 변환
+                    if cls_cnt > 1:
+                        cls_str += f" {cls_cnt}개"
+                else:
+                    cls_str = cls
                 dir_result.append(cls_str)
             dist_result.append(f"{dir_str} " + " ".join(dir_result))
         result.append(f"{dist_str} " + " ".join(dist_result))
