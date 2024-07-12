@@ -27,6 +27,7 @@ main a {
   width: 300px;
   background-color: #a0ce8a;
 }
+main .walk.active,
 main .navi.active {
   background-color: #337614;
 }
