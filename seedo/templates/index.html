@@ -5,16 +5,16 @@
 <script defer src="{% static 'navigation/js/navi.js' %}"></script>
 {% endblock extra_head %} {% block content %}
 <main>
-  <div id="map" style="height: 400px;"></div>
-  <a class="walk", href="/walking_mode/">보행모드</a>
+  <div id="map" style="height: 400px"></div>
+  <a class="walk" , href="/walking_mode/">보행모드</a>
   <a class="navi" href="/nav/">길안내</a>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      var routeData = localStorage.getItem('routeData');
+      var routeData = localStorage.getItem("routeData");
       if (routeData) {
-        var walkLink = document.querySelector('.navi');
+        var walkLink = document.querySelector(".navi");
         if (walkLink) {
-          walkLink.classList.add('active'); 
+          walkLink.classList.add("active");
         }
       }
     });

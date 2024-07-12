@@ -1,6 +1,7 @@
 from common.decorators import token_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render
 from matching.models import UserRequest
 
@@ -18,7 +19,7 @@ def broken_view(request, request_id):
 
     partner_list = [{"user": user}]
     for user_request in user_requests:
-        partner_info = {"user": user_request.recipient if user_request.requester == user else user_request.requester}
+        partner_info = {"user": (user_request.recipient if user_request.requester == user else user_request.requester)}
         partner_list.append(partner_info)
 
     # 조회하는 사용자의 파손 기록 조회
@@ -47,7 +48,7 @@ def accident_view(request, request_id):
 
     partner_list = [{"user": user}]
     for user_request in user_requests:
-        partner_info = {"user": user_request.recipient if user_request.requester == user else user_request.requester}
+        partner_info = {"user": (user_request.recipient if user_request.requester == user else user_request.requester)}
         partner_list.append(partner_info)
 
     # 조회하는 사용자의 사고 기록 조회
@@ -66,3 +67,20 @@ def accident_view(request, request_id):
 
     context = {"selected_user": selected_user, "partner_list": partner_list, "accident_list": accident_list}
     return render(request, "record/accident.html", context)
+
+
+@token_required
+def save_accident_view(request):
+    if request.method == "POST":
+
+        user_id = request.user.id
+        accident_location = request.POST["accident_location"]
+        video_file = request.FILES["video_file"]
+
+        user = User.objects.get(id=user_id)
+
+        accident = Accident.objects.create(user=user, accident_video=video_file, accident_location=accident_location)
+
+        return JsonResponse({"status": "success", "accident_id": accident.id})
+
+    return JsonResponse({"status": "error"}, status=400)
