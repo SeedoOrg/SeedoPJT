@@ -3,11 +3,19 @@
   <head>
     <title>Home</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    {% load static %}
+    <script src="{% static 'sensor/js/sensor.js' %}"></script>
     <script>
-      const MAX_CONCURRENT_REQUESTS = 3; // 동시에 처리될 수 있는 최대 요청 수
-      let activeRequests = 0; // 현재 처리 중인 요청 수
-      let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐
-      let isPlaying = false; // 현재 오디오가 재생 중인지 여부
+      const MAX_CONCURRENT_REQUESTS = 1; // 동시에 처리될 수 있는 최대 요청 수.,,,
+      let activeRequests = 0; // 현재 처리 중인 요청 수``
+      let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐,
+      let isPlaying = false; // 현재 오디오가 재생 중인지 여부,
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
 
       async function sendCameraImage(imageData) {
         try {
@@ -24,8 +32,9 @@
           console.log(result);
 
           // 탐지된 객체 정보를 HTML에 표시
-          document.getElementById("object_detection").textContent =
-            `Detection: ${result.od_classes.join(", ")} (Segmentation: ${result.seg_classes.join(", ")})`;
+          document.getElementById("object_detection").textContent = `Detection: ${result.od_classes.join(
+            ", ",
+          )} (Segmentation: ${result.seg_classes.join(", ")})`;
 
           // 이미지 표시
           const imgElement = document.getElementById("annotated-image");
@@ -78,9 +87,17 @@
         const frameRate = 1; // frames per second
         let video = document.getElementById("video");
         let canvas = document.getElementById("canvas");
+        let mediaRecorder;
+        let recordedChunks = [];
+        const streamFrameRate = 30;
+        const maxChunks = 2; // Assuming a frameRate of 1 chunk per second for 1 minute
+        let lastSaveTime = 0;
+        const saveInterval = 1000 * 60; // milliseconds
+        var csrftoken = getCookie("csrftoken");
 
         async function maybeSendCameraImage() {
           if (recording && activeRequests < MAX_CONCURRENT_REQUESTS) {
+            console.log(activeRequests);
             activeRequests++; // 새로운 요청을 시작하기 전에 activeRequests를 증가
             const imageData = captureImage(video, canvas);
             sendCameraImage(imageData);
@@ -89,18 +106,54 @@
 
         function startRecording() {
           recording = true;
+          recordedChunks = [];
           document.getElementById("recording-status").textContent = "Recording...";
 
           navigator.mediaDevices
-            .getUserMedia({ video: { facingMode: "environment" } })
+            .getUserMedia({
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+              video: { facingMode: "environment" },
+              frameRate: { ideal: streamFrameRate, max: streamFrameRate },
+            })
             .then(function (stream) {
               video.srcObject = stream;
               video.play();
+
+              // Set up MediaRecorder
+              mediaRecorder = new MediaRecorder(stream);
+              mediaRecorder.ondataavailable = function (event) {
+                return new Promise((resolve, reject) => {
+                  if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                    // Remove older chunks if exceeding the maxChunks limit
+                    if (recordedChunks.length > maxChunks) {
+                      recordedChunks.splice(0, recordedChunks.length - maxChunks);
+                    }
+                  }
+                  resolve();
+                })
+                  .then(() => {
+                    // Start recording again
+                    if (recording) {
+                      mediaRecorder.start();
+                      console.log("Recording constraint and Recording restarted");
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Error during ondataavailable processing:", error);
+                  });
+              };
+              mediaRecorder.start();
             })
             .catch(function (error) {
               console.error("Error accessing camera:", error);
             });
+
           setInterval(maybeSendCameraImage, 1000 / frameRate);
+          setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
+          setInterval(observePredictionChange, 1000 / streamFrameRate);
+          setInterval(handlePrediction, 1000 * 60);
         }
 
         function stopRecording() {
@@ -108,6 +161,106 @@
           document.getElementById("recording-status").textContent = "Recording stopped.";
           video.pause();
           video.srcObject.getTracks().forEach((track) => track.stop());
+          mediaRecorder.stop();
+        }
+
+        function handlePrediction() {
+          const fallRecognitionElement = document.getElementById("fall_recognition");
+          if (fallRecognitionElement) {
+            fallRecognitionElement.textContent = `Prediction: 1`;
+          }
+        }
+
+        function observePredictionChange() {
+          const targetNode = document.getElementById("fall_recognition");
+          const config = {
+            characterData: true,
+            childList: true,
+            subtree: true,
+          };
+
+          const callback = function (mutationsList) {
+            for (let mutation of mutationsList) {
+              if (mutation.type === "childList" || mutation.type === "characterData") {
+                const currentText = targetNode.textContent;
+
+                if (currentText === "Prediction: 1") {
+                  const currentTime = Date.now();
+                  if (currentTime - lastSaveTime >= saveInterval) {
+                    lastSaveTime = currentTime;
+                    new Promise((resolve, reject) => {
+                      try {
+                        constraintRecordedChunks();
+                        setTimeout(() => {
+                          resolve();
+                        }, 50);
+                      } catch (error) {
+                        reject(error);
+                      }
+                    })
+                      .then(() => {
+                        return saveRecordedChunks();
+                      })
+                      .catch((error) => {
+                        console.error("Error during constraint or save:", error);
+                      });
+                  }
+                }
+              }
+            }
+          };
+
+          const observer = new MutationObserver(callback);
+          observer.observe(targetNode, config);
+        }
+
+        function constraintRecordedChunks() {
+          if (mediaRecorder.state !== "inactive") {
+            mediaRecorder.stop();
+          }
+        }
+
+        async function saveRecordedChunks() {
+          if (!recording) {
+            return;
+          }
+          if (recordedChunks.length > 0) {
+            const recordedBlob = new Blob(recordedChunks, {
+              type: "video/mp4",
+            });
+            const videoFile = new File([recordedBlob], "video.mp4", {
+              type: "video/mp4",
+            });
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append("accident_location", "currentPosition"); // Replace with actual location data
+            formData.append("video_file", videoFile);
+
+            for (let [key, value] of formData.entries()) {
+              console.log(key, value);
+            }
+
+            try {
+              const response = await fetch("../record/accident/save_accident/", {
+                method: "POST",
+                body: formData,
+                headers: {
+                  "X-CSRFToken": csrftoken,
+                },
+              });
+
+              const data = await response.json();
+
+              if (data.status === "success") {
+                console.log("Recorded chunk saved successfully");
+              } else {
+                console.error("Error saving recorded chunk");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+            }
+          }
         }
 
         document.getElementById("start-camera").addEventListener("click", startRecording);
@@ -119,7 +272,13 @@
     <h1>Object Detection</h1>
     <p id="object_detection">Detection: Loading...</p>
     <p id="recording-status">Recording status: Not recording</p>
-
+    <p id="sensoring-status">Secording status: Not sensoring</p>
+    <p id="location">Location: Loading...</p>
+    <p id="accelerometer">Accelerometer: Loading...</p>
+    <p id="gyroscope">Gyroscope: Loading...</p>
+    <p id="fall_recognition">fall_recognition: Loading...</p>
+    <button id="start-sensor">Start sensor</button>
+    <button id="stop-sensor">Stop sensor</button>
     <button id="start-camera">Start Camera</button>
     <button id="stop-camera">Stop Camera</button>
 
@@ -132,5 +291,6 @@
 
     <h2>Audio Description</h2>
     <div id="audio-container"></div>
+    <audio id="alert-sound" src="media/audios/alert_sound.mp3"></audio>
   </body>
 </html>

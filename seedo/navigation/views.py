@@ -1,17 +1,16 @@
 import json
+import urllib.parse
+import urllib.request
+from pathlib import Path
 
+import environ
 import requests
 from common.decorators import token_required
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-import urllib.parse
-import urllib.request
-from django.http import HttpResponse
-import environ
-from .models import Navigation
-from pathlib import Path
 
+from .models import Navigation
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,6 +24,7 @@ environ.Env.read_env(env_file=env_path)
 
 CLIENT_ID = env("NAVER_TTS_CLIENT_ID")
 SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
+
 
 @token_required
 def index(request):
@@ -75,13 +75,14 @@ def get_walking_directions(request):
     else:
         return render(request, "navigation/index.html")
 
+
 @token_required
 def naver_tts(request):
-    print('success')
-    if request.method == 'POST':
+    print("success")
+    if request.method == "POST":
         try:
             data = json.loads(request.body)
-            text = data.get('text', '')
+            text = data.get("text", "")
             encText = urllib.parse.quote(text)
             data = f"speaker=nara&volume=0&speed=0&pitch=0&format=mp3&text={encText}"
             url = "https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts"
@@ -95,8 +96,8 @@ def naver_tts(request):
 
             if rescode == 200:
                 response_body = response.read()
-                response = HttpResponse(response_body, content_type='audio/mp3')
-                response['Content-Disposition'] = 'attachment; filename="tts.mp3"'
+                response = HttpResponse(response_body, content_type="audio/mp3")
+                response["Content-Disposition"] = 'attachment; filename="tts.mp3"'
                 return response
             else:
                 return HttpResponse(f"Error Code: {rescode}", status=rescode)

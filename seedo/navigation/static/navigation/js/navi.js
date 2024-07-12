@@ -43,11 +43,10 @@ async function ttsAlert(text) {
 }
 
 // 기존 alert 함수를 불러올때 ttsAlert 함수 호출
-window.alert = function(text) {
+window.alert = function (text) {
   ttsAlert(text); // TTS 변환 함수 호출
   window.alert = ttsAlert; // alert 함수를 다시 TTS 함수로 설정하여 중복 호출 방지
 };
-
 
 function initMap() {
   map = new Tmapv2.Map("map", {
@@ -103,7 +102,6 @@ function initMap() {
   });
 }
 
-
 function successCallback(position) {
   var lat = position.coords.latitude;
   var lng = position.coords.longitude;
@@ -129,10 +127,9 @@ function successCallback(position) {
 
   map.panTo(currentLocation); // 지도를 현재 위치로 이동
 }
-function stopnavi(){
+function stopnavi() {
   localStorage.removeItem("routeData");
   window.location.reload();
-  
 }
 function displayRoute(directionsData) {
   if (polyline) {
@@ -212,6 +209,7 @@ async function checkRoute(currentLocation) {
     var distanceToWaypoint = getDistance(currentLocation, nextWaypoint);
 
     if (distanceToWaypoint < 50) {
+      updateRouteInfo();
       currentWaypointIndex++;
     }
   } else {
@@ -238,7 +236,7 @@ async function checkRoute(currentLocation) {
   }
 }
 function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 function getDistanceToPolyline(point, pathCoordinates) {
   var minDistance = Infinity;
@@ -517,16 +515,16 @@ function findRoute() {
   }, 10000); // 매 10초마다 경로 체크
 }
 
-function saveRouteToLocalStorage(startLocation, endLocation, currentWaypointIndex) {
+function saveRouteToLocalStorage(startLocation, endLocation) {
   var routeData = {
     startLocation: [startLocation.lng(), startLocation.lat()],
     endLocation: [endLocation.lng(), endLocation.lat()],
-    routeSearchStarted: true, // 경로 탐색 상태 표시
-    currentWaypointIndex: currentWaypointIndex // 최근 도달한 인덱스 저장
+    routeSearchStarted: true // 경로 탐색 상태 표시
   };
 
-  localStorage.setItem('routeData', JSON.stringify(routeData));
+  localStorage.setItem("routeData", JSON.stringify(routeData));
 }
+
 
 function sendLocations(startLocation, endLocation) {
   routeSearchStarted = true; // 경로 탐색 시작
@@ -643,29 +641,28 @@ function getCurrentLocation2() {
   return new Promise((resolve, reject) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        position => {
+        (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           const currentLatLng = new Tmapv2.LatLng(lat, lng);
           resolve(currentLatLng);
         },
-        error => {
+        (error) => {
           reject(error);
         },
         {
           enableHighAccuracy: true,
           maximumAge: 0,
           timeout: 5000,
-        }
+        },
       );
     } else {
       reject(new Error("Geolocation is not supported by this browser."));
     }
   });
-}
-
+};
 function loadRouteFromLocalStorage() {
-  var routeData = localStorage.getItem('routeData');
+  var routeData = localStorage.getItem("routeData");
   if (routeData) {
     try {
       routeData = JSON.parse(routeData);
@@ -673,45 +670,51 @@ function loadRouteFromLocalStorage() {
       // 기존 구조를 새 구조로 매핑
       var newRouteData = {
         start: {
-          lat: routeData.intermediateWaypoint[1],
-          lng: routeData.intermediateWaypoint[0]
+          lat: routeData.startLocation[1],
+          lng: routeData.startLocation[0]
         },
         destination: {
           lat: routeData.endLocation[1],
-          lng: routeData.endLocation[0]
+          lng: routeData.endLocation[0],
         },
-        routeSearchStarted: routeData.routeSearchStarted
+        routeSearchStarted: routeData.routeSearchStarted,
       };
 
       if (newRouteData.start.lat && newRouteData.start.lng &&
           newRouteData.destination.lat && newRouteData.destination.lng) {
-        var startLatLng = new Tmapv2.LatLng(routeData.startLocation[1],routeData.startLocation[0]);
-        var currentLatLng = new Tmapv2.LatLng(newRouteData.start.lat, newRouteData.start.lng);
+
+        var startLatLng = new Tmapv2.LatLng(newRouteData.start.lat, newRouteData.start.lng);
         var endLatLng = new Tmapv2.LatLng(newRouteData.destination.lat, newRouteData.destination.lng);
 
         // 출발지와 도착지 마커 표시
         var startMarker = new Tmapv2.Marker({
           position: startLatLng,
           map: map,
-          title: "출발지"
+          title: "출발지",
         });
 
         var endMarker = new Tmapv2.Marker({
           position: endLatLng,
           map: map,
-          title: "도착지"
+          title: "도착지",
         });
         console.log("Start and end markers added to the map.");
 
         // 경로 안내 시작
         sendLocations(startLatLng, endLatLng);
 
+        // 현재 위치 업데이트 (5초마다)
         setInterval(function () {
           getCurrentLocation();
           console.log("현재 위치 업데이트");
-          checkRoute(currentLatLng);
-          console.log(currentLatLng);
         }, 5000);
+
+        // 경로 체크 (10초마다)
+        setInterval(function () {
+          console.log("---------------");
+          console.log(currentMarker);
+          checkRoute(currentMarker.getPosition());
+        }, 10000);
       } else {
         console.error("Invalid route data structure:", newRouteData);
       }
@@ -724,8 +727,8 @@ function loadRouteFromLocalStorage() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  initMap(); 
-  var routeData = localStorage.getItem('routeData');
+  initMap();
+  var routeData = localStorage.getItem("routeData");
   if (routeData) {
     loadRouteFromLocalStorage();
   } else {
