@@ -55,9 +55,7 @@ SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
 
 
 # 한글 폰트
-font_dir = "/usr/share/fonts/truetype/nanum/"
-os.listdir(font_dir)
-font_file = font_dir + "NanumGothic.ttf"
+font_file = os.path.join(BASE_DIR, "walking_mode/static/walking_mode/fonts/NanumGothic.ttf")
 FONT = ImageFont.truetype(font_file)
 
 
@@ -72,9 +70,6 @@ def visioneye_pil(self, box, center_point, color=(235, 219, 11), pin_color=(255,
     self.draw.ellipse((center_point[0] - self.tf, center_point[1] - self.tf, center_point[0] + self.tf, center_point[1] + self.tf), fill=pin_color)
     self.draw.ellipse((center_bbox[0] - self.tf, center_bbox[1] - self.tf, center_bbox[0] + self.tf, center_bbox[1] + self.tf), fill=color)
     self.draw.line([center_point, center_bbox], fill=color, width=self.tf)
-
-
-Annotator.visioneye_pil = visioneye_pil
 
 
 # tts api
@@ -166,6 +161,7 @@ class ImageUploadView(View):
     frame_cnt = 0
     model_od = YOLO(yolo_od_pt)
     model_seg = YOLO(yolo_seg_pt)
+    Annotator.visioneye_pil = visioneye_pil
 
     def get(self, request):
         return render(request, self.template_name)
