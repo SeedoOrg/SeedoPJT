@@ -11,6 +11,12 @@
       let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐,
       let isPlaying = false; // 현재 오디오가 재생 중인지 여부,
 
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
+
       async function sendCameraImage(imageData) {
         try {
           const response = await fetch('{% url "walking_mode:test" %}', {
