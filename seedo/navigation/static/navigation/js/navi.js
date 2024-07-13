@@ -112,6 +112,7 @@ function successCallback(position) {
   var lat = position.coords.latitude;
   var lng = position.coords.longitude;
   currentLocation = new Tmapv2.LatLng(lat, lng);
+  markerLatLng = currentLocation;
 
   // 현재 위치 마커 초기화 또는 위치 업데이트
   if (!currentMarker) {
@@ -132,6 +133,40 @@ function successCallback(position) {
   }
 
   map.panTo(currentLocation); // 지도를 현재 위치로 이동
+
+  currentMarker.addListener("click", function () {
+    if (!routeSearchStarted) {
+      var content = `<div style='width: 120px'>
+                       <div onclick='addMarker("start")'>출발지 설정</div>
+                       <div onclick='addMarker("end")'>목적지 설정</div>
+                     </div>`;
+      //Popup 객체 생성.
+      infoWindow = new Tmapv2.InfoWindow({
+        position: currentLocation, //Popup 이 표출될 맵 좌표
+        content: content, //Popup 표시될 text
+        type: 2, //Popup의 type 설정.
+        border: 4,
+        map: map, //Popup이 표시될 맵 객체
+      });
+    }
+  });
+
+  currentMarker.addListener("touchstart", function () {
+    if (!routeSearchStarted) {
+      var content = `<div style='width: 120px'>
+                       <div ontouchstart='addMarker("start")'>출발지 설정</div>
+                       <div ontouchstart='addMarker("end")'>목적지 설정</div>
+                     </div>`;
+      //Popup 객체 생성.
+      infoWindow = new Tmapv2.InfoWindow({
+        position: currentLocation, //Popup 이 표출될 맵 좌표
+        content: content, //Popup 표시될 text
+        type: 2, //Popup의 type 설정.
+        border: 4,
+        map: map, //Popup이 표시될 맵 객체
+      });
+    }
+  });
 }
 function stopnavi() {
   localStorage.removeItem("routeData");
@@ -313,6 +348,7 @@ function addMarker(type) {
     startLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
     startMarker = new Tmapv2.Marker({
       position: startLocation,
+      icon: startIcon,
       map: map,
       title: "출발지",
     });
@@ -320,6 +356,7 @@ function addMarker(type) {
     endLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
     endMarker = new Tmapv2.Marker({
       position: endLocation,
+      icon: endIcon,
       map: map,
       title: "목적지",
     });
@@ -381,7 +418,7 @@ function reverseGeo(lat, lng, callback) {
 
       var address = "새주소 : " + newRoadAddr + "<br/>";
       address += "지번주소 : " + jibunAddr + "<br/>";
-      address += "위경도좌표 : " + lat + ", " + lng;
+      // address += "위경도좌표 : " + lat + ", " + lng;
 
       callback(address);
     },
@@ -477,6 +514,7 @@ function setStart(lat, lon) {
   startLocation = new Tmapv2.LatLng(lat, lon);
   startMarker = new Tmapv2.Marker({
     position: startLocation,
+    icon: startIcon,
     map: map,
     title: "출발지",
   });
@@ -493,6 +531,7 @@ function setEnd(lat, lon) {
   endLocation = new Tmapv2.LatLng(lat, lon);
   endMarker = new Tmapv2.Marker({
     position: endLocation,
+    icon: endIcon,
     map: map,
     title: "목적지",
   });
@@ -536,12 +575,12 @@ function saveRouteToLocalStorage(startLocation, endLocation) {
   var routeData = {
     startLocation: [startLocation.lng(), startLocation.lat()],
     endLocation: [endLocation.lng(), endLocation.lat()],
-    routeSearchStarted: true // 경로 탐색 상태 표시
+    routeSearchStarted: true, // 경로 탐색 상태 표시
+    currentWaypointIndex: currentWaypointIndex, // 최근 도달한 인덱스 저장
   };
 
   localStorage.setItem("routeData", JSON.stringify(routeData));
 }
-
 
 function sendLocations(startLocation, endLocation) {
   routeSearchStarted = true;
@@ -692,7 +731,7 @@ function loadRouteFromLocalStorage() {
       var newRouteData = {
         start: {
           lat: routeData.startLocation[1],
-          lng: routeData.startLocation[0]
+          lng: routeData.startLocation[0],
         },
         destination: {
           lat: routeData.endLocation[1],
@@ -703,20 +742,20 @@ function loadRouteFromLocalStorage() {
         features: routeData.features || []
       };
 
-      if (newRouteData.start.lat && newRouteData.start.lng &&
-          newRouteData.destination.lat && newRouteData.destination.lng) {
-
+      if (newRouteData.start.lat && newRouteData.start.lng && newRouteData.destination.lat && newRouteData.destination.lng) {
         var startLatLng = new Tmapv2.LatLng(newRouteData.start.lat, newRouteData.start.lng);
         var endLatLng = new Tmapv2.LatLng(newRouteData.destination.lat, newRouteData.destination.lng);
 
         startMarker = new Tmapv2.Marker({
           position: startLatLng,
+          icon: startIcon,
           map: map,
           title: "출발지",
         });
 
         endMarker = new Tmapv2.Marker({
           position: endLatLng,
+          icon: endIcon,
           map: map,
           title: "도착지",
         });
