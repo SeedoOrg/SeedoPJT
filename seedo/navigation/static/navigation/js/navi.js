@@ -234,9 +234,11 @@ function displayRoute(directionsData) {
   if (currentRouteData.start && currentRouteData.destination) {
     updateRouteStorage(); // Polyline 업데이트 시 로컬 스토리지 업데이트
   } else {
-    console.error("currentRouteData가 올바르게 초기화되지 않았습니다.");
+    console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
+    console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
   }
 }
+
 
 async function checkRoute(currentLocation) {
   if (!currentMarker) {
@@ -628,19 +630,7 @@ function updateCurrentLocationMarker(location) {
   }
   // 지도를 현재 위치로 이동
   map.panTo(location);
-}
-
-// function updateRouteInfo(features) {
-//   var routeInfoContainer = document.getElementById("route-info");
-//   routeInfoContainer.innerHTML = "";
-
-//   var nextDescription = features[currentWaypointIndex].properties.description;
-//   console.log(nextDescription);
-//   var info = document.createElement("div");
-//   info.classList.add("route-info-item");
-//   info.innerHTML = `<p>다음 안내: ${nextDescription}</p>`;
-//   routeInfoContainer.appendChild(info);
-// }
+};
 
 // gpt한테 물어봄 해버시늄??처음들어봄
 function getDistance(location1, location2) {
@@ -719,7 +709,8 @@ function getCurrentLocation2() {
 function updateRouteStorage() {
   // currentRouteData 초기화 확인
   if (!currentRouteData.start || !currentRouteData.destination) {
-    console.error("currentRouteData가 올바르게 초기화되지 않았습니다.");
+    console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
+    console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
     return;
   }
 
