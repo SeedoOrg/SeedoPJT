@@ -4,7 +4,10 @@
 <div class="layout">
   <div class="content-wrapper">
     <h2>회원가입</h2>
-    <form method="post">
+    <div class="overlay">
+      <div class="spinner"></div>
+  </div>
+    <form id="signup_form" method="post">
       {% csrf_token %}
       <div class="form-wrapper">
         <div class="form-group {% if form.email.errors %}error{% endif %}">
@@ -45,6 +48,7 @@
           {% endfor %}
         </div>
       </div>
+      
       <div class="button-wrapper">
         <button type="submit" class="button-link">완료</button>
       </div>
@@ -54,4 +58,10 @@
     </form>
   </div>
 </div>
+<script>
+  document.getElementById('signup_form').addEventListener('submit', function() {
+      document.querySelector('.overlay').style.display = 'block';
+      document.querySelector('.spinner').style.display = 'block';
+  });
+</script>
 {% endblock %}

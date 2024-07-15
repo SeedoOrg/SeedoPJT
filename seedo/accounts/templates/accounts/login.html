@@ -4,7 +4,10 @@
 <div class="layout">
   <div class="content-wrapper">
     <h2>로그인</h2>
-    <form method="post">
+    <div class="overlay">
+      <div class="spinner"></div>
+    </div>
+    <form id ="login_form"method="post">
       {% csrf_token %}
       <div class="form-wrapper">
         <div class="form-group {% if form.username.errors %}error{% endif %}">
@@ -33,4 +36,10 @@
     </form>
   </div>
 </div>
+<script>
+  document.getElementById('login_form').addEventListener('submit', function() {
+      document.querySelector('.overlay').style.display = 'block';
+      document.querySelector('.spinner').style.display = 'block';
+  });
+</script>
 {% endblock %}
