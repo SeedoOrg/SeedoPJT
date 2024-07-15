@@ -16,9 +16,6 @@
     <video id="video" width="640" height="480" style="display: none"></video>
     <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
   </div>
-
-  <a class="walk" , href="/walking_mode/">보행모드</a>
-  <a class="navi" href="/nav/">길안내</a>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       var routeData = localStorage.getItem("routeData");
@@ -38,8 +35,21 @@
       }
     });
   </script>
-  <a href="/record/break/{{user.id}}">시설 파손 기록</a>
-  <a href="/record/accident/{{user.id}}">사고 기록 확인</a>
-  <a href="/qna/">문의 게시판</a>
+
+  <div class="wrapper_a">
+    <a class="walk" , href="/walking_mode/">보행 모드</a>
+  </div>
+  <div class="wrapper_a">
+    <a class="navi" href="/nav/">길 안내</a>
+  </div>
+  <div class="wrapper_a">
+    <a href="/record/break/{{user.id}}">시설 파손</a>
+  </div>
+  <div class="wrapper_a">
+    <a href="/record/accident/{{user.id}}">사고 확인</a>
+  </div>
+  <div class="wrapper_a">
+    <a href="/qna/">문의 게시판</a>
+  </div>
 </main>
 {% endblock content %}

@@ -2,39 +2,58 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 100vh;
+  min-height: calc(100vh - 56px); /* Ensure it takes at least full viewport height */
+  margin-top: 56px;
   align-items: center;
   flex-direction: column; /* Arrange buttons vertically */
   gap: 34px; /* Gap between buttons */
-  padding: 70px 0px 10px;
+  padding: 30px;
 }
 
 main a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
-  font-size: 40px;
-  color: #ffffff;
-  text-shadow:
-    -1px 0px #000000,
-    0px 1px #000000,
-    1px 0px #000000,
-    0px -1px #000000,
-    2px 2px 5px #00000080;
-  border-radius: 4px;
+  font-size: 36px;
+  color: #193b08;
+  /* text-shadow: -1px 0px #000000, 0px 1px #000000, 1px 0px #000000,
+    0px -1px #000000, 2px 2px 5px #00000080; */
+  border-radius: 13px;
   text-align: center;
   font-weight: 700;
-
-  padding: 20px 0;
-  width: 300px;
+  height: 20%;
+  min-height: 90px;
+  max-height: 120px;
+  width: 200px;
   background-color: #a0ce8a;
+  transition: width 0.5s ease;
 }
+
+main a:hover {
+  width: 292px; /* New width on hover */
+}
+
 main .walk.active,
 main .navi.active {
   background-color: #337614;
+  color: #f8f9fa;
 }
 main .walk,
 main .navi {
-  background-color: #e01b41;
+  background-color: rgb(237, 202, 28);
 }
 #map {
   display: none;
+}
+
+.wrapper_a {
+  height: 100%;
+  display: flex;
+  justify-content: right;
+  border-radius: 16px;
+  width: 292px;
+  background-color: #f8f9fa;
+  /* border: 3px solid #337614; */
+  box-shadow: 1px 1px 3px 0px rgba(89, 93, 88, 0.5); /* Recommended box shadow */
 }
