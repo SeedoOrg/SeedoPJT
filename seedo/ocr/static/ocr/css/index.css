@@ -1,31 +1,75 @@
-main {
-    margin-top: 58px;
-    width: 100%;
-    position: static;
+@keyframes shimmer {
+    0% {
+        text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 40px #00ff00, 0 0 80px #00ff00, 0 0 90px #00ff00, 0 0 100px #00ff00, 0 0 150px #00ff00;
+        color: rgb(0, 100, 0);
+    }
+    50% {
+        text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #00dd00, 0 0 40px #00dd00, 0 0 50px #00dd00, 0 0 60px #00dd00, 0 0 70px #00dd00, 0 0 80px #00dd00;
+        color: rgb(244, 252, 244);
+    }
+    100% {
+        text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 40px #00ff00, 0 0 80px #00ff00, 0 0 90px #00ff00, 0 0 100px #00ff00, 0 0 150px #00ff00;
+        color: rgb(0, 100, 0);
+    }
 }
 
-.text {
+@keyframes marquee {
+    0% {
+        transform: translateX(1%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+main {
+    margin-top: 60px;
+    width: 100%;
+    height: 80vh;
+    position: relative;
+    flex-direction: column;
+    justify-content: center; /* 수평 가운데 정렬 */
+    align-items: center;
+}
+
+
+#text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 97%;
+    height: 70vh;
     max-width: 480px;
     margin: 0 auto;
 }
 
 #touch-start {
     text-align: center;
+    font-size: 35px;
+    animation: shimmer 3s infinite;
+    text-align: center;
+    margin-top: 20%;
 }
-.camera_view {
+#camera_view {
+    display:none;
+    justify-content: center;
+    align-items: center;
     width: 97%;
     max-width: 480px;
     aspect-ratio: 3 / 4;
     margin: 0 auto;
-    background-color: lightgray;
+    border-radius: 12px;
 }
 
 #video {
+    opacity: 0;
+    transition: opacity 10s;
     width: 100%;
     max-width: 480px;
     aspect-ratio: 3 / 4;
     margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 #canvas {
@@ -39,22 +83,59 @@ main {
     display:none;
     width: 100%;
     max-width: 480px;
+    height:auto;
     margin: auto 0;
     vertical-align:middle;
+    border-radius: 12px;
 }
 
-.button {
+#result {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+    height: 50px; /* 원하는 높이로 설정 */
+}
+
+#result p {
+    display: inline-block;
+    padding-left: 100%;
+    font-size: 32px;
+    cursor: inherit; /* 부모 요소의 커서 스타일을 상속 */
+}
+
+
+
+#button {
     width: 97%;
     max-width: 480px;
     margin: 0 auto;
-    margin-top: 5px;
-    font-size: x-large;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #capture-button {
     width: 100%;
     max-width: 480px;
-    aspect-ratio: 3 / 0.8;
+    aspect-ratio: 3 / 0.7;
     margin: 0 auto;
-    background-color: green;
+    background-color: rgb(0, 179, 0);
+    border-radius: 10px;
+    font-size: 40px;
+}
+
+
+.fade {
+    opacity: 0;
+    transition: opacity 6s;
+    display: none; /* Initially hidden */
+}
+
+.fadeVisible {
+    display: block; /* Ensure element is displayed */
+    opacity: 1; /* Fully opaque */
+    transition: opacity 4s
 }
