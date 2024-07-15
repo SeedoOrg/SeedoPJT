@@ -237,9 +237,8 @@ function displayRoute(directionsData) {
     updateRouteStorage(); // Polyline 업데이트 시 로컬 스토리지 업데이트
   } else {
     console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
-    console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
-  }
-}
+  };
+};
 
 async function checkRoute(currentLocation) {
   if (!currentMarker) {
@@ -567,8 +566,6 @@ function findRoute() {
   }, 5000);
   // 경로 체크
   setInterval(function () {
-    console.log("check");
-    console.log(currentMarker);
     checkRoute(currentMarker.getPosition());
   }, 10000); // 매 10초마다 경로 체크
 }
@@ -597,7 +594,6 @@ function sendLocations(startLocation, endLocation) {
     start_location: [startLocation.lng(), startLocation.lat()],
     end_location: [endLocation.lng(), endLocation.lat()],
   };
-  console.log(JSON.stringify(data));
   fetch("/nav/location/", {
     method: "POST",
     headers: {
@@ -780,8 +776,6 @@ function loadRouteFromLocalStorage() {
         }, 5000);
 
         setInterval(function () {
-          console.log("---------------");
-          console.log(currentMarker);
           checkRoute(currentMarker.getPosition());
         }, 10000);
       } else {
