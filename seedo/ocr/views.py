@@ -63,16 +63,22 @@ def capture(request):
                                                 1. 정확하지 않은거나 사진에 없는 내용은 말하지 마세요.
                                                 2. 명확하지 글에 대해서는 무조건 인식하기 어렵고 출력되는 내용이 정확하지 않을 수 있다고 말합니다.
                                                 3. 글자가 선명하지 않다면 사진이 선명하지 않으니 다시 찍어달라고 안내합니다.
-                                                4. 긴글은 페이지당 50글자 이내로 요약하여 말하세요.
+                                                4. 선명하지 않은 긴글은 페이지당 100글자 이내로 요약하여 말하세요.
                                                 5. 당신의 지식을 이용해서 사진에 없는 내용을 판단하여 지어내는 행위를 절대 하지마세요.
                                                 6. 의약품, 주의사항, 위험물, 의료정보, 안전정보 와 같은 내용에서는 5번을 절대적으로 지키세요.
                                                 7. 정확하게 읽은 문장이 아니면 읽지 마세요.
-                                                """,
-                    },
-                    {"role": "user", "content": [{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}}]},
-                ],
-                temperature=0.0,
-                top_p=0.95,
+                                                8. 당신의 주요 역할은 글자를 읽어주는 것입니다. 읽을 글자가 없다면 반드시 안내하세요.
+                                                9. 글과 그림이 있다면 글은 읽고 그림에 대해서 설명하세요.
+                                                """},
+                {"role": "user", "content": [
+                    {"type": "image_url", "image_url": {
+                        "url": f"data:image/png;base64,{image_base64}"}
+                    }  
+                ]}
+            ],
+            temperature=0.0,
+            top_p=0.65,
+            frequency_penalty=0.8,
             )
             answer = response.choices[0].message.content
             print(answer)
