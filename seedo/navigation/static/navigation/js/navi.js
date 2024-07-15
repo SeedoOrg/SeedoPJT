@@ -213,20 +213,22 @@ function displayRoute(directionsData) {
   map.fitBounds(bounds);
 
   var routeInfoContainer = document.getElementById("route-info");
-  routeInfoContainer.innerHTML = "";
+  if (routeInfoContainer) {
+    routeInfoContainer.innerHTML = "";
 
-  features.forEach(function (feature, index) {
-    if (index === currentWaypointIndex && feature.properties.description.includes("이동")) {
-      alert("다음 안내 지점: " + feature.properties.description);
-    }
+    features.forEach(function (feature, index) {
+      if (index === currentWaypointIndex && feature.properties.description.includes("이동")) {
+        alert("다음 안내 지점: " + feature.properties.description);
+      }
 
-    if (feature.properties.description.includes("이동")) {
-      var info = document.createElement("div");
-      info.classList.add("route-info-item");
-      info.innerHTML = `<p>${feature.properties.description}</p>`;
-      routeInfoContainer.appendChild(info);
-    }
-  });
+      if (feature.properties.description.includes("이동")) {
+        var info = document.createElement("div");
+        info.classList.add("route-info-item");
+        info.innerHTML = `<p>${feature.properties.description}</p>`;
+        routeInfoContainer.appendChild(info);
+      }
+    });
+  }
 
   window.alert = ttsAlert;
 
@@ -235,10 +237,8 @@ function displayRoute(directionsData) {
     updateRouteStorage(); // Polyline 업데이트 시 로컬 스토리지 업데이트
   } else {
     console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
-    console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
   }
 }
-
 
 async function checkRoute(currentLocation) {
   if (!currentMarker) {
@@ -566,8 +566,6 @@ function findRoute() {
   }, 5000);
   // 경로 체크
   setInterval(function () {
-    console.log("check");
-    console.log(currentMarker);
     checkRoute(currentMarker.getPosition());
   }, 10000); // 매 10초마다 경로 체크
 }
@@ -596,7 +594,6 @@ function sendLocations(startLocation, endLocation) {
     start_location: [startLocation.lng(), startLocation.lat()],
     end_location: [endLocation.lng(), endLocation.lat()],
   };
-  console.log(JSON.stringify(data));
   fetch("/nav/location/", {
     method: "POST",
     headers: {
@@ -630,7 +627,7 @@ function updateCurrentLocationMarker(location) {
   }
   // 지도를 현재 위치로 이동
   map.panTo(location);
-};
+}
 
 // gpt한테 물어봄 해버시늄??처음들어봄
 function getDistance(location1, location2) {
@@ -779,8 +776,6 @@ function loadRouteFromLocalStorage() {
         }, 5000);
 
         setInterval(function () {
-          console.log("---------------");
-          console.log(currentMarker);
           checkRoute(currentMarker.getPosition());
         }, 10000);
       } else {

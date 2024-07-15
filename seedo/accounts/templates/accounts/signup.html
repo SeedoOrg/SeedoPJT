@@ -1,10 +1,14 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/accounts.css' %}" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 {% endblock %} {% block content %}
 <div class="layout">
   <div class="content-wrapper">
     <h2>회원가입</h2>
-    <form method="post">
+    <div class="overlay">
+      <div class="spinner"></div>
+    </div>
+    <form id="signup_form" method="post">
       {% csrf_token %}
       <div class="form-wrapper">
         <div class="form-group {% if form.email.errors %}error{% endif %}">
@@ -13,7 +17,7 @@
         </div>
         <div class="error-message">
           {% for error in form.email.errors %}
-          <p>⎷{{ error }}</p>
+          <p>❗️{{ error }}</p>
           {% endfor %}
         </div>
         <div class="form-group {% if form.phonenumber.errors %}error{% endif %}">
@@ -22,7 +26,7 @@
         </div>
         <div class="error-message">
           {% for error in form.phonenumber.errors %}
-          <p>⎷{{ error }}</p>
+          <p>❗️{{ error }}</p>
           {% endfor %}
         </div>
         <div class="form-group {% if form.password1.errors %}error{% endif %}">
@@ -31,7 +35,7 @@
         </div>
         <div class="error-message">
           {% for error in form.password1.errors %}
-          <p>⎷{{ error }}</p>
+          <p>❗️{{ error }}</p>
           {% endfor %}
         </div>
         <div class="form-group {% for error in form.password2.errors %}{% if error %}error{%endif%}{% endfor %}">
@@ -41,15 +45,22 @@
         <div class="error-message">
           {% for error in form.password2.errors %}
 
-          <p>{% if error %}⎷{%endif%}{{ error }}</p>
+          <p>{% if error %}❗️{%endif%}{{ error }}</p>
           {% endfor %}
         </div>
       </div>
+
       <div class="button-wrapper">
-        <a href="{% url 'accounts:login' %}" class="button-link">로그인</a>
-        <button type="submit" class="button-link">회원가입</button>
+        <button type="submit" class="button-link">완료</button>
       </div>
+      <a class="hover-text" href="{% url 'accounts:login' %}"><span class="noti material-symbols-outlined" style="font-weight: 700">undo</span> 로그인</a>
     </form>
   </div>
 </div>
+<script>
+  document.getElementById("signup_form").addEventListener("submit", function () {
+    document.querySelector(".overlay").style.display = "block";
+    document.querySelector(".spinner").style.display = "block";
+  });
+</script>
 {% endblock %}

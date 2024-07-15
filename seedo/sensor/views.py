@@ -4,6 +4,7 @@ import json
 
 import numpy as np
 import pandas as pd
+from common.decorators import token_required
 from django.http import JsonResponse
 from django.shortcuts import render
 from joblib import load
@@ -12,6 +13,7 @@ from scipy.fftpack import fft
 from scipy.stats import median_abs_deviation
 
 
+@token_required
 def get_sensor(request):
 
     return render(request, "sensor/index.html")
@@ -20,6 +22,7 @@ def get_sensor(request):
 model = load_model("sensor/ml_models/sensor/ml_model/fall_recognition_v2.h5")
 
 
+@token_required
 def fall_recognition(request):
     if request.method == "POST":
         data = json.loads(request.body)

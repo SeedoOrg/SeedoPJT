@@ -7,8 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
   </head>
   <body>
-    <h1>OCR Capture</h1>
-    <video id="video" width="640" height="480" autoplay></video>
+    <h1>OCR Capture - 화면을 터치하면 카메라 시작</h1>
+    <video id="video" width="640" height="480" autoplay playsinline></video>
     <!-- 실시간 비디오 스트림 -->
     <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
     <!-- 비디오 프레임을 캡처할 캔버스 -->
@@ -34,14 +34,17 @@
       let isCapturing = true; // 현재 상태를 추적하기 위한 플래그
 
       // 디바이스 카메라에 접근하여 비디오 요소에 스트림을 전달합니다.
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          video.srcObject = stream; // 비디오 요소에 스트림을 설정합니다.
-        })
-        .catch((err) => {
-          console.error("Error accessing the camera: ", err); // 카메라 접근 오류를 처리합니다.
-        });
+      function startCamera() {
+        navigator.mediaDevices
+          .getUserMedia({ video: { facingMode: "environment" } })
+          .then((stream) => {
+            video.srcObject = stream; // 비디오 요소에 스트림을 설정합니다.
+            video.play();
+          })
+          .catch((err) => {
+            console.error("Error accessing the camera: ", err); // 카메라 접근 오류를 처리합니다.
+          });
+      }
 
       captureButton.addEventListener("click", () => {
         if (isCapturing) {
@@ -112,6 +115,9 @@
         isPlaying = true;
         sound.play();
       }
+
+      // 사용자 제스처로 카메라 시작
+      document.body.addEventListener("click", startCamera, { once: true });
     </script>
   </body>
 </html>
