@@ -23,6 +23,8 @@ from geopy.geocoders import Nominatim
 
 from datetime import datetime
 
+import copy
+
 # 클래스 한글 이름
 OD_CLS_KR = ["휠체어", "유모차", "정류장", "킥보드", "기둥", "이동식 간판", "오토바이", "소화전", "강아지", "볼라드", "자전거", "벤치", "바리케이드"]
 SEG_CLS_KR = [
@@ -221,6 +223,10 @@ class ImageUploadView(View):
         annotator = Annotator(img, line_width=3, example=str("가나다"), font=font_file)  # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
         annotator.tf = max(annotator.lw - 1, 1)
         txt_color, txt_background = ((0, 0, 0), (255, 255, 255))
+        
+        complain_img = copy.deepcopy(img)
+        annot_complain = Annotator(complain_img, line_width=3, example=str('가나다'), font=font_file) # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
+        annot_complain.tf = max(annot_complain.lw - 1, 1)
 
         detected_obstacle = False  # 객체가 탐지되었는지 확인하는 플래그
 
@@ -242,8 +248,6 @@ class ImageUploadView(View):
                         seg_classes.append(names[cls])
                     if (cls in _obstacles) and i == 1:
                         if cls==2: # 파손된 점자블록인 경우 처리
-                            
-                            
                             # GPS를 도로명 주소로 변환
                             ### 여기는 Django 이식 전 테스트를 위한 임시 코드 ###
                             here_req = requests.get("http://www.geoplugin.net/json.gp")
