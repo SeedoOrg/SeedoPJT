@@ -213,20 +213,22 @@ function displayRoute(directionsData) {
   map.fitBounds(bounds);
 
   var routeInfoContainer = document.getElementById("route-info");
-  routeInfoContainer.innerHTML = "";
+  if (routeInfoContainer) {
+    routeInfoContainer.innerHTML = "";
 
-  features.forEach(function (feature, index) {
-    if (index === currentWaypointIndex && feature.properties.description.includes("이동")) {
-      alert("다음 안내 지점: " + feature.properties.description);
-    }
+    features.forEach(function (feature, index) {
+      if (index === currentWaypointIndex && feature.properties.description.includes("이동")) {
+        alert("다음 안내 지점: " + feature.properties.description);
+      }
 
-    if (feature.properties.description.includes("이동")) {
-      var info = document.createElement("div");
-      info.classList.add("route-info-item");
-      info.innerHTML = `<p>${feature.properties.description}</p>`;
-      routeInfoContainer.appendChild(info);
-    }
-  });
+      if (feature.properties.description.includes("이동")) {
+        var info = document.createElement("div");
+        info.classList.add("route-info-item");
+        info.innerHTML = `<p>${feature.properties.description}</p>`;
+        routeInfoContainer.appendChild(info);
+      }
+    });
+  }
 
   window.alert = ttsAlert;
 
