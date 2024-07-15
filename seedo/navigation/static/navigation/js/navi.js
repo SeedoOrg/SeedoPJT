@@ -213,20 +213,22 @@ function displayRoute(directionsData) {
   map.fitBounds(bounds);
 
   var routeInfoContainer = document.getElementById("route-info");
-  routeInfoContainer.innerHTML = "";
+  if (routeInfoContainer) {
+    routeInfoContainer.innerHTML = "";
 
-  features.forEach(function (feature, index) {
-    if (index === currentWaypointIndex && feature.properties.description.includes("이동")) {
-      alert("다음 안내 지점: " + feature.properties.description);
-    }
+    features.forEach(function (feature, index) {
+      if (index === currentWaypointIndex && feature.properties.description.includes("이동")) {
+        alert("다음 안내 지점: " + feature.properties.description);
+      }
 
-    if (feature.properties.description.includes("이동")) {
-      var info = document.createElement("div");
-      info.classList.add("route-info-item");
-      info.innerHTML = `<p>${feature.properties.description}</p>`;
-      routeInfoContainer.appendChild(info);
-    }
-  });
+      if (feature.properties.description.includes("이동")) {
+        var info = document.createElement("div");
+        info.classList.add("route-info-item");
+        info.innerHTML = `<p>${feature.properties.description}</p>`;
+        routeInfoContainer.appendChild(info);
+      }
+    });
+  }
 
   window.alert = ttsAlert;
 
@@ -238,7 +240,6 @@ function displayRoute(directionsData) {
     console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
   }
 }
-
 
 async function checkRoute(currentLocation) {
   if (!currentMarker) {
@@ -630,7 +631,7 @@ function updateCurrentLocationMarker(location) {
   }
   // 지도를 현재 위치로 이동
   map.panTo(location);
-};
+}
 
 // gpt한테 물어봄 해버시늄??처음들어봄
 function getDistance(location1, location2) {

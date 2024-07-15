@@ -16,7 +16,7 @@ function setWalkingModeToLocalStorage(walking_mode) {
 async function sendCameraImage(imageData) {
   var csrf_token = getCookie("csrftoken");
   try {
-    const response = await fetch("/walking_mode/", {
+    const response = await fetch("/walking_mode/test/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

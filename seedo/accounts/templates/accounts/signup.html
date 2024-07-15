@@ -13,7 +13,7 @@
         </div>
         <div class="error-message">
           {% for error in form.email.errors %}
-          <p>⎷{{ error }}</p>
+          <p>❗️{{ error }}</p>
           {% endfor %}
         </div>
         <div class="form-group {% if form.phonenumber.errors %}error{% endif %}">
@@ -22,7 +22,7 @@
         </div>
         <div class="error-message">
           {% for error in form.phonenumber.errors %}
-          <p>⎷{{ error }}</p>
+          <p>❗️{{ error }}</p>
           {% endfor %}
         </div>
         <div class="form-group {% if form.password1.errors %}error{% endif %}">
@@ -31,7 +31,7 @@
         </div>
         <div class="error-message">
           {% for error in form.password1.errors %}
-          <p>⎷{{ error }}</p>
+          <p>❗️{{ error }}</p>
           {% endfor %}
         </div>
         <div class="form-group {% for error in form.password2.errors %}{% if error %}error{%endif%}{% endfor %}">
@@ -41,14 +41,16 @@
         <div class="error-message">
           {% for error in form.password2.errors %}
 
-          <p>{% if error %}⎷{%endif%}{{ error }}</p>
+          <p>{% if error %}❗️{%endif%}{{ error }}</p>
           {% endfor %}
         </div>
       </div>
       <div class="button-wrapper">
-        <a href="{% url 'accounts:login' %}" class="button-link">로그인</a>
-        <button type="submit" class="button-link">회원가입</button>
+        <button type="submit" class="button-link">완료</button>
       </div>
+      <p style="text-align: right">
+        <a class="hover-text" href="{% url 'accounts:login' %}">⏎ 로그인</a>
+      </p>
     </form>
   </div>
 </div>
