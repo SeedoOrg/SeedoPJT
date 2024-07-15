@@ -7,7 +7,7 @@
     <h2>회원가입</h2>
     <div class="overlay">
       <div class="spinner"></div>
-  </div>
+    </div>
     <form id="signup_form" method="post">
       {% csrf_token %}
       <div class="form-wrapper">
@@ -49,7 +49,7 @@
           {% endfor %}
         </div>
       </div>
-      
+
       <div class="button-wrapper">
         <button type="submit" class="button-link">완료</button>
       </div>
@@ -58,9 +58,9 @@
   </div>
 </div>
 <script>
-  document.getElementById('signup_form').addEventListener('submit', function() {
-      document.querySelector('.overlay').style.display = 'block';
-      document.querySelector('.spinner').style.display = 'block';
+  document.getElementById("signup_form").addEventListener("submit", function () {
+    document.querySelector(".overlay").style.display = "block";
+    document.querySelector(".spinner").style.display = "block";
   });
 </script>
 {% endblock %}
