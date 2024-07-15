@@ -12,6 +12,7 @@ main {
 .switchCondition {
   display: flex;
   justify-content: space-between;
+  color: #183b08;
   width: 80%;
 }
 
@@ -20,6 +21,7 @@ main {
   position: relative;
   display: inline-block;
   width: 80%; /* Width as a percentage of the parent */
+  max-width: 180px;
   height: auto; /* Let JavaScript set the height */
 }
 
