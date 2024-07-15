@@ -160,13 +160,6 @@ def make_caption(history):
     return " ".join(result)
 
 
-def get_location(request):
-    if request.method == "POST":
-        data = json.loads(request.body)["sensor_data"]
-        datetime.fromtimestamp(timestamp / 1000)
-
-        
-
 
 class ImageUploadView(View):
     template_name = "test2.html"
