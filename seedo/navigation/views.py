@@ -64,7 +64,6 @@ def get_walking_directions(request):
 
             # 데이터베이스에 저장
             Navigation.objects.create(user=request.user, start_location=start_location, end_location=end_location)
-            print(directions_data)
             # JSON 형식으로 데이터 전송
             return JsonResponse(directions_data)
 
@@ -78,7 +77,6 @@ def get_walking_directions(request):
 
 @token_required
 def naver_tts(request):
-    print("success")
     if request.method == "POST":
         try:
             data = json.loads(request.body)
