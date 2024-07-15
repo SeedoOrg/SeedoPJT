@@ -7,8 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 </head>
 <body>
-    <h1>OCR Capture</h1>
-    <video id="video" width="640" height="480" autoplay></video> <!-- 실시간 비디오 스트림 -->
+    <h1>OCR Capture - 화면을 터치하면 카메라 시작</h1>
+    <video id="video" width="640" height="480" autoplay playsinline></video> <!-- 실시간 비디오 스트림 -->
     <canvas id="canvas" width="640" height="480" style="display:none;"></canvas> <!-- 비디오 프레임을 캡처할 캔버스 -->
     <img id="captured-image" style="display:none; width: 640px; height: 480px;" /> <!-- 캡처된 이미지를 표시할 요소 -->
     <button id="capture-button">Capture Photo</button> <!-- 사진을 찍기 위한 버튼 -->
@@ -29,13 +29,16 @@
         let isCapturing = true; // 현재 상태를 추적하기 위한 플래그
 
         // 디바이스 카메라에 접근하여 비디오 요소에 스트림을 전달합니다.
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream; // 비디오 요소에 스트림을 설정합니다.
-            })
-            .catch(err => {
-                console.error("Error accessing the camera: ", err); // 카메라 접근 오류를 처리합니다.
-            });
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    video.srcObject = stream; // 비디오 요소에 스트림을 설정합니다.
+                    video.play();
+                })
+                .catch(err => {
+                    console.error("Error accessing the camera: ", err); // 카메라 접근 오류를 처리합니다.
+                });
+        }
 
         captureButton.addEventListener('click', () => {
             if (isCapturing) {
@@ -59,7 +62,7 @@
                 .then(data => {
                     if (data.answer) {
                         resultDiv.innerHTML = `<p>Answer: ${data.answer}</p>`; // 서버 응답을 결과 영역에 표시합니다.
-                            // 오디오를 재생목록에 추가하고 재생
+                        // 오디오를 재생목록에 추가하고 재생
                         if (data.tts_audio_base64) {
                             const audioData = `data:audio/mpeg;base64,${data.tts_audio_base64}`;
                             soundQueue.push(audioData);
@@ -79,8 +82,6 @@
                 video.style.display = 'none'; // 비디오를 숨깁니다.
                 captureButton.innerText = 'Retake Photo'; // 버튼 텍스트를 변경합니다.
                 isCapturing = false; // 상태 플래그를 업데이트합니다.
-                
-                
             } else {
                 // 비디오를 다시 표시합니다.
                 capturedImage.style.display = 'none'; // 캡처된 이미지를 숨깁니다.
@@ -93,21 +94,24 @@
 
         function playNextInQueue() {
             if (isPlaying || soundQueue.length === 0) return;
-    
+
             const audioData = soundQueue.shift();
             const sound = new Howl({
-              src: [audioData],
-              format: ["mp3"],
-              autoplay: true,
-              onend: function () {
-                isPlaying = false;
-                playNextInQueue();
-              },
+                src: [audioData],
+                format: ["mp3"],
+                autoplay: true,
+                onend: function () {
+                    isPlaying = false;
+                    playNextInQueue();
+                },
             });
-    
+
             isPlaying = true;
             sound.play();
-          }
+        }
+
+        // 사용자 제스처로 카메라 시작
+        document.body.addEventListener('click', startCamera, { once: true });
     </script>
 </body>
 </html>
