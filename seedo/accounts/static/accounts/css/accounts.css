@@ -105,6 +105,11 @@ input {
   color: #193b08;
   text-decoration: none;
   font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  height: 26px;
 }
 
 .hover-text:hover {
