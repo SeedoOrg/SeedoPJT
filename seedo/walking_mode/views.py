@@ -174,6 +174,7 @@ class ImageUploadView(View):
     model_od = YOLO(yolo_od_pt)
     model_seg = YOLO(yolo_seg_pt)
     Annotator.visioneye_pil = visioneye_pil
+    complaints = []
 
     def get(self, request):
         return render(request, self.template_name)
@@ -248,29 +249,43 @@ class ImageUploadView(View):
                         seg_classes.append(names[cls])
                     if (cls in _obstacles) and i == 1:
                         if cls==2: # 파손된 점자블록인 경우 처리
-                            # GPS를 도로명 주소로 변환
-                            ### 여기는 Django 이식 전 테스트를 위한 임시 코드 ###
-                            here_req = requests.get("http://www.geoplugin.net/json.gp")
-                            if (here_req.status_code != 200):
-                                print("현재 위치를 불러올 수 없습니다!")
-                            else:
-                                location = json.loads(here_req.text)
-                                crd = str(location["geoplugin_latitude"])+', '+str(location["geoplugin_longitude"])
-                            # location = ''' GPS value '''
-                            # crd = str(location["latitude"])+', '+str(location["longitude"])
+                            
+                            
+                            ############## 수정 필요한 부분 시작 ##################
+                            
+                            # 센서 데이터로부터 GPS 및 시간 등 정보 추출하는 코드 필요
+                            # GPS 값(latitude, longitude) 받아오기 
+                            location = ''' GPS value ''' # 이 부분 채우기
+                            # crd = 'latitude, longitude' 형식으로 변환 
+                            crd = str(location["latitude"])+', '+str(location["longitude"])
+                            # 시간을 어떻게 불러올지에 따라 아래 두 코드 중 선택적으로 사용할 것
+                            # 선택지 1) 센서 데이터에서 시간 추출; 단, 변수 timestamp에 센서 데이터의 시간 정보 저장해두는 코드도 필요 
+                            timestamp = datetime.fromtimestamp(timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')
+                            # 선택지 2) 현재 시간 확인하여 추출
+                            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                                                        
+                            ############## 수정 필요한 부분 끝 ####################
                             
                             
                             geolocoder = Nominatim(user_agent='South Korea', timeout=None) # OSM 지오코딩
                             address = geolocoder.reverse(crd) # 입력: '위도, 경도', 출력: 주소 정보
-                            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S') # 파손 발견 시간
                             # 파손 점자블록 표시
                             # annot_complain.box_label(box, label=f'{names[cls]}{track_id}', color=colors(cls))
                             annot_complain.box_label(box, label=f'{names_kr[cls]}{track_id}', color=colors(cls)) # 한글 ver.
                             complain_img = np.array(annot_complain.im) # PIL Image를 cv2로 처리하기 위해 numpy array로 변환
-                            # 민원 정보 추가
-                            complaints.append({'timestamp': timestamp, 'image': complain_img, 'track_id': track_id, 'address': address.address, 'latitude': address.latitude, 'longitude': address.longitude, 'altitude': address.altitude})
-                            # cv2_imshow(complain_img)
-                            cv2.imwrite(f'{complaints_path.split(".")[0]}_{track_id}.jpg', complain_img)                    
+
+                            
+                            ############## 수정 필요한 부분 시작 ##################
+                            
+                            # 아래 두 코드를 적절히 수정해서 DB에 민원 사진 및 상세 정보 저장 필요
+                            # 파손 점자블록 민원 정보 추가
+                            self.complaints.append({'timestamp': timestamp, 'image': complain_img, 'track_id': track_id, 'address': address.address, 'latitude': address.latitude, 'longitude': address.longitude, 'altitude': address.altitude})                           
+                            # 파손 점자블록 민원 사진 저장 경로
+                            cv2.imwrite(f'{complaints_path.split(".")[0]}_{track_id}.jpg', complain_img)
+                            
+                            ############## 수정 필요한 부분 끝 ####################
+                            
+                            
                         continue
                     
                     detected_obstacle = True
@@ -286,9 +301,9 @@ class ImageUploadView(View):
                         )  # 한글 ver.
                         # annotator.visioneye(box, start_point)
                         annotator.visioneye_pil(box, start_point)
-                        text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-                        cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
-                        cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
+                        # text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+                        # cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
+                        # cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
 
                         # 음성안내를 위한 객체 정보 추가
                         history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
