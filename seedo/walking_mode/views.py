@@ -14,8 +14,13 @@ from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
+
 from ultralytics import YOLO
 from ultralytics.utils.plotting import Annotator, colors
+
+from geopy.geocoders import Nominatim
+
+from datetime import datetime
 
 # 클래스 한글 이름
 OD_CLS_KR = ["휠체어", "유모차", "정류장", "킥보드", "기둥", "이동식 간판", "오토바이", "소화전", "강아지", "볼라드", "자전거", "벤치", "바리케이드"]
@@ -130,6 +135,14 @@ def make_caption(history):
     return " ".join(result)
 
 
+def get_location(request):
+    if request.method == "POST":
+        data = json.loads(request.body)["sensor_data"]
+        datetime.fromtimestamp(timestamp / 1000)
+
+        
+
+
 class ImageUploadView(View):
     template_name = "test2.html"
     frame_cnt = 0
@@ -203,7 +216,34 @@ class ImageUploadView(View):
                     elif i == 1:  # Segmentation
                         seg_classes.append(names[int(cls)])
                     if (int(cls) in _obstacles) and i == 1:
+                        if cls==2: # 파손된 점자블록인 경우 처리
+                            
+                            
+                            # GPS를 도로명 주소로 변환
+                            ### 여기는 Django 이식 전 테스트를 위한 임시 코드 ###
+                            here_req = requests.get("http://www.geoplugin.net/json.gp")
+                            if (here_req.status_code != 200):
+                                print("현재 위치를 불러올 수 없습니다!")
+                            else:
+                                location = json.loads(here_req.text)
+                                crd = str(location["geoplugin_latitude"])+', '+str(location["geoplugin_longitude"])
+                            # location = ''' GPS value '''
+                            # crd = str(location["latitude"])+', '+str(location["longitude"])
+                            
+                            
+                            geolocoder = Nominatim(user_agent='South Korea', timeout=None) # OSM 지오코딩
+                            address = geolocoder.reverse(crd) # 입력: '위도, 경도', 출력: 주소 정보
+                            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S') # 파손 발견 시간
+                            # 파손 점자블록 표시
+                            # annot_complain.box_label(box, label=f'{names[cls]}{track_id}', color=colors(cls))
+                            annot_complain.box_label(box, label=f'{names_kr[cls]}{track_id}', color=colors(cls)) # 한글 ver.
+                            complain_img = np.array(annot_complain.im) # PIL Image를 cv2로 처리하기 위해 numpy array로 변환
+                            # 민원 정보 추가
+                            complaints.append({'timestamp': timestamp, 'image': complain_img, 'track_id': track_id, 'address': address.address, 'latitude': address.latitude, 'longitude': address.longitude, 'altitude': address.altitude})
+                            # cv2_imshow(complain_img)
+                            cv2.imwrite(f'{complaints_path.split(".")[0]}_{track_id}.jpg', complain_img)                    
                         continue
+                    
                     detected_obstacle = True
 
                     x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
