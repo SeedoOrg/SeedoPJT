@@ -47,7 +47,6 @@ def fall_recognition(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
-@token_required
 def process_sensor_data(data):
     # Define the column titles
     columns = [
