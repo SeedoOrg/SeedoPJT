@@ -14,6 +14,20 @@ function setWalkingModeToLocalStorage(walking_mode) {
 }
 
 async function sendCameraImage(imageData) {
+  var location = document.getElementById("location").textContent;
+  var regex = /Latitude\s([-\d.]+),\sLongitude\s([-\d.]+)/;
+  var matches = location.match(regex);
+
+  if (matches) {
+    var latitude = parseFloat(matches[1]);
+    var longitude = parseFloat(matches[2]);
+
+    console.log("Latitude:", latitude);
+    console.log("Longitude:", longitude);
+  } else {
+    console.error("Could not parse location string.");
+  }
+
   var csrf_token = getCookie("csrftoken");
   try {
     const response = await fetch("/walking_mode/test/", {
@@ -22,7 +36,7 @@ async function sendCameraImage(imageData) {
         "Content-Type": "application/json",
         "X-CSRFToken": csrf_token,
       },
-      body: JSON.stringify({ image_data: imageData }),
+      body: JSON.stringify({ image_data: imageData, latitude: latitude, longitude: longitude }),
     });
 
     const result = await response.json();

@@ -173,13 +173,15 @@ class ImageUploadView(View):
         if request.content_type == "application/json":
             data = json.loads(request.body)
             image_data = data.get("image_data")
+            longitude = data.get("longitude")
+            latitude = data.get("latitude")
             format, imgstr = image_data.split(";base64,")
             ext = format.split("/")[-1]
             image_data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
             nparr = np.frombuffer(image_data.read(), np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             od_classes, seg_classes, tts_audio_base64, annotated_image = self.process_image(
-                img, self.model_od, self.model_seg, history, pixel_per_meter
+                img, self.model_od, self.model_seg, history, pixel_per_meter, longitude, latitude
             )
         else:
             return JsonResponse({"error": "Invalid content type"}, status=400)
@@ -195,7 +197,7 @@ class ImageUploadView(View):
         return JsonResponse(response_data)
 
     @classmethod
-    def process_image(self, img, model_od, model_seg, history, pixel_per_meter):
+    def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude):
         frame_per_audio = 5
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
