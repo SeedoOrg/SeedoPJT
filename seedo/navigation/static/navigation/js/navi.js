@@ -237,8 +237,8 @@ function displayRoute(directionsData) {
     updateRouteStorage(); // Polyline 업데이트 시 로컬 스토리지 업데이트
   } else {
     console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
-  };
-};
+  }
+}
 
 async function checkRoute(currentLocation) {
   if (!currentMarker) {
