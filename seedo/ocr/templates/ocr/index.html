@@ -1,23 +1,26 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OCR Capture</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-  </head>
-  <body>
-    <h1>OCR Capture - 화면을 터치하면 카메라 시작</h1>
-    <video id="video" width="640" height="480" autoplay playsinline></video>
-    <!-- 실시간 비디오 스트림 -->
-    <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
-    <!-- 비디오 프레임을 캡처할 캔버스 -->
-    <img id="captured-image" style="display: none; width: 640px; height: 480px" />
-    <!-- 캡처된 이미지를 표시할 요소 -->
-    <button id="capture-button">Capture Photo</button>
-    <!-- 사진을 찍기 위한 버튼 -->
-    <div id="result"></div>
-    <!-- 결과를 표시할 영역 -->
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'ocr/css/index.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script defer src="{% static 'navigation/js/navi.js' %}"></script>
+<script defer src="{% static 'sensor/js/sensor.js' %}"></script>
+<script defer src="{% static 'walking_mode/js/walking_mode.js' %}"></script>
+{% endblock extra_head %} {% block content %}
+
+<main>
+    <div class="text">
+    <h1 id='touch-start'>화면을 터치하여 시작</h1>
+    </div>
+    <div class="camera_view">
+        <video id="video" autoplay playsinline></video> <!-- 실시간 비디오 스트림 -->
+        <canvas id="canvas" style="display:none;"></canvas> <!-- 비디오 프레임을 캡처할 캔버스 -->
+        <img id="captured-image"  /> <!-- 캡처된 이미지를 표시할 요소 -->
+    </div>
+    <div class="button">
+    <button id="capture-button">Capture Photo</button> <!-- 사진을 찍기 위한 버튼 -->
+    </div>
+    <div id="result"></div> <!-- 결과를 표시할 영역 -->
 
     <script>
       const video = document.getElementById("video"); // 비디오 요소를 가져옵니다.
@@ -119,5 +122,6 @@
       // 사용자 제스처로 카메라 시작
       document.body.addEventListener("click", startCamera, { once: true });
     </script>
-  </body>
+</main>
 </html>
+{% endblock content %}

@@ -1,0 +1,60 @@
+main {
+    margin-top: 58px;
+    width: 100%;
+    position: static;
+}
+
+.text {
+    width: 97%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+#touch-start {
+    text-align: center;
+}
+.camera_view {
+    width: 97%;
+    max-width: 480px;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+    background-color: lightgray;
+}
+
+#video {
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+}
+
+#canvas {
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+}
+
+#captured-image {
+    display:none;
+    width: 100%;
+    max-width: 480px;
+    margin: auto 0;
+    vertical-align:middle;
+}
+
+.button {
+    width: 97%;
+    max-width: 480px;
+    margin: 0 auto;
+    margin-top: 5px;
+    font-size: x-large;
+}
+
+#capture-button {
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 3 / 0.8;
+    margin: 0 auto;
+    background-color: green;
+}
