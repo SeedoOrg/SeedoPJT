@@ -69,16 +69,13 @@ def capture(request):
                                                 7. 정확하게 읽은 문장이 아니면 읽지 마세요.
                                                 8. 당신의 주요 역할은 글자를 읽어주는 것입니다. 읽을 글자가 없다면 반드시 안내하세요.
                                                 9. 글과 그림이 있다면 글은 읽고 그림에 대해서 설명하세요.
-                                                """},
-                {"role": "user", "content": [
-                    {"type": "image_url", "image_url": {
-                        "url": f"data:image/png;base64,{image_base64}"}
-                    }  
-                ]}
-            ],
-            temperature=0.0,
-            top_p=0.65,
-            frequency_penalty=0.8,
+                                                """,
+                    },
+                    {"role": "user", "content": [{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}}]},
+                ],
+                temperature=0.0,
+                top_p=0.65,
+                frequency_penalty=0.8,
             )
             answer = response.choices[0].message.content
             print(answer)

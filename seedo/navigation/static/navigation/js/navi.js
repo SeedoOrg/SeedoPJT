@@ -239,7 +239,6 @@ function displayRoute(directionsData) {
   }
 }
 
-
 async function checkRoute(currentLocation) {
   if (!currentMarker) {
     console.error("현재 위치 마커가 정의되지 않았습니다.");
@@ -630,7 +629,7 @@ function updateCurrentLocationMarker(location) {
   }
   // 지도를 현재 위치로 이동
   map.panTo(location);
-};
+}
 
 // gpt한테 물어봄 해버시늄??처음들어봄
 function getDistance(location1, location2) {
