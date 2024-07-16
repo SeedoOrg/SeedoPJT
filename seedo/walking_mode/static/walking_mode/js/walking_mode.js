@@ -122,6 +122,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const frameRate = 1; // frames per second
   let video = document.getElementById("video");
   let canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
   let mediaRecorder;
   let recordedChunks = [];
   const streamFrameRate = 30;
@@ -132,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var walking_mode = localStorage.getItem("walking_mode");
   if (walking_mode === "true") {
-    startRecording();
+    startRecording(deviceId);
     console.log("보행모드를 시작합니다.", walking_mode);
   } else {
     console.log("보행모드가 중지상태입니다.");
@@ -147,7 +149,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function startRecording() {
+  const cameraSelect = document.getElementById("cameraSelect");
+  let deviceId = cameraSelect.value;
+  // 카메라 장치를 나열하고 선택 목록을 업데이트
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    devices.forEach((device) => {
+      if (device.kind === "videoinput") {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.text = device.label || `Camera ${cameraSelect.length + 1}`;
+        cameraSelect.appendChild(option);
+      }
+    });
+  });
+
+  function startRecording(deviceId) {
     recording = true;
     recordedChunks = [];
     var recordingStatusElement = document.getElementById("recording-status");
@@ -157,14 +173,67 @@ document.addEventListener("DOMContentLoaded", function () {
     setWalkingModeToLocalStorage(recording);
     navigator.mediaDevices
       .getUserMedia({
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        video: { facingMode: "environment" },
+        // width: { ideal: 1280 },
+        // height: { ideal: 720 },
+        video: { deviceId: deviceId ? { exact: deviceId } : undefined },
         frameRate: { ideal: streamFrameRate, max: streamFrameRate },
       })
       .then(function (stream) {
         video.srcObject = stream;
         video.play();
+
+        cameraSelect.addEventListener("change", () => {
+          if (video.srcObject) {
+            video.srcObject.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+          deviceId = cameraSelect.value;
+          startRecording(deviceId);
+        });
+
+        //동영상이 재생되면 인터벌함수를 통해 캔버스에 putImage를 해 줍니다.
+        video.addEventListener(
+          "play",
+          () => {
+            setInterval(() => {
+              const videoWidth = video.videoWidth;
+              const videoHeight = video.videoHeight;
+              resizeCanvas(videoWidth, videoHeight);
+
+              // 창 크기가 변경될 때마다 캔버스 크기를 조정
+              window.addEventListener("resize", () => {
+                if (video.videoWidth && video.videoHeight) {
+                  resizeCanvas(video.videoWidth, video.videoHeight);
+                }
+              });
+              function resizeCanvas() {
+                const aspectRatio = videoWidth / videoHeight;
+                canvas.width = window.innerWidth * 0.75;
+                canvas.height = canvas.width / aspectRatio;
+                draw();
+              }
+
+              function draw() {
+                //초기화
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 4;
+                //비디오 이미지 먼저 그려줍니다.
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                //4각형을 한번 그려 봅니다.
+                ctx.strokeRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
+                ctx.stroke();
+                ctx.closePath();
+                ctx.restore();
+              }
+            }, 1);
+          },
+          false,
+        );
 
         // Set up MediaRecorder
         mediaRecorder = new MediaRecorder(stream);
@@ -312,7 +381,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var startCameraButton = document.getElementById("start-camera");
   if (startCameraButton) {
-    startCameraButton.addEventListener("click", startRecording);
+    startCameraButton.addEventListener("click", () => startRecording(deviceId));
   }
 
   var stopCameraButton = document.getElementById("stop-camera");
