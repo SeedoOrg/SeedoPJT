@@ -60,9 +60,12 @@
     var walking_mode = localStorage.getItem("walking_mode");
     if (walking_mode === "true") {
       var walkstatus = document.querySelector(".walk");
+      document.getElementById("toggleSwitch").checked = true;
       if (walkstatus) {
         walkstatus.classList.add("active");
       }
+    } else {
+      document.getElementById("toggleSwitch").checked = false;
     }
 
     function adjustSwitchSize() {

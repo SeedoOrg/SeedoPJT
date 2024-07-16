@@ -179,6 +179,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "qna", "static"),
     os.path.join(BASE_DIR, "navigation", "static"),
     os.path.join(BASE_DIR, "walking_mode", "static"),
+    os.path.join(BASE_DIR, "ocr", "static"),
 ]  # 프로젝트 수준의 static 디렉토리
 
 

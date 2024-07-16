@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
-    //setInterval(handlePrediction, 1000 * 60);
+    setInterval(handlePrediction, 1000 * 6);
   }
 
   function stopRecording() {
