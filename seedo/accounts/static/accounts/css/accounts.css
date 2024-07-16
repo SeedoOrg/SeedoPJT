@@ -124,7 +124,7 @@ input {
   height: 30px;
   animation: spin 1s linear infinite;
   position: absolute;
-  left: 48%;
+  left: calc(50% - 13px);
   top: 45%;
   transform: translate(-60%, -60%);
   z-index: 1001;
