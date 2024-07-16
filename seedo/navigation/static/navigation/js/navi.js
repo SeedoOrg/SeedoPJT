@@ -255,8 +255,8 @@ async function checkRoute(currentLocation) {
     console.log(endLocation);
     ttsAlert("경로를 벗어났습니다.경로를 재탐색 합니다.");
     await delay(6000);
-    updateRouteStorageforoutway(currentLocation,endLocation);
-    sendLocations(currentLocation,endLocation);
+    updateRouteStorageforoutway(currentLocation, endLocation);
+    sendLocations(currentLocation, endLocation);
     return;
   }
 
@@ -724,7 +724,7 @@ function updateRouteStorage() {
   };
   localStorage.setItem("routeData", JSON.stringify(routeData));
 }
-function updateRouteStorageforoutway(currentLocation,endLocation) {
+function updateRouteStorageforoutway(currentLocation, endLocation) {
   var routeData = {
     startLocation: [currentLocation._lng, currentLocation._lat],
     endLocation: [endLocation._lng, endLocation._lat],
