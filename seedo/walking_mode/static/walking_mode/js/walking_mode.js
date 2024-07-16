@@ -36,7 +36,11 @@ async function sendCameraImage(imageData) {
         "Content-Type": "application/json",
         "X-CSRFToken": csrf_token,
       },
-      body: JSON.stringify({ image_data: imageData, latitude: latitude, longitude: longitude }),
+      body: JSON.stringify({
+        image_data: imageData,
+        latitude: latitude,
+        longitude: longitude,
+      }),
     });
 
     const result = await response.json();
@@ -50,11 +54,9 @@ async function sendCameraImage(imageData) {
         },
         body: JSON.stringify({
           broken_address: result.complaints.address,
-          broken_timestamp: result.complaints.timestamp,
-          broken_latitude: result.complaints.latitude,
-          broken_longitude: result.complaints.longitude,
+          // broken_latitude: result.complaints.latitude,
+          // broken_longitude: result.complaints.longitude,
           broken_img: result.complaints.img,
-          box_label: result.complaints.box_label,
         }),
       });
       const save_break_result = await save_break_response.json();
@@ -266,7 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
-    setInterval(handlePrediction, 1000 * 6);
+    //setInterval(handlePrediction, 1000 * 30);
   }
 
   function stopRecording() {

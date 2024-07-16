@@ -1,7 +1,11 @@
+import base64
 import json
 
+import cv2
+import numpy as np
 from common.decorators import token_required
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -92,25 +96,43 @@ def save_accident_view(request):
 def save_broken_view(request):
     if request.method == "POST":
         data = json.loads(request.body)
+
         user_id = request.user.id
-        broken_location = data["broken_address"]
-        broken_timestamp = data["broken_timestamp"]
-        broken_latitude = data["broken_latitude"]
-        broken_longitude = data["broken_longitude"]
-        box_label = data["box_label"]
-        broken_img = data["broken_img"]
+        broken_location = data.get("broken_address", "dummy_location")
+        broken_location = "dummy_location"
+
+        print(f"broken_location: '{broken_location}'")
+        # broken_latitude = data["broken_latitude"]
+        # broken_longitude = data["broken_longitude"]
+        broken_img = data.get("broken_img", "")
+
         # broken_image_file = request.FILES["broken_image_file"]
+
+        # Step 1: Decode the base64 encoded image to binary data
+        img_data = base64.b64decode(broken_img)
+
+        # Step 2: Convert the binary data to a NumPy array
+        nparr = np.frombuffer(img_data, np.uint8)
+
+        # Step 3: Decode the NumPy array to an OpenCV image
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        # Step 4: Encode the image to PNG format
+        _, buffer = cv2.imencode(".png", img)
+
+        # Step 5: Create a ContentFile from the image data
+        image_file = ContentFile(buffer.tobytes(), name="broken_image.png")
+
+        # Output the base64 encoded PNG string (if needed)print(png_base64)
 
         user = User.objects.get(id=user_id)
 
         broken = Condition.objects.create(
             user=user,
-            broken_location=broken_location,
-            broken_timestamp=broken_timestamp,
-            broken_latitude=broken_latitude,
-            broken_longitude=broken_longitude,
-            box_label=box_label,
-            broken_img=broken_img,
+            condition_location=broken_location,
+            # broken_latitude=broken_latitude,
+            # broken_longitude=broken_longitude,
+            condition_image=image_file,
         )
         # broken_image=broken_image_file,
         return JsonResponse({"status": "success", "broken_id": broken.id})
