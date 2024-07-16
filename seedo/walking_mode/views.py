@@ -192,7 +192,8 @@ class ImageUploadView(View):
             _, buffer = cv2.imencode(".jpg", annotated_image)
             img_base64 = base64.b64encode(buffer).decode("utf-8")
         else:
-            img_base64 = None
+            _, buffer = cv2.imencode(".jpg", img)
+            img_base64 = base64.b64encode(buffer).decode("utf-8")
 
         response_data = {
             "od_classes": od_classes,
