@@ -94,7 +94,7 @@ def save_broken_view(request):
         data = json.loads(request.body)
         user_id = request.user.id
         broken_location = data["broken_address"]
-        broken_timestamp = data["broken_timestamp"]
+        data["broken_timestamp"]
         broken_latitude = data["broken_latitude"]
         broken_longitude = data["broken_longitude"]
         box_label = data["box_label"]
@@ -106,10 +106,9 @@ def save_broken_view(request):
         broken = Condition.objects.create(
             user=user,
             broken_location=broken_location,
-            broken_timestamp=broken_timestamp,
             broken_latitude=broken_latitude,
             broken_longitude=broken_longitude,
-            box_label=box_label,
+            broken_label=box_label,
             broken_img=broken_img,
         )
         # broken_image=broken_image_file,

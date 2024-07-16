@@ -36,14 +36,16 @@ class Condition(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     condition_date = models.DateField(auto_now_add=True)
     condition_time = models.TimeField(auto_now_add=True)
-    # condition_image = models.ImageField(upload_to=upload_to_img)
+
     broken_location = models.TextField(null=False)
     broken_latitude = models.TextField(null=False)
     broken_longitude = models.TextField(null=False)
-    broken_timestamp = models.TextField(null=False)
+    broken_img = models.TextField(null=False)
+    broken_label = models.TextField(null=False)
 
     def save(self, *args, **kwargs):
-        super().save(update_fields=["broken_location", "broken_latitude", "broken_longitude", "broken_timestamp"])
+        super().save(*args, **kwargs)
+        # super().save(update_fields=["broken_location", "broken_latitude", "broken_longitude", "broken_label","broken_img"])
         # is_new = self._state.adding
         # temp_image_file = self.condition_image
 

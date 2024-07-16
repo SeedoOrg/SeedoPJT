@@ -247,6 +247,7 @@ class ImageUploadView(View):
                         seg_classes.append(names[cls])
                     if (cls in _obstacles) and i == 1:
                         if cls == 2:
+                            print("파손된 점자블록")
                             base_url = "https://nominatim.openstreetmap.org/reverse"
                             params = {"lat": latitude, "lon": longitude, "format": "json"}
                             response = requests.get(base_url, params=params)
@@ -267,6 +268,8 @@ class ImageUploadView(View):
                             _, buffer = cv2.imencode(".jpg", img)
                             complain_img = base64.b64encode(buffer).decode("utf-8")
 
+                            box_numpy = box.cpu().numpy().tolist()
+
                             # 민원 정보 추가
                             complaints = {
                                 "timestamp": timestamp,
@@ -274,7 +277,7 @@ class ImageUploadView(View):
                                 "latitude": latitude,
                                 "longitude": longitude,
                                 "img": complain_img,
-                                "box_label": box,
+                                "box_label": box_numpy,
                             }
                         else:
                             continue
