@@ -166,50 +166,44 @@ document.addEventListener("DOMContentLoaded", function () {
         video.srcObject = stream;
         video.play();
 
-        video.addEventListener("loadedmetadata", () => {
-          const videoWidth = video.videoWidth;
-          const videoHeight = video.videoHeight;
-          resizeCanvas(videoWidth, videoHeight);
-
-          // 창 크기가 변경될 때마다 캔버스 크기를 조정
-          window.addEventListener("resize", () => {
-            if (video.videoWidth && video.videoHeight) {
-              resizeCanvas(video.videoWidth, video.videoHeight);
-            }
-          });
-          function resizeCanvas() {
-            const aspectRatio = videoWidth / videoHeight;
-            canvas.width = window.innerWidth * 0.75;
-            canvas.height = canvas.width / aspectRatio;
-            draw();
-          }
-
-          function draw() {
-            //초기화
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-          }
-        });
-
         //동영상이 재생되면 인터벌함수를 통해 캔버스에 putImage를 해 줍니다.
         video.addEventListener(
           "play",
           () => {
             setInterval(() => {
-              //초기화
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              ctx.save();
-              ctx.beginPath();
-              ctx.strokeStyle = "red";
-              ctx.lineWidth = 4;
-              //비디오 이미지 먼저 그려줍니다.
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              const videoWidth = video.videoWidth;
+              const videoHeight = video.videoHeight;
+              resizeCanvas(videoWidth, videoHeight);
 
-              //4각형을 한번 그려 봅니다.
-              ctx.strokeRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
-              ctx.stroke();
-              ctx.closePath();
-              ctx.restore();
+              // 창 크기가 변경될 때마다 캔버스 크기를 조정
+              window.addEventListener("resize", () => {
+                if (video.videoWidth && video.videoHeight) {
+                  resizeCanvas(video.videoWidth, video.videoHeight);
+                }
+              });
+              function resizeCanvas() {
+                const aspectRatio = videoWidth / videoHeight;
+                canvas.width = window.innerWidth * 0.75;
+                canvas.height = canvas.width / aspectRatio;
+                draw();
+              }
+
+              function draw() {
+                //초기화
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 4;
+                //비디오 이미지 먼저 그려줍니다.
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                //4각형을 한번 그려 봅니다.
+                ctx.strokeRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
+                ctx.stroke();
+                ctx.closePath();
+                ctx.restore();
+              }
             }, 1);
           },
           false,
