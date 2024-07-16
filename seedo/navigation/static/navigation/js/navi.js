@@ -249,9 +249,14 @@ async function checkRoute(currentLocation) {
   var distanceToPolyline = getDistanceToPolyline(currentLocation, pathCoordinates);
   console.log("Polyline Distance: ", distanceToPolyline);
 
-  if (distanceToPolyline > 50) {
+  if (distanceToPolyline > 60) {
     console.log("경로이탈");
-    ttsAlert("경로를 벗어났습니다.");
+    var endLocation = endMarker.getPosition();
+    console.log(endLocation);
+    ttsAlert("경로를 벗어났습니다.경로를 재탐색 합니다.");
+    await delay(6000);
+    updateRouteStorageforoutway(currentLocation,endLocation);
+    sendLocations(currentLocation,endLocation);
     return;
   }
 
@@ -259,7 +264,7 @@ async function checkRoute(currentLocation) {
     var nextWaypoint = waypoints[currentWaypointIndex];
     var distanceToWaypoint = getDistance(currentLocation, nextWaypoint);
 
-    if (distanceToWaypoint < 50) {
+    if (distanceToWaypoint < 60) {
       currentWaypointIndex++;
       updateRouteStorage();
       var startLocation = waypoints[currentWaypointIndex - 1];
@@ -277,7 +282,7 @@ async function checkRoute(currentLocation) {
   if (endMarker) {
     var distanceToDestination = getDistance(currentLocation, endMarker.getPosition());
     console.log(distanceToDestination);
-    if (distanceToDestination < 10) {
+    if (distanceToDestination < 15) {
       ttsAlert("도착 지점 근처에 도착했습니다. 경로 안내를 종료합니다.");
       await delay(6000);
       localStorage.removeItem("routeData");
@@ -563,7 +568,7 @@ function findRoute() {
   setInterval(function () {
     getCurrentLocation();
     console.log("현재 위치 업데이트");
-  }, 5000);
+  }, 1000);
   // 경로 체크
   setInterval(function () {
     checkRoute(currentMarker.getPosition());
@@ -719,6 +724,13 @@ function updateRouteStorage() {
   };
   localStorage.setItem("routeData", JSON.stringify(routeData));
 }
+function updateRouteStorageforoutway(currentLocation,endLocation) {
+  var routeData = {
+    startLocation: [currentLocation._lng, currentLocation._lat],
+    endLocation: [endLocation._lng, endLocation._lat],
+  };
+  localStorage.setItem("routeData", JSON.stringify(routeData));
+}
 function loadRouteFromLocalStorage() {
   var routeData = localStorage.getItem("routeData");
   if (routeData) {
@@ -773,7 +785,7 @@ function loadRouteFromLocalStorage() {
         setInterval(function () {
           getCurrentLocation();
           console.log("현재 위치 업데이트");
-        }, 5000);
+        }, 1000);
 
         setInterval(function () {
           checkRoute(currentMarker.getPosition());

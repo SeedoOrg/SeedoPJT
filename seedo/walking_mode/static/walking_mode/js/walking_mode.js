@@ -14,6 +14,20 @@ function setWalkingModeToLocalStorage(walking_mode) {
 }
 
 async function sendCameraImage(imageData) {
+  var location = document.getElementById("location").textContent;
+  var regex = /Latitude\s([-\d.]+),\sLongitude\s([-\d.]+)/;
+  var matches = location.match(regex);
+
+  if (matches) {
+    var latitude = parseFloat(matches[1]);
+    var longitude = parseFloat(matches[2]);
+
+    console.log("Latitude:", latitude);
+    console.log("Longitude:", longitude);
+  } else {
+    console.error("Could not parse location string.");
+  }
+
   var csrf_token = getCookie("csrftoken");
   try {
     const response = await fetch("/walking_mode/test/", {
@@ -22,11 +36,30 @@ async function sendCameraImage(imageData) {
         "Content-Type": "application/json",
         "X-CSRFToken": csrf_token,
       },
-      body: JSON.stringify({ image_data: imageData }),
+      body: JSON.stringify({ image_data: imageData, latitude: latitude, longitude: longitude }),
     });
 
     const result = await response.json();
     console.log(result);
+    if (result.complaints != null) {
+      const save_break_response = await fetch("/record/break/save_break/", {
+        method: "POST",
+        headers: {
+          Content_Type: "application/json",
+          "X-CSRFToken": csrf_token,
+        },
+        body: JSON.stringify({
+          broken_address: result.complaints.address,
+          broken_timestamp: result.complaints.timestamp,
+          broken_latitude: result.complaints.latitude,
+          broken_longitude: result.complaints.longitude,
+          broken_img: result.complaints.img,
+          box_label: result.complaints.box_label,
+        }),
+      });
+      const save_break_result = await save_break_response.json();
+      console.log(save_break_result);
+    }
 
     // 탐지된 객체 정보를 HTML에 표시
     var objectDetectionElement = document.getElementById("object_detection");
@@ -215,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
-    //setInterval(handlePrediction, 1000 * 60);
+    setInterval(handlePrediction, 1000 * 6);
   }
 
   function stopRecording() {
