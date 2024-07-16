@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var walking_mode = localStorage.getItem("walking_mode");
   if (walking_mode === "true") {
-    startRecording();
+    startRecording(deviceId);
     console.log("보행모드를 시작합니다.", walking_mode);
   } else {
     console.log("보행모드가 중지상태입니다.");
@@ -147,7 +147,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function startRecording() {
+  const cameraSelect = document.getElementById("cameraSelect");
+  let deviceId = cameraSelect.value;
+  // 카메라 장치를 나열하고 선택 목록을 업데이트
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    devices.forEach((device) => {
+      if (device.kind === "videoinput") {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.text = device.label || `Camera ${cameraSelect.length + 1}`;
+        cameraSelect.appendChild(option);
+      }
+    });
+  });
+
+  function startRecording(deviceId) {
     recording = true;
     recordedChunks = [];
     var recordingStatusElement = document.getElementById("recording-status");
@@ -157,14 +171,24 @@ document.addEventListener("DOMContentLoaded", function () {
     setWalkingModeToLocalStorage(recording);
     navigator.mediaDevices
       .getUserMedia({
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        video: { facingMode: "environment" },
+        // width: { ideal: 1280 },
+        // height: { ideal: 720 },
+        video: { deviceId: deviceId ? { exact: deviceId } : undefined },
         frameRate: { ideal: streamFrameRate, max: streamFrameRate },
       })
       .then(function (stream) {
         video.srcObject = stream;
         video.play();
+
+        cameraSelect.addEventListener("change", () => {
+          if (video.srcObject) {
+            video.srcObject.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+          deviceId = cameraSelect.value;
+          startRecording(deviceId);
+        });
 
         //동영상이 재생되면 인터벌함수를 통해 캔버스에 putImage를 해 줍니다.
         video.addEventListener(
@@ -355,7 +379,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var startCameraButton = document.getElementById("start-camera");
   if (startCameraButton) {
-    startCameraButton.addEventListener("click", startRecording);
+    startCameraButton.addEventListener("click", () => startRecording(deviceId));
   }
 
   var stopCameraButton = document.getElementById("stop-camera");
