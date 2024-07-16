@@ -41,6 +41,25 @@ async function sendCameraImage(imageData) {
 
     const result = await response.json();
     console.log(result);
+    if (result.complaints != null) {
+      const save_break_response = await fetch("/record/break/save_break/", {
+        method: "POST",
+        headers: {
+          Content_Type: "application/json",
+          "X-CSRFToken": csrf_token,
+        },
+        body: JSON.stringify({
+          broken_address: result.complaints.address,
+          broken_timestamp: result.complaints.timestamp,
+          broken_latitude: result.complaints.latitude,
+          broken_longitude: result.complaints.longitude,
+          broken_img: result.complaints.img,
+          box_label: result.complaints.box_label,
+        }),
+      });
+      const save_break_result = await save_break_response.json();
+      console.log(save_break_result);
+    }
 
     // 탐지된 객체 정보를 HTML에 표시
     var objectDetectionElement = document.getElementById("object_detection");

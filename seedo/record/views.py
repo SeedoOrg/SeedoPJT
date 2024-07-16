@@ -1,3 +1,5 @@
+import json
+
 from common.decorators import token_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -82,5 +84,35 @@ def save_accident_view(request):
         accident = Accident.objects.create(user=user, accident_video=video_file, accident_location=accident_location)
 
         return JsonResponse({"status": "success", "accident_id": accident.id})
+
+    return JsonResponse({"status": "error"}, status=400)
+
+
+@token_required
+def save_broken_view(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        user_id = request.user.id
+        broken_location = data["broken_address"]
+        broken_timestamp = data["broken_timestamp"]
+        broken_latitude = data["broken_latitude"]
+        broken_longitude = data["broken_longitude"]
+        box_label = data["box_label"]
+        broken_img = data["broken_img"]
+        # broken_image_file = request.FILES["broken_image_file"]
+
+        user = User.objects.get(id=user_id)
+
+        broken = Condition.objects.create(
+            user=user,
+            broken_location=broken_location,
+            broken_timestamp=broken_timestamp,
+            broken_latitude=broken_latitude,
+            broken_longitude=broken_longitude,
+            box_label=box_label,
+            broken_img=broken_img,
+        )
+        # broken_image=broken_image_file,
+        return JsonResponse({"status": "success", "broken_id": broken.id})
 
     return JsonResponse({"status": "error"}, status=400)

@@ -21,12 +21,42 @@ def upload_to(instance, filename):
     return os.path.join("record/videos/", new_filename)
 
 
+def upload_to_img(instance, filename):
+    # Split the file name and extension
+    base, ext = os.path.splitext(filename)
+    # Generate the new file name with the primary key
+    if instance.id:
+        new_filename = f"{base}_{instance.id}{ext}"
+    else:
+        new_filename = f"{base}_tmp{ext}"
+    return os.path.join("record/images/", new_filename)
+
+
 class Condition(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     condition_date = models.DateField(auto_now_add=True)
     condition_time = models.TimeField(auto_now_add=True)
-    condition_image = models.ImageField(upload_to="record/images/")
-    condition_location = models.TextField(null=False)
+    # condition_image = models.ImageField(upload_to=upload_to_img)
+    broken_location = models.TextField(null=False)
+    broken_latitude = models.TextField(null=False)
+    broken_longitude = models.TextField(null=False)
+    broken_timestamp = models.TextField(null=False)
+
+    def save(self, *args, **kwargs):
+        super().save(update_fields=["broken_location", "broken_latitude", "broken_longitude", "broken_timestamp"])
+        # is_new = self._state.adding
+        # temp_image_file = self.condition_image
+
+        # self.condition_image = None
+        # super().save(*args, **kwargs)
+
+        # if is_new:
+        #     new_file_name = upload_to_img(self, temp_image_file.name)
+        #     self.condition_image = temp_image_file
+        #     self.condition_image.name = new_file_name
+        #     super().save(update_fields=["broken_image"])
+        # else:
+        #     super().save(*args, **kwargs)
 
 
 class Accident(models.Model):

@@ -4,12 +4,14 @@ import math
 import os
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 
 import cv2
 import environ
 import numpy as np
 import pandas as pd
+import requests
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -180,7 +182,7 @@ class ImageUploadView(View):
             image_data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
             nparr = np.frombuffer(image_data.read(), np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            od_classes, seg_classes, tts_audio_base64, annotated_image = self.process_image(
+            od_classes, seg_classes, tts_audio_base64, annotated_image, complaints = self.process_image(
                 img, self.model_od, self.model_seg, history, pixel_per_meter, longitude, latitude
             )
         else:
@@ -192,12 +194,20 @@ class ImageUploadView(View):
         else:
             img_base64 = None
 
-        response_data = {"od_classes": od_classes, "seg_classes": seg_classes, "tts_audio_base64": tts_audio_base64, "annotated_image": img_base64}
+        response_data = {
+            "od_classes": od_classes,
+            "seg_classes": seg_classes,
+            "tts_audio_base64": tts_audio_base64,
+            "annotated_image": img_base64,
+            "complaints": complaints,
+        }
 
         return JsonResponse(response_data)
 
     @classmethod
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude):
+        complaints = None
+
         frame_per_audio = 5
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
@@ -209,12 +219,17 @@ class ImageUploadView(View):
 
         annotator = Annotator(img, line_width=3, example=str("가나다"), font=font_file)  # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
         annotator.tf = max(annotator.lw - 1, 1)
+
+        annot_complain = Annotator(img, line_width=3, example=str("가나다"), font=font_file)
+        annot_complain.tf = max(annotator.lw - 1, 1)
+
         txt_color, txt_background = ((0, 0, 0), (255, 255, 255))
 
         detected_obstacle = False  # 객체가 탐지되었는지 확인하는 플래그
 
         # 모델 2개 순회
         for i, model in enumerate([model_od, model_seg]):
+
             names = model.model.names
             names_kr = [OD_CLS_KR, SEG_CLS_KR][i]
             results = model.track(img, persist=True)
@@ -222,6 +237,7 @@ class ImageUploadView(View):
             clss = results[0].boxes.cls.int().cpu().tolist()
 
             # 만약 객체가 탐지 됐다면
+            # print(results[0].boxes.id)
             if results[0].boxes.id is not None:
                 track_ids = results[0].boxes.id.int().cpu().tolist()
                 for box, track_id, cls in zip(boxes, track_ids, clss):
@@ -230,26 +246,55 @@ class ImageUploadView(View):
                     elif i == 1:  # Segmentation
                         seg_classes.append(names[cls])
                     if (cls in _obstacles) and i == 1:
-                        continue
-                    detected_obstacle = True
+                        if cls == 2:
+                            base_url = "https://nominatim.openstreetmap.org/reverse"
+                            params = {"lat": latitude, "lon": longitude, "format": "json"}
+                            response = requests.get(base_url, params=params)
 
-                    x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
-                    x_loc = get_x_loc(x1, w)
-                    y_loc = get_y_loc(y1, h, threshold=4)
-                    distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
-                    if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
-                        # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
-                        annotator.box_label(
-                            box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc,x_loc-12][x_loc>12]}시", color=colors(cls)
-                        )  # 한글 ver.
-                        # annotator.visioneye(box, start_point)
-                        annotator.visioneye_pil(box, start_point)
-                        text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-                        cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
-                        cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
+                            if response.status_code == 200:
+                                data = response.json()
+                                if "address" in data:
+                                    address = data["display_name"]
+                                else:
+                                    print("No address found")
+                                    address = None
+                            else:
+                                print("Failed to connect to Nominatim API")
+                                address = None
 
-                        # 음성안내를 위한 객체 정보 추가
-                        history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
+                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # 파손 발견 시간
+
+                            _, buffer = cv2.imencode(".jpg", img)
+                            complain_img = base64.b64encode(buffer).decode("utf-8")
+
+                            # 민원 정보 추가
+                            complaints = {
+                                "timestamp": timestamp,
+                                "address": address,
+                                "latitude": latitude,
+                                "longitude": longitude,
+                                "img": complain_img,
+                                "box_label": box,
+                            }
+
+                        detected_obstacle = True
+                        x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
+                        x_loc = get_x_loc(x1, w)
+                        y_loc = get_y_loc(y1, h, threshold=4)
+                        distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
+                        if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
+                            # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
+                            annotator.box_label(
+                                box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc,x_loc-12][x_loc>12]}시", color=colors(cls)
+                            )  # 한글 ver.
+                            # annotator.visioneye(box, start_point)
+                            annotator.visioneye_pil(box, start_point)
+                            text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+                            cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
+                            cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
+
+                            # 음성안내를 위한 객체 정보 추가
+                            history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
 
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
             print(ImageUploadView.frame_cnt)
@@ -263,4 +308,5 @@ class ImageUploadView(View):
 
         ImageUploadView.frame_cnt += 1
         annotated_image = annotator.result() if detected_obstacle else None
-        return od_classes, seg_classes, tts_audio_base64, annotated_image
+
+        return od_classes, seg_classes, tts_audio_base64, annotated_image, complaints
