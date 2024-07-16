@@ -276,25 +276,27 @@ class ImageUploadView(View):
                                 "img": complain_img,
                                 "box_label": box,
                             }
+                        else:
+                            continue
 
-                        detected_obstacle = True
-                        x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
-                        x_loc = get_x_loc(x1, w)
-                        y_loc = get_y_loc(y1, h, threshold=4)
-                        distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
-                        if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
-                            # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
-                            annotator.box_label(
-                                box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc,x_loc-12][x_loc>12]}시", color=colors(cls)
-                            )  # 한글 ver.
-                            # annotator.visioneye(box, start_point)
-                            annotator.visioneye_pil(box, start_point)
-                            text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-                            cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
-                            cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
+                    detected_obstacle = True
+                    x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
+                    x_loc = get_x_loc(x1, w)
+                    y_loc = get_y_loc(y1, h, threshold=4)
+                    distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
+                    if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
+                        # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
+                        annotator.box_label(
+                            box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc,x_loc-12][x_loc>12]}시", color=colors(cls)
+                        )  # 한글 ver.
+                        # annotator.visioneye(box, start_point)
+                        annotator.visioneye_pil(box, start_point)
+                        text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+                        cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
+                        cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
 
-                            # 음성안내를 위한 객체 정보 추가
-                            history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
+                        # 음성안내를 위한 객체 정보 추가
+                        history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
 
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
             print(ImageUploadView.frame_cnt)
