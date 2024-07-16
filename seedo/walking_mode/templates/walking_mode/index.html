@@ -8,18 +8,22 @@
 <script defer src="{% static 'walking_mode/js/walking_mode.js' %}"></script>
 {% endblock extra_head %} {% block content %}
 <main>
-  <div class="switchCondition">
-    <span class="switchTxt">보행모드</span>
-    <span class="switchTxt switchOff">Off</span>
-    <span class="switchTxt">/</span>
-    <span class="switchTxt switchOn">On</span>
+  <div class="switchContainer">
+    <span class="titleTxt">보행모드</span>
+    <div class="switchCondition">
+      <span class="switchTxt switchOff">Off</span>
+      <span class="switchTxt">/</span>
+      <span class="switchTxt switchOn">On</span>
+    </div>
+    <!-- Rounded switch -->
+    <label class="switch">
+      <input type="checkbox" id="toggleSwitch" />
+      <span class="slider round"></span>
+    </label>
   </div>
-  <!-- Rounded switch -->
-  <label class="switch">
-    <input type="checkbox" id="toggleSwitch" />
-    <span class="slider round"></span>
-  </label>
-  <video id="video" width="320" height="240" style="display: block"></video>
+  <select id="cameraSelect"></select>
+  <canvas id="canvas"></canvas>
+
   <div style="display: none">
     <div id="map" style="height: 400px"></div>
     <h1>Object Detection</h1>
@@ -36,8 +40,7 @@
     <button id="stop-camera">Stop Camera</button>
 
     <h2>Video</h2>
-
-    <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
+    <video id="video" width="320" height="240" style="display: block"></video>
 
     <h2>Annotated Image</h2>
     <img id="annotated-image" width="640" height="480" style="display: none" />
@@ -68,66 +71,6 @@
     } else {
       document.getElementById("toggleSwitch").checked = false;
     }
-
-    function adjustSwitchSize() {
-      const switchElement = document.querySelector(".switch");
-      const sliderElement = switchElement.querySelector(".slider");
-      const switchWidth = switchElement.offsetWidth;
-      const switchHeight = (switchWidth * 34) / 60;
-      const sliderButtonSize = switchHeight - 8;
-      const translateXValue = switchWidth - switchHeight;
-
-      // Set the height and border-radius dynamically
-      switchElement.style.height = `${switchHeight}px`;
-      sliderElement.style.borderRadius = `${switchHeight / 2}px`;
-      sliderElement.style.height = `${switchHeight}px`;
-
-      // Create a new style element
-      const style = document.createElement("style");
-      document.head.appendChild(style);
-      const styleSheet = style.sheet;
-
-      // Add the ::before pseudo-element styles dynamically
-      styleSheet.insertRule(
-        `
-        .switch .slider::before {
-          height: ${sliderButtonSize}px;
-          width: ${sliderButtonSize}px;
-          left: 4px;
-          bottom: 4px;
-          border-radius: 50%;
-        }
-      `,
-        styleSheet.cssRules.length,
-      );
-
-      styleSheet.insertRule(
-        `
-        .switch input:checked + .slider::before {
-          transform: translateX(${translateXValue}px);
-        }
-      `,
-        styleSheet.cssRules.length,
-      );
-    }
-
-    function adjustFontSize() {
-      const switchElement = document.querySelector(".switch");
-      const switchWidth = switchElement.offsetWidth;
-      const fontSize = switchWidth * 0.2; // 폰트 사이즈를 .switch 너비의 20%로 설정
-      const switchTxtElements = document.querySelectorAll(".switchTxt");
-      switchTxtElements.forEach(function (switchTxt) {
-        switchTxt.style.fontSize = `${fontSize}px`;
-      });
-    }
-
-    adjustSwitchSize();
-    adjustFontSize();
-
-    window.addEventListener("resize", function () {
-      adjustSwitchSize();
-      adjustFontSize();
-    });
 
     function updateTextColor() {
       const checkbox = document.getElementById("toggleSwitch");
