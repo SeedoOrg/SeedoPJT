@@ -53,6 +53,8 @@ class LoginView(View):
                 response = redirect("home")
                 response.set_cookie("access_token", access_token)
                 response.set_cookie("refresh_token", refresh_token)
+                response.set_cookie("preloadLastShown", 0, max_age=86400 * 30)
+
                 return response
 
         return render(request, "accounts/login.html", {"form": form})
@@ -90,7 +92,7 @@ def profile(request):
 
     for user_request in user_requests:
         partner_info = {
-            "user": user_request.recipient if user_request.requester == user else user_request.requester,
+            "user": (user_request.recipient if user_request.requester == user else user_request.requester),
             "request_id": user_request.id,
             "is_accepted": user_request.is_accepted,
             "is_verified": user_request.is_verified,
