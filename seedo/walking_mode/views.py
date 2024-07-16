@@ -208,7 +208,7 @@ class ImageUploadView(View):
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude):
         complaints = None
 
-        frame_per_audio = 5
+        frame_per_audio = 3
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
         _obstacles = [0, 1, 2, 3, 4, 5, 11, 12]
