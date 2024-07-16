@@ -41,8 +41,6 @@ class Condition(models.Model):
     condition_time = models.TimeField(auto_now_add=True)
     condition_image = models.ImageField(upload_to=upload_to_img)
     condition_location = models.TextField(null=False)
-    # broken_latitude = models.TextField(null=False)
-    # broken_longitude = models.TextField(null=False)
 
     def save(self, *args, **kwargs):
         is_new = self._state.adding

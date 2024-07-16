@@ -1,8 +1,11 @@
 import base64
 import json
+from pathlib import Path
 
 import cv2
+import environ
 import numpy as np
+import requests
 from common.decorators import token_required
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
@@ -15,6 +18,15 @@ from .models import Accident, Condition
 
 # Create your views here.
 User = get_user_model()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+# API 가져오기
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+env_path = BASE_DIR.parent / ".env"
+environ.Env.read_env(env_file=env_path)
 
 
 @token_required
@@ -80,12 +92,27 @@ def save_accident_view(request):
     if request.method == "POST":
 
         user_id = request.user.id
-        accident_location = request.POST["accident_location"]
+        latitude = request.POST["latitude"]
+        longitude = request.POST["longitude"]
         video_file = request.FILES["video_file"]
+        base_url = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result"
+        params = {"lat": latitude, "lon": longitude, "coordType": "WGS84GEO", "addressType": "A10"}
+        headers = {"appKey": env("TMAP_API_KEY")}
+        response = requests.get(base_url, params=params, headers=headers)
+
+        if response.status_code == 200:
+            data = response.json()
+            address = data["addressInfo"]["fullAddress"].split(",")[2]
+        else:
+            print("Failed to connect to Nominatim API")
+            address = None
+
+        if address is None:
+            address = "dummy_location"
 
         user = User.objects.get(id=user_id)
 
-        accident = Accident.objects.create(user=user, accident_video=video_file, accident_location=accident_location)
+        accident = Accident.objects.create(user=user, accident_video=video_file, accident_location=address)
 
         return JsonResponse({"status": "success", "accident_id": accident.id})
 
@@ -99,14 +126,10 @@ def save_broken_view(request):
 
         user_id = request.user.id
         broken_location = data.get("broken_address", "dummy_location")
-        broken_location = "dummy_location"
+        if broken_location is None:
+            broken_location = "dummy_location"
 
-        print(f"broken_location: '{broken_location}'")
-        # broken_latitude = data["broken_latitude"]
-        # broken_longitude = data["broken_longitude"]
         broken_img = data.get("broken_img", "")
-
-        # broken_image_file = request.FILES["broken_image_file"]
 
         # Step 1: Decode the base64 encoded image to binary data
         img_data = base64.b64decode(broken_img)
@@ -123,18 +146,9 @@ def save_broken_view(request):
         # Step 5: Create a ContentFile from the image data
         image_file = ContentFile(buffer.tobytes(), name="broken_image.png")
 
-        # Output the base64 encoded PNG string (if needed)print(png_base64)
-
         user = User.objects.get(id=user_id)
 
-        broken = Condition.objects.create(
-            user=user,
-            condition_location=broken_location,
-            # broken_latitude=broken_latitude,
-            # broken_longitude=broken_longitude,
-            condition_image=image_file,
-        )
-        # broken_image=broken_image_file,
+        broken = Condition.objects.create(user=user, condition_location=broken_location, condition_image=image_file)
         return JsonResponse({"status": "success", "broken_id": broken.id})
 
     return JsonResponse({"status": "error"}, status=400)

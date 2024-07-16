@@ -246,17 +246,14 @@ class ImageUploadView(View):
                         seg_classes.append(names[cls])
                     if (cls in _obstacles) and i == 1:
                         if cls == 2:
-                            base_url = "https://nominatim.openstreetmap.org/reverse"
-                            params = {"lat": latitude, "lon": longitude, "format": "json"}
-                            response = requests.get(base_url, params=params)
+                            base_url = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result"
+                            params = {"lat": latitude, "lon": longitude, "coordType": "WGS84GEO", "addressType": "A10"}
+                            headers = {"appKey": env("TMAP_API_KEY")}
+                            response = requests.get(base_url, params=params, headers=headers)
 
                             if response.status_code == 200:
                                 data = response.json()
-                                if "address" in data:
-                                    address = data["display_name"]
-                                else:
-                                    print("No address found")
-                                    address = None
+                                address = data["addressInfo"]["fullAddress"].split(",")[2]
                             else:
                                 print("Failed to connect to Nominatim API")
                                 address = None
@@ -265,12 +262,7 @@ class ImageUploadView(View):
                             complain_img = base64.b64encode(buffer).decode("utf-8")
 
                             # 민원 정보 추가
-                            complaints = {
-                                "address": address,
-                                # "latitude": latitude,
-                                # "longitude": longitude,
-                                "img": complain_img,
-                            }
+                            complaints = {"address": address, "img": complain_img}
                         else:
                             continue
 
