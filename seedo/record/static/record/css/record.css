@@ -5,7 +5,7 @@ main {
   align-items: center;
   flex-direction: column;
   gap: 34px; /* Gap between buttons */
-  padding: 75px 0px 25px;
+  padding: 50px 0px 20px;
 }
 
 .layout {
@@ -80,7 +80,7 @@ video {
 
 .recordList {
   font-weight: 700;
-  height: 75vh;
+  height: 430px;
   overflow-y: auto;
   position: relative;
   z-index: 1;
@@ -99,4 +99,33 @@ video {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease-out;
+}
+
+#pagination {
+  /* position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%); */
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+#pagination button {
+  border: 1px solid #337614;
+  background-color: #fff;
+  color: #337614;
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#pagination button.active {
+  background-color: #337614;
+  color: #fff;
+}
+
+#pagination button:hover {
+  background-color: #e6f5df;
 }
