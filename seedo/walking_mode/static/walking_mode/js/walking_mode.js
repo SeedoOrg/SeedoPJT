@@ -69,14 +69,15 @@ async function sendCameraImage(imageData) {
 
     // 이미지 표시
     const imgElement = document.getElementById("annotated-image");
-    if (imgElement) {
-      if (result.annotated_image) {
-        imgElement.src = `data:image/jpeg;base64,${result.annotated_image}`;
-        imgElement.style.display = "block";
-      } else {
-        imgElement.style.display = "none";
-      }
-    }
+    imgElement.src = `data:image/jpeg;base64,${result.annotated_image}`;
+    // if (imgElement) {
+    //   if (result.annotated_image) {
+    //     imgElement.src = `data:image/jpeg;base64,${result.annotated_image}`;
+    //     imgElement.style.display = "block";
+    //   } else {
+    //     imgElement.style.display = "none";
+    //   }
+    // }
 
     // TTS 오디오를 큐에 추가하고 재생 관리
     if (result.tts_audio_base64) {
@@ -121,7 +122,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let video = document.getElementById("video");
   let canvas = document.getElementById("canvas");
   let image = document.getElementById("annotated-image");
-  const ctx = canvas.getContext("2d");
 
   let mediaRecorder;
   let recordedChunks = [];
@@ -131,23 +131,46 @@ document.addEventListener("DOMContentLoaded", function () {
   const saveInterval = 1000 * 60; // milliseconds
   var csrftoken = getCookie("csrftoken");
 
-  const cameraSelect = document.getElementById("cameraSelect");
-  let deviceId = cameraSelect.value;
-  // 카메라 장치를 나열하고 선택 목록을 업데이트
-  navigator.mediaDevices.enumerateDevices().then((devices) => {
-    devices.forEach((device) => {
-      if (device.kind === "videoinput") {
-        const option = document.createElement("option");
-        option.value = device.deviceId;
-        option.text = device.label || `Camera ${cameraSelect.length + 1}`;
-        cameraSelect.appendChild(option);
-      }
-    });
-  });
+  // const cameraSelect = document.getElementById("cameraSelect");
+  // let deviceId = localStorage.getItem("cameraId");
+  // if (!deviceId) {
+  //   deviceId = cameraSelect.value;
+  // }
+  // console.log(deviceId);
+  // // 카메라 장치를 나열하고 선택 목록을 업데이트
+  // navigator.mediaDevices.enumerateDevices().then((devices) => {
+  //   devices.forEach((device) => {
+  //     if (device.kind === "videoinput") {
+  //       const option = document.createElement("option");
+  //       option.value = device.deviceId;
+  //       option.text = device.label || `Camera ${cameraSelect.length + 1}`;
+  //       cameraSelect.appendChild(option);
+
+  //       // 로컬 스토리지에서 불러온 deviceId와 일치하면 해당 옵션을 선택
+  //       if (device.deviceId === deviceId) {
+  //         option.selected = true;
+  //       }
+  //     }
+  //   });
+  // });
+  // cameraSelect.addEventListener("change", () => {
+  //   if (video.srcObject) {
+  //     video.srcObject.getTracks().forEach((track) => {
+  //       track.stop();
+  //     });
+  //     deviceId = cameraSelect.value;
+  //     localStorage.setItem("cameraId", deviceId);
+  //     startRecording(deviceId);
+  //   } else {
+  //     deviceId = cameraSelect.value;
+  //     localStorage.setItem("cameraId", deviceId);
+  //   }
+  //   console.log(deviceId);
+  // });
 
   var walking_mode = localStorage.getItem("walking_mode");
   if (walking_mode === "true") {
-    startRecording(deviceId);
+    startRecording();
     console.log("보행모드를 시작합니다.", walking_mode);
   } else {
     console.log("보행모드가 중지상태입니다.");
@@ -162,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function startRecording(deviceId) {
+  function startRecording() {
     recording = true;
     recordedChunks = [];
     var recordingStatusElement = document.getElementById("recording-status");
@@ -172,55 +195,31 @@ document.addEventListener("DOMContentLoaded", function () {
     setWalkingModeToLocalStorage(recording);
     navigator.mediaDevices
       .getUserMedia({
-        // width: { ideal: 1280 },
-        // height: { ideal: 720 },
-        video: { deviceId: deviceId },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        video: { facingMode: "environment" },
         frameRate: { ideal: streamFrameRate, max: streamFrameRate },
       })
       .then(function (stream) {
         video.srcObject = stream;
         video.play();
 
-        cameraSelect.addEventListener("change", () => {
-          if (video.srcObject) {
-            video.srcObject.getTracks().forEach((track) => {
-              track.stop();
-            });
-          }
-          deviceId = cameraSelect.value;
-          startRecording(deviceId);
+        video.addEventListener("loadedmetadata", () => {
+          const videoWidth = video.videoWidth;
+          const videoHeight = video.videoHeight;
+          resizeCanvas(videoWidth, videoHeight);
         });
-
-        //동영상이 재생되면 인터벌함수를 통해 캔버스에 putImage를 해 줍니다.
-        video.addEventListener(
-          "play",
-          () => {
-            setInterval(() => {
-              const videoWidth = video.videoWidth;
-              const videoHeight = video.videoHeight;
-              resizeCanvas(videoWidth, videoHeight);
-
-              // 창 크기가 변경될 때마다 캔버스 크기를 조정
-              window.addEventListener("resize", () => {
-                if (video.videoWidth && video.videoHeight) {
-                  resizeCanvas(video.videoWidth, video.videoHeight);
-                }
-              });
-              function resizeCanvas() {
-                const aspectRatio = videoWidth / videoHeight;
-                canvas.width = window.innerWidth * 0.75;
-                canvas.height = canvas.width / aspectRatio;
-
-                image.width = window.innerWidth * 0.75;
-                image.height = image.width / aspectRatio;
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-              }
-            }, 1);
-          },
-          false,
-        );
+        // 창 크기가 변경될 때마다 캔버스 크기를 조정
+        window.addEventListener("resize", () => {
+          if (video.videoWidth && video.videoHeight) {
+            resizeCanvas(video.videoWidth, video.videoHeight);
+          }
+        });
+        function resizeCanvas(videoWidth, videoHeight) {
+          const aspectRatio = videoWidth / videoHeight;
+          image.width = window.innerWidth * 0.75;
+          image.height = image.width / aspectRatio;
+        }
 
         // Set up MediaRecorder
         mediaRecorder = new MediaRecorder(stream);
@@ -377,7 +376,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var startCameraButton = document.getElementById("start-camera");
   if (startCameraButton) {
-    startCameraButton.addEventListener("click", () => startRecording(deviceId));
+    startCameraButton.addEventListener("click", startRecording);
   }
 
   var stopCameraButton = document.getElementById("stop-camera");
