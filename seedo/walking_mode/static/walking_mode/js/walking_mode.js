@@ -58,6 +58,17 @@ async function sendCameraImage(imageData) {
         }),
       });
       const save_break_result = await save_break_response.json();
+
+      if (save_break_result.status === "success") {
+        const brokenInformElement = document.getElementById("broken_inform");
+
+        if (brokenInformElement) {
+          brokenInformElement.play().catch((error) => {
+            console.log("Audio play failed:", error);
+          });
+        }
+      }
+
       console.log(save_break_result);
     }
 
@@ -168,6 +179,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if (recordingStatusElement) {
       recordingStatusElement.textContent = "Recording...";
     }
+
+    if (walking_mode !== "true") {
+      const onWalkingElement = document.getElementById("on_walking");
+
+      if (onWalkingElement) {
+        onWalkingElement.play().catch((error) => {
+          console.log("Audio play failed:", error);
+        });
+      }
+    }
+
     setWalkingModeToLocalStorage(recording);
     navigator.mediaDevices
       .getUserMedia({
@@ -266,6 +288,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
+
     // setInterval(handlePrediction, 1000 * 6);
   }
 
@@ -276,6 +299,13 @@ document.addEventListener("DOMContentLoaded", function () {
     video.pause();
     video.srcObject.getTracks().forEach((track) => track.stop());
     mediaRecorder.stop();
+    const offWalkingElement = document.getElementById("off_walking");
+
+    if (offWalkingElement) {
+      offWalkingElement.play().catch((error) => {
+        console.log("Audio play failed:", error);
+      });
+    }
   }
 
   function handlePrediction() {
@@ -377,6 +407,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (data.status === "success") {
           console.log("Recorded chunk saved successfully");
+          const fallingInformElement = document.getElementById("falling_inform");
+
+          if (fallingInformElement) {
+            fallingInformElement.play().catch((error) => {
+              console.log("Audio play failed:", error);
+            });
+          }
         } else {
           console.error("Error saving recorded chunk");
         }
