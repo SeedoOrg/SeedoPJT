@@ -13,6 +13,8 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 from matching.models import UserRequest
+from django.core.mail import send_mail
+from django.conf import settings
 
 from .models import Accident, Condition
 
@@ -104,7 +106,7 @@ def save_accident_view(request):
             data = response.json()
             address = data["addressInfo"]["fullAddress"].split(",")[2]
         else:
-            print("Failed to connect to Nominatim API")
+            print("Failed to connect to TMAP API")
             address = None
 
         if address is None:
@@ -113,6 +115,16 @@ def save_accident_view(request):
         user = User.objects.get(id=user_id)
 
         accident = Accident.objects.create(user=user, accident_video=video_file, accident_location=address)
+        user_requests = UserRequest.objects.filter((Q(requester=user) | Q(recipient=user)) & Q(is_accepted=True))
+
+        for user_request in user_requests:
+            recipient = user_request.requester if user_request.recipient == user else user_request.recipient
+            subject = "사고 알림"
+            message = f"{user.username} 님의 사고영상이 저장되었습니다."
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [recipient.email]
+
+            send_mail(subject, message, from_email, recipient_list)
 
         return JsonResponse({"status": "success", "accident_id": accident.id})
 
