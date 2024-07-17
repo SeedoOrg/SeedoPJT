@@ -14,6 +14,7 @@ main {
   flex-direction: column;
   height: 100%;
   width: 100%;
+  max-width: 768px;
 }
 
 .qnaList {
@@ -53,9 +54,13 @@ main {
   cursor: pointer;
 }
 .edel > a:hover,
-.edel > form > button:hover,
 #edit-button:hover {
-  color: #c2c2c2;
+  color: #337614;
+  font-weight: 700;
+}
+.edel > form > button:hover {
+  color: #e01b41;
+  font-weight: 700;
 }
 .edel > a {
   text-decoration: none;
