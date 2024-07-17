@@ -205,8 +205,10 @@ class ImageUploadView(View):
 
     @classmethod
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude):
+        current_update = False
         complaints = None
-
+        tts_audio = []
+        tts_audio_base64 = []
         frame_per_audio = 5
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
@@ -272,6 +274,11 @@ class ImageUploadView(View):
                     y_loc = get_y_loc(y1, h, threshold=4)
                     distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
 
+                    # 현재 걷고 있느 노면은 무엇인가?
+                    if (cls == 0 or cls == 1 or cls == 2 or cls == 3 or cls == 4 or cls == 5 or cls == 11) and (x_loc == 12) and (y_loc == "near"):
+                        names_kr[cls]
+                        current_update = True
+
                     if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
                         # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
                         annotator.box_label(
@@ -287,17 +294,21 @@ class ImageUploadView(View):
                         # 음성안내를 위한 객체 정보 추가
                         history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
 
+        if current_update:
+            msg = "노면이 바뀌었습니다."
+            tts_audio.append(naver_tts(msg))
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
             print(ImageUploadView.frame_cnt)
             history = pd.DataFrame(history)
             tmp = history["dist"]
             history["dist"] = np.where(tmp > 20, 20, np.where(tmp > 15, 15, np.where(tmp > 10, 10, np.where(tmp > 5, 5, tmp.astype(int)))))
             msg = make_caption(history)
-            tts_audio = naver_tts(msg)
-        if tts_audio:
-            tts_audio_base64 = base64.b64encode(tts_audio).decode("utf-8")
+            tts_audio.append(naver_tts(msg))
+        if tts_audio != []:
+            for i in tts_audio:
+                tts_audio_base64.append(base64.b64encode(i).decode("utf-8"))
 
         ImageUploadView.frame_cnt += 1
         annotated_image = annotator.result() if detected_obstacle else None
-
+        current_update = False
         return od_classes, seg_classes, tts_audio_base64, annotated_image, complaints

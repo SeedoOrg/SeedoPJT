@@ -79,7 +79,13 @@ async function sendCameraImage(imageData) {
     }
 
     // TTS 오디오를 큐에 추가하고 재생 관리
-    if (result.tts_audio_base64) {
+    if (Array.isArray(result.tts_audio_base64)) {
+      result.tts_audio_base64.forEach((audioBase64) => {
+        const audioData = `data:audio/mpeg;base64,${audioBase64}`;
+        soundQueue.push(audioData);
+      });
+      playNextInQueue();
+    } else {
       const audioData = `data:audio/mpeg;base64,${result.tts_audio_base64}`;
       soundQueue.push(audioData);
       playNextInQueue();
