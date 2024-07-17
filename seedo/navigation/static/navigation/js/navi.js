@@ -568,7 +568,7 @@ function findRoute() {
   setInterval(function () {
     getCurrentLocation();
     console.log("현재 위치 업데이트");
-  }, 1000);
+  }, 5000);
   // 경로 체크
   setInterval(function () {
     checkRoute(currentMarker.getPosition());
@@ -785,7 +785,7 @@ function loadRouteFromLocalStorage() {
         setInterval(function () {
           getCurrentLocation();
           console.log("현재 위치 업데이트");
-        }, 1000);
+        }, 5000);
 
         setInterval(function () {
           checkRoute(currentMarker.getPosition());
