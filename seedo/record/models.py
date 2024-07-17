@@ -13,6 +13,8 @@ User = get_user_model()
 def upload_to(instance, filename):
     # Split the file name and extension
     base, ext = os.path.splitext(filename)
+
+    print(base, ext)
     # Generate the new file name with the primary key
     if instance.id:
         new_filename = f"{base}_{instance.id}{ext}"
@@ -23,6 +25,7 @@ def upload_to(instance, filename):
 
 def upload_to_img(instance, filename):
     # Split the file name and extension
+
     base, ext = os.path.splitext(filename)
     # Generate the new file name with the primary key
     if instance.id:
@@ -36,29 +39,23 @@ class Condition(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     condition_date = models.DateField(auto_now_add=True)
     condition_time = models.TimeField(auto_now_add=True)
-
-    broken_location = models.TextField(null=False)
-    broken_latitude = models.TextField(null=False)
-    broken_longitude = models.TextField(null=False)
-    broken_img = models.TextField(null=False)
-    broken_label = models.TextField(null=False)
+    condition_image = models.ImageField(upload_to=upload_to_img)
+    condition_location = models.TextField(null=False)
 
     def save(self, *args, **kwargs):
+        is_new = self._state.adding
+        temp_image_file = self.condition_image
+
+        self.condition_image = None
         super().save(*args, **kwargs)
-        # super().save(update_fields=["broken_location", "broken_latitude", "broken_longitude", "broken_label","broken_img"])
-        # is_new = self._state.adding
-        # temp_image_file = self.condition_image
 
-        # self.condition_image = None
-        # super().save(*args, **kwargs)
-
-        # if is_new:
-        #     new_file_name = upload_to_img(self, temp_image_file.name)
-        #     self.condition_image = temp_image_file
-        #     self.condition_image.name = new_file_name
-        #     super().save(update_fields=["broken_image"])
-        # else:
-        #     super().save(*args, **kwargs)
+        if is_new:
+            new_file_name = upload_to_img(self, temp_image_file.name)
+            self.condition_image = temp_image_file
+            self.condition_image.name = new_file_name
+            super().save(update_fields=["condition_image"])
+        else:
+            super().save(*args, **kwargs)
 
 
 class Accident(models.Model):

@@ -4,7 +4,6 @@ import math
 import os
 import urllib.parse
 import urllib.request
-from datetime import datetime
 from pathlib import Path
 
 import cv2
@@ -208,7 +207,7 @@ class ImageUploadView(View):
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude):
         complaints = None
 
-        frame_per_audio = 3
+        frame_per_audio = 5
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
         _obstacles = [0, 1, 2, 3, 4, 5, 11, 12]
@@ -247,38 +246,23 @@ class ImageUploadView(View):
                         seg_classes.append(names[cls])
                     if (cls in _obstacles) and i == 1:
                         if cls == 2:
-                            print("파손된 점자블록")
-                            base_url = "https://nominatim.openstreetmap.org/reverse"
-                            params = {"lat": latitude, "lon": longitude, "format": "json"}
-                            response = requests.get(base_url, params=params)
+                            base_url = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result"
+                            params = {"lat": latitude, "lon": longitude, "coordType": "WGS84GEO", "addressType": "A10"}
+                            headers = {"appKey": env("TMAP_API_KEY")}
+                            response = requests.get(base_url, params=params, headers=headers)
 
                             if response.status_code == 200:
                                 data = response.json()
-                                if "address" in data:
-                                    address = data["display_name"]
-                                else:
-                                    print("No address found")
-                                    address = None
+                                address = data["addressInfo"]["fullAddress"].split(",")[2]
                             else:
                                 print("Failed to connect to Nominatim API")
                                 address = None
 
-                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")  # 파손 발견 시간
-
                             _, buffer = cv2.imencode(".jpg", img)
                             complain_img = base64.b64encode(buffer).decode("utf-8")
 
-                            box_numpy = box.cpu().numpy().tolist()
-
                             # 민원 정보 추가
-                            complaints = {
-                                "timestamp": timestamp,
-                                "address": address,
-                                "latitude": latitude,
-                                "longitude": longitude,
-                                "img": complain_img,
-                                "box_label": box_numpy,
-                            }
+                            complaints = {"address": address, "img": complain_img}
                         else:
                             continue
 
@@ -287,6 +271,7 @@ class ImageUploadView(View):
                     x_loc = get_x_loc(x1, w)
                     y_loc = get_y_loc(y1, h, threshold=4)
                     distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
+
                     if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
                         # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
                         annotator.box_label(
@@ -295,6 +280,7 @@ class ImageUploadView(View):
                         # annotator.visioneye(box, start_point)
                         annotator.visioneye_pil(box, start_point)
                         text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+
                         cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
                         cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
 

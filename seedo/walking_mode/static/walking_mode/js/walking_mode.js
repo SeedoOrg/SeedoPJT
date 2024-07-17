@@ -36,7 +36,11 @@ async function sendCameraImage(imageData) {
         "Content-Type": "application/json",
         "X-CSRFToken": csrf_token,
       },
-      body: JSON.stringify({ image_data: imageData, latitude: latitude, longitude: longitude }),
+      body: JSON.stringify({
+        image_data: imageData,
+        latitude: latitude,
+        longitude: longitude,
+      }),
     });
 
     const result = await response.json();
@@ -50,11 +54,7 @@ async function sendCameraImage(imageData) {
         },
         body: JSON.stringify({
           broken_address: result.complaints.address,
-          broken_timestamp: result.complaints.timestamp,
-          broken_latitude: result.complaints.latitude,
-          broken_longitude: result.complaints.longitude,
           broken_img: result.complaints.img,
-          box_label: result.complaints.box_label,
         }),
       });
       const save_break_result = await save_break_response.json();
@@ -120,6 +120,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const frameRate = 1; // frames per second
   let video = document.getElementById("video");
   let canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
   let mediaRecorder;
   let recordedChunks = [];
   const streamFrameRate = 30;
@@ -130,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var walking_mode = localStorage.getItem("walking_mode");
   if (walking_mode === "true") {
-    startRecording();
+    startRecording(deviceId);
     console.log("보행모드를 시작합니다.", walking_mode);
   } else {
     console.log("보행모드가 중지상태입니다.");
@@ -145,7 +147,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function startRecording() {
+  const cameraSelect = document.getElementById("cameraSelect");
+  let deviceId = cameraSelect.value;
+  // 카메라 장치를 나열하고 선택 목록을 업데이트
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    devices.forEach((device) => {
+      if (device.kind === "videoinput") {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.text = device.label || `Camera ${cameraSelect.length + 1}`;
+        cameraSelect.appendChild(option);
+      }
+    });
+  });
+
+  function startRecording(deviceId) {
     recording = true;
     recordedChunks = [];
     var recordingStatusElement = document.getElementById("recording-status");
@@ -155,14 +171,67 @@ document.addEventListener("DOMContentLoaded", function () {
     setWalkingModeToLocalStorage(recording);
     navigator.mediaDevices
       .getUserMedia({
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        video: { facingMode: "environment" },
+        // width: { ideal: 1280 },
+        // height: { ideal: 720 },
+        video: { deviceId: deviceId ? { exact: deviceId } : undefined },
         frameRate: { ideal: streamFrameRate, max: streamFrameRate },
       })
       .then(function (stream) {
         video.srcObject = stream;
         video.play();
+
+        cameraSelect.addEventListener("change", () => {
+          if (video.srcObject) {
+            video.srcObject.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+          deviceId = cameraSelect.value;
+          startRecording(deviceId);
+        });
+
+        //동영상이 재생되면 인터벌함수를 통해 캔버스에 putImage를 해 줍니다.
+        video.addEventListener(
+          "play",
+          () => {
+            setInterval(() => {
+              const videoWidth = video.videoWidth;
+              const videoHeight = video.videoHeight;
+              resizeCanvas(videoWidth, videoHeight);
+
+              // 창 크기가 변경될 때마다 캔버스 크기를 조정
+              window.addEventListener("resize", () => {
+                if (video.videoWidth && video.videoHeight) {
+                  resizeCanvas(video.videoWidth, video.videoHeight);
+                }
+              });
+              function resizeCanvas() {
+                const aspectRatio = videoWidth / videoHeight;
+                canvas.width = window.innerWidth * 0.75;
+                canvas.height = canvas.width / aspectRatio;
+                draw();
+              }
+
+              function draw() {
+                //초기화
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 4;
+                //비디오 이미지 먼저 그려줍니다.
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                //4각형을 한번 그려 봅니다.
+                ctx.strokeRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
+                ctx.stroke();
+                ctx.closePath();
+                ctx.restore();
+              }
+            }, 1);
+          },
+          false,
+        );
 
         // Set up MediaRecorder
         mediaRecorder = new MediaRecorder(stream);
@@ -197,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
-    setInterval(handlePrediction, 1000 * 6);
+    // setInterval(handlePrediction, 1000 * 6);
   }
 
   function stopRecording() {
@@ -269,6 +338,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!recording) {
       return;
     }
+    var location = document.getElementById("location").textContent;
+    var regex = /Latitude\s([-\d.]+),\sLongitude\s([-\d.]+)/;
+    var matches = location.match(regex);
+
+    if (matches) {
+      var latitude = parseFloat(matches[1]);
+      var longitude = parseFloat(matches[2]);
+    }
     if (recordedChunks.length > 0) {
       const recordedBlob = new Blob(recordedChunks, {
         type: "video/mp4",
@@ -279,7 +356,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Prepare form data
       const formData = new FormData();
-      formData.append("accident_location", "currentPosition"); // Replace with actual location data
+      formData.append("latitude", latitude); // Replace with actual location data
+      formData.append("longitude", longitude); // Replace with actual location data
       formData.append("video_file", videoFile);
 
       for (let [key, value] of formData.entries()) {
@@ -310,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var startCameraButton = document.getElementById("start-camera");
   if (startCameraButton) {
-    startCameraButton.addEventListener("click", startRecording);
+    startCameraButton.addEventListener("click", () => startRecording(deviceId));
   }
 
   var stopCameraButton = document.getElementById("stop-camera");
