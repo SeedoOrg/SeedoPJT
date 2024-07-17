@@ -7,6 +7,17 @@
 <script src="{% static 'sensor/js/sensor.js' %}"></script>
 {% endblock extra_head %} {% block content %}
 <main>
+  <div style="display: none">
+    <div id="map" style="height: 400px"></div>
+    <p id="location" style="display: none">Location: Loading...</p>
+    <p id="accelerometer" style="display: none">Accelerometer: Loading...</p>
+    <p id="gyroscope" style="display: none">Gyroscope: Loading...</p>
+    <p id="fall_recognition" style="display: none">fall_recognition: Loading...</p>
+    <video id="video" width="640" height="480" style="display: none"></video>
+    <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
+    <select id="cameraSelect"></select>
+    <img id="annotated-image" width="640" height="480" style="display: none" />
+  </div>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       var routeData = localStorage.getItem("routeData");
