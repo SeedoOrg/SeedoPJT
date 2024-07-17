@@ -36,7 +36,11 @@ async function sendCameraImage(imageData) {
         "Content-Type": "application/json",
         "X-CSRFToken": csrf_token,
       },
-      body: JSON.stringify({ image_data: imageData, latitude: latitude, longitude: longitude }),
+      body: JSON.stringify({
+        image_data: imageData,
+        latitude: latitude,
+        longitude: longitude,
+      }),
     });
 
     const result = await response.json();
@@ -50,11 +54,7 @@ async function sendCameraImage(imageData) {
         },
         body: JSON.stringify({
           broken_address: result.complaints.address,
-          broken_timestamp: result.complaints.timestamp,
-          broken_latitude: result.complaints.latitude,
-          broken_longitude: result.complaints.longitude,
           broken_img: result.complaints.img,
-          box_label: result.complaints.box_label,
         }),
       });
       const save_break_result = await save_break_response.json();
@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
-    setInterval(handlePrediction, 1000 * 6);
+    // setInterval(handlePrediction, 1000 * 6);
   }
 
   function stopRecording() {
@@ -338,6 +338,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!recording) {
       return;
     }
+    var location = document.getElementById("location").textContent;
+    var regex = /Latitude\s([-\d.]+),\sLongitude\s([-\d.]+)/;
+    var matches = location.match(regex);
+
+    if (matches) {
+      var latitude = parseFloat(matches[1]);
+      var longitude = parseFloat(matches[2]);
+    }
     if (recordedChunks.length > 0) {
       const recordedBlob = new Blob(recordedChunks, {
         type: "video/mp4",
@@ -348,7 +356,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Prepare form data
       const formData = new FormData();
-      formData.append("accident_location", "currentPosition"); // Replace with actual location data
+      formData.append("latitude", latitude); // Replace with actual location data
+      formData.append("longitude", longitude); // Replace with actual location data
       formData.append("video_file", videoFile);
 
       for (let [key, value] of formData.entries()) {
