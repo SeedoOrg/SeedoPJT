@@ -17,7 +17,7 @@
     <!-- 캡처된 이미지를 표시할 요소 -->
   </div>
 
-  <div id="result" class="fade"><p></p></div>
+  <div id="result"><p></p></div>
   <!-- 결과를 표시할 영역 -->
 
   <div id="button" class="fade">
@@ -106,6 +106,7 @@
           .then((data) => {
             if (data.answer) {
               resultDiv.innerHTML = `<p>${data.answer}</p>`; // 서버 응답을 결과 영역에 표시합니다.
+              resultDiv.style.display="flex"
               setMarqueeAnimation(); // 애니메이션 설정 함수 호출
               // 오디오를 재생목록에 추가하고 재생
               if (data.tts_audio_base64) {
@@ -132,6 +133,7 @@
       } else {
         // 비디오를 다시 표시합니다.
         capturedImage.style.display = "none"; // 캡처된 이미지를 숨깁니다.
+        resultDiv.style.display="none"
         video.style.display = "block"; // 비디오를 다시 표시합니다.
         captureButton.innerText = "Capture Photo"; // 버튼 텍스트를 변경합니다.
         captureButton.style.backgroundColor = "rgb(0, 179, 0)";
