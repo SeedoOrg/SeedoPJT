@@ -112,7 +112,7 @@ function playNextInQueue() {
 function captureImage(video, canvas) {
   const context = canvas.getContext("2d");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/png");
+  return canvas.toDataURL("image/jpeg", 0.8);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
