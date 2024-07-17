@@ -24,8 +24,9 @@
           console.log(result);
 
           // 탐지된 객체 정보를 HTML에 표시
-          document.getElementById("object_detection").textContent =
-            `Detection: ${result.od_classes.join(", ")} (Segmentation: ${result.seg_classes.join(", ")})`;
+          document.getElementById("object_detection").textContent = `Detection: ${result.od_classes.join(
+            ", ",
+          )} (Segmentation: ${result.seg_classes.join(", ")})`;
 
           // 이미지 표시
           const imgElement = document.getElementById("annotated-image");
@@ -130,8 +131,5 @@
 
     <h2>Annotated Image</h2>
     <img id="annotated-image" width="640" height="480" style="display: none" />
-
-    <h2>Audio Description</h2>
-    <div id="audio-container"></div>
   </body>
 </html>

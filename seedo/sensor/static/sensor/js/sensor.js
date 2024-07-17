@@ -18,24 +18,6 @@ async function sendSensorData(sensorData) {
 
     const result = await response.json();
     //console.log('Prediction:', result.prediction);
-    var alertSoundElement = document.getElementById("alert-sound");
-
-    // Play sound if prediction changes from 0 to 1
-    if (previousPrediction[0] === 0 && result.prediction[0] === 1) {
-      if (alertSoundElement) {
-        alertSoundElement.play();
-      }
-      console.log("play");
-    }
-
-    // Stop sound or play a different sound if prediction changes from 1 to 0
-    if (previousPrediction[0] === 0 && result.prediction[0] === 0) {
-      if (alertSoundElement) {
-        alertSoundElement.pause();
-        alertSoundElement.currentTime = 0;
-      }
-      // document.getElementById('stop-sound').play(); // Uncomment if you have a stop sound
-    }
 
     previousPrediction = result.prediction;
 
