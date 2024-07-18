@@ -155,10 +155,8 @@ def make_caption(history):
 
 
 class ImageUploadView(View):
-    def __init__(self):
-        self.current_cls = 99
-
     template_name = "test2.html"
+    current_cls = 99
     frame_cnt = 0
     model_od = YOLO(yolo_od_pt)
     model_seg = YOLO(yolo_seg_pt)
@@ -185,10 +183,9 @@ class ImageUploadView(View):
             image_data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
             nparr = np.frombuffer(image_data.read(), np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            od_classes, seg_classes, tts_audio_base64, annotated_image, complaints, current_cls = self.process_image(
-                img, self.model_od, self.model_seg, history, pixel_per_meter, longitude, latitude, self.current_cls
+            od_classes, seg_classes, tts_audio_base64, annotated_image, complaints = self.process_image(
+                img, self.model_od, self.model_seg, history, pixel_per_meter, longitude, latitude
             )
-            self.current_cls = current_cls
         else:
             return JsonResponse({"error": "Invalid content type"}, status=400)
 
@@ -210,9 +207,9 @@ class ImageUploadView(View):
         return JsonResponse(response_data)
 
     @classmethod
-    def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude, current_cls):
+    def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude):
         current_update = False
-        print(current_cls)
+        print(self.current_cls)
         complaints = None
         tts_audio = []
         tts_audio_base64 = []
@@ -278,9 +275,9 @@ class ImageUploadView(View):
                     # 현재 걷고 있느 노면은 무엇인가?
                     if (cls in [0, 1, 2, 3, 4, 5, 11]) and (x_loc == 12) and (i == 1) and (ImageUploadView.frame_cnt % frame_per_audio == 0):
                         print(names_kr[cls])
-                        if current_cls != cls:
+                        if self.current_cls != cls:
                             current_update = True
-                            current_cls = cls
+                            self.current_cls = cls
 
                     if (cls in _obstacles) and i == 1:
                         continue
@@ -306,7 +303,7 @@ class ImageUploadView(View):
                         history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
 
         if current_update:
-            msg = f"노면이 {names_kr[current_cls]}로 바뀌었습니다."
+            msg = f"노면이 {names_kr[cls]}로 바뀌었습니다."
             tts_audio.append(naver_tts(msg))
 
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
@@ -323,4 +320,4 @@ class ImageUploadView(View):
         ImageUploadView.frame_cnt += 1
         annotated_image = annotator.result() if detected_obstacle else None
         current_update = False
-        return od_classes, seg_classes, tts_audio_base64, annotated_image, complaints, current_cls
+        return od_classes, seg_classes, tts_audio_base64, annotated_image, complaints
