@@ -161,8 +161,16 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  var walking_mode = localStorage.getItem("walking_mode");
+  if (walking_mode === "true") {
+    startRecording(deviceId);
+    console.log("보행모드를 시작합니다.", walking_mode);
+  } else {
+    console.log("보행모드가 중지상태입니다.");
+  }
   cameraSelect.addEventListener("change", () => {
-    if (video.srcObject) {
+    if (walking_mode === "true") {
       stopRecording();
       deviceId = cameraSelect.value;
       localStorage.setItem("cameraId", deviceId);
@@ -172,14 +180,6 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem("cameraId", deviceId);
     }
   });
-
-  var walking_mode = localStorage.getItem("walking_mode");
-  if (walking_mode === "true") {
-    startRecording(deviceId);
-    console.log("보행모드를 시작합니다.", walking_mode);
-  } else {
-    console.log("보행모드가 중지상태입니다.");
-  }
 
   async function maybeSendCameraImage() {
     if (recording && activeRequests < MAX_CONCURRENT_REQUESTS) {
