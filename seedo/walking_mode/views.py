@@ -289,7 +289,6 @@ class ImageUploadView(View):
                         if self.current_cls != cls:
                             current_update = True
                             self.current_cls = cls
-
                     if (cls in _obstacles) and i == 1:
                         continue
 
