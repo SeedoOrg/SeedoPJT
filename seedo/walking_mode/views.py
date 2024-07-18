@@ -225,11 +225,8 @@ class ImageUploadView(View):
         od_classes = []
         seg_classes = []
 
-        annotator = Annotator(img, line_width=3, example=str("가나다"), font=font_file)  # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
-        annotator.tf = max(annotator.lw - 1, 1)
-
-        annot_complain = Annotator(img, line_width=3, example=str("가나다"), font=font_file)
-        annot_complain.tf = max(annotator.lw - 1, 1)
+        # annot_complain = Annotator(img, line_width=3, example=str("가나다"), font=font_file)
+        # annot_complain.tf = max(annotator.lw - 1, 1)
 
         txt_color, txt_background = ((0, 0, 0), (255, 255, 255))
 
@@ -273,6 +270,10 @@ class ImageUploadView(View):
                         complaints = {"address": address, "img": complain_img}
                         continue
 
+                    annotator = Annotator(
+                        img, line_width=3, example=str("가나다"), font=font_file
+                    )  # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
+                    annotator.tf = max(annotator.lw - 1, 1)
                     x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
                     x_loc = get_x_loc(x1, w)
                     y_loc = get_y_loc(y1, h, threshold=4)
