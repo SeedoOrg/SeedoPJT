@@ -21,7 +21,7 @@
   <!-- 결과를 표시할 영역 -->
 
   <div id="button" class="fade">
-    <button id="capture-button">Capture Photo</button>
+    <button id="capture-button">글 탐색</button>
     <!-- 사진을 찍기 위한 버튼 -->
   </div>
 
@@ -106,7 +106,8 @@
           .then((data) => {
             if (data.answer) {
               resultDiv.innerHTML = `<p>${data.answer}</p>`; // 서버 응답을 결과 영역에 표시합니다.
-              resultDiv.style.display="flex"
+              resultDiv.style.display = "flex";
+              resultDiv.style.opacity = 0.9;
               setMarqueeAnimation(); // 애니메이션 설정 함수 호출
               // 오디오를 재생목록에 추가하고 재생
               if (data.tts_audio_base64) {
@@ -127,16 +128,17 @@
         capturedImage.src = imageData;
         capturedImage.style.display = "block";
         video.style.display = "none"; // 비디오를 숨깁니다.
-        captureButton.innerText = "Retake Photo"; // 버튼 텍스트를 변경합니다.
-        captureButton.style.backgroundColor = "rgb(255, 50, 50)";
+        captureButton.innerText = "다시 찍기"; // 버튼 텍스트를 변경합니다.
+        captureButton.style.backgroundColor = "#e01b41";
         isCapturing = false; // 상태 플래그를 업데이트합니다.
       } else {
         // 비디오를 다시 표시합니다.
         capturedImage.style.display = "none"; // 캡처된 이미지를 숨깁니다.
-        resultDiv.style.display="none"
+        resultDiv.style.display = "none";
+        resultDiv.style.opacity = 0;
         video.style.display = "block"; // 비디오를 다시 표시합니다.
-        captureButton.innerText = "Capture Photo"; // 버튼 텍스트를 변경합니다.
-        captureButton.style.backgroundColor = "rgb(0, 179, 0)";
+        captureButton.innerText = "글 탐색"; // 버튼 텍스트를 변경합니다.
+        captureButton.style.backgroundColor = "#a0ce8a";
         resultDiv.innerHTML = ""; // 이전 결과를 지웁니다.
         isCapturing = true; // 상태 플래그를 업데이트합니다.
       }
