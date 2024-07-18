@@ -228,7 +228,7 @@ class ImageUploadView(View):
         # annot_complain = Annotator(img, line_width=3, example=str("가나다"), font=font_file)
         # annot_complain.tf = max(annotator.lw - 1, 1)
 
-        txt_color, txt_background = ((0, 0, 0), (255, 255, 255))
+        # txt_color, txt_background = ((0, 0, 0), (255, 255, 255))
 
         detected_obstacle = False  # 객체가 탐지되었는지 확인하는 플래그
 
@@ -270,10 +270,6 @@ class ImageUploadView(View):
                         complaints = {"address": address, "img": complain_img}
                         continue
 
-                    annotator = Annotator(
-                        img, line_width=3, example=str("가나다"), font=font_file
-                    )  # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
-                    annotator.tf = max(annotator.lw - 1, 1)
                     x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
                     x_loc = get_x_loc(x1, w)
                     y_loc = get_y_loc(y1, h, threshold=4)
@@ -293,6 +289,10 @@ class ImageUploadView(View):
                     if (cls in _obstacles) and i == 1:
                         continue
 
+                    annotator = Annotator(
+                        img, line_width=3, example=str("가나다"), font=font_file
+                    )  # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
+                    annotator.tf = max(annotator.lw - 1, 1)
                     detected_obstacle = True
                     distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
                     print(cls)
@@ -307,8 +307,8 @@ class ImageUploadView(View):
                         annotator.visioneye_pil(box, start_point)
                         text_size, _ = cv2.getTextSize(f"Distance: {int(distance)}m", cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
 
-                        cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
-                        cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
+                        # cv2.rectangle(img, (x1, y1 - text_size[1] - 10), (x1 + text_size[0] + 10, y1), txt_background, -1)
+                        # cv2.putText(img, f"Distance: {int(distance)}m", (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, txt_color, 1)
 
                         # 음성안내를 위한 객체 정보 추가
                         history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
