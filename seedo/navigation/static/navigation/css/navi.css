@@ -151,3 +151,39 @@ main {
   overflow-y: auto; /* 스크롤 추가 */
   color: #193b08;
 }
+
+.infoWindow {
+  width: 120px;
+  height: 60px;
+  border-radius: 4px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.infoStart,
+.infoEnd {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.infoStart {
+  color: #fff;
+  background-color: #337614;
+}
+.infoStart:hover {
+  font-weight: 700;
+  background-color: #489c21;
+}
+.infoEnd {
+  color: #fff;
+  background-color: #df1b41;
+}
+.infoEnd:hover {
+  font-weight: 700;
+  background-color: #dd3153;
+}
