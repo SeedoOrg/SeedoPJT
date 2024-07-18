@@ -7,14 +7,14 @@ import environ
 import numpy as np
 import requests
 from common.decorators import token_required
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
+from django.core.mail import send_mail
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 from matching.models import UserRequest
-from django.core.mail import send_mail
-from django.conf import settings
 
 from .models import Accident, Condition
 

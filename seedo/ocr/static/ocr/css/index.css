@@ -163,7 +163,12 @@ main {
 #capture-button {
   color: #ffffff;
   border: transparent;
-  text-shadow: -1px 0px #000000, 0px 1px #000000, 1px 0px #000000, 0px -1px #000000, 2px 2px 5px #00000080;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
   width: 100%;
   max-width: 480px;
   aspect-ratio: 3 / 0.7;

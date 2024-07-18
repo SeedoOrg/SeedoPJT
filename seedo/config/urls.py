@@ -25,7 +25,7 @@ from django.urls import include, path
 
 @token_required
 def index(request):
-    return render(request, "index.html")
+    return render(request, "index.html", {"MEDIA_URL": settings.MEDIA_URL})
 
 
 urlpatterns = [
