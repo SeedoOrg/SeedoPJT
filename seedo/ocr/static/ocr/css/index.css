@@ -126,7 +126,7 @@ main {
   max-height: 85%;
   margin: 0 auto;
   border-radius: 12px;
-  overflow: auto;
+  overflow: scroll;
   background-color: ghostwhite;
   border-radius: 12px;
   opacity: 0;
