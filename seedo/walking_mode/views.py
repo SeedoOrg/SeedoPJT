@@ -119,8 +119,12 @@ def get_x_loc(x_center, frame_width):
 def get_y_loc(y_center, frame_height, threshold=4):
     if y_center < frame_height / threshold:  # threshold가 작을수록 시야가 좁아짐
         direction = "far"
+    elif y_center < frame_height / threshold * 2:
+        direction = "middle"
+    elif y_center < frame_height / threshold * 3:
+        direction = "reallynear"
     else:
-        direction = "near"
+        direction = "supernear"
     return direction
 
 
@@ -157,6 +161,7 @@ def make_caption(history):
 class ImageUploadView(View):
     template_name = "test2.html"
     current_cls = 99
+    # stun=0
     frame_cnt = 0
     model_od = YOLO(yolo_od_pt)
     model_seg = YOLO(yolo_seg_pt)
@@ -272,8 +277,14 @@ class ImageUploadView(View):
                     x_loc = get_x_loc(x1, w)
                     y_loc = get_y_loc(y1, h, threshold=4)
 
-                    # 현재 걷고 있느 노면은 무엇인가?
-                    if (cls in [0, 1, 2, 3, 4, 5, 11]) and (x_loc == 12) and (i == 1) and (ImageUploadView.frame_cnt % frame_per_audio == 0):
+                    # 현재 걷고 있 노면은 무엇인가?
+                    if (
+                        (cls in [0, 1, 2, 3, 4, 5, 9, 11, 12])
+                        and (x_loc == 12)
+                        and (i == 1)
+                        and (y_loc == "supernear")
+                        and (ImageUploadView.frame_cnt % frame_per_audio == 0)
+                    ):
                         print(names_kr[cls])
                         if self.current_cls != cls:
                             current_update = True
@@ -287,7 +298,7 @@ class ImageUploadView(View):
                     print(cls)
                     print(type(cls))
 
-                    if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
+                    if y_loc != "far":  # 수직 방향이 near인 경우에만 객체 알림
                         # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
                         annotator.box_label(
                             box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc,x_loc-12][x_loc>12]}시", color=colors(cls)
@@ -303,8 +314,12 @@ class ImageUploadView(View):
                         history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
 
         if current_update:
-            msg = f"노면이 {names_kr[cls]}로 바뀌었습니다."
+            msg = f"{names_kr[self.current_cls]}위를 걷고 있습니다!"
             tts_audio.append(naver_tts(msg))
+
+        # if current_update_brail and self.stun>=0:
+        #     msg = f"점자블럭이 {x_loc}시 방향에 있습니다!"
+        #     tts_audio.append(naver_tts(msg))
 
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
             print(ImageUploadView.frame_cnt)
