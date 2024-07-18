@@ -119,8 +119,12 @@ def get_x_loc(x_center, frame_width):
 def get_y_loc(y_center, frame_height, threshold=4):
     if y_center < frame_height / threshold:  # threshold가 작을수록 시야가 좁아짐
         direction = "far"
+    elif y_center < frame_height / threshold * 2:
+        direction = "middle"
+    elif y_center < frame_height / threshold * 3:
+        direction = "reallynear"
     else:
-        direction = "near"
+        direction = "supernear"
     return direction
 
 
@@ -156,6 +160,8 @@ def make_caption(history):
 
 class ImageUploadView(View):
     template_name = "test2.html"
+    current_cls = 99
+    # stun=0
     frame_cnt = 0
     model_od = YOLO(yolo_od_pt)
     model_seg = YOLO(yolo_seg_pt)
@@ -165,6 +171,7 @@ class ImageUploadView(View):
         return render(request, self.template_name)
 
     def post(self, request):
+
         od_classes = []
         seg_classes = []
         history = []
@@ -206,14 +213,15 @@ class ImageUploadView(View):
 
     @classmethod
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude):
+        current_update = False
+        print(self.current_cls)
         complaints = None
-
+        tts_audio = []
+        tts_audio_base64 = []
         frame_per_audio = 5
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
         _obstacles = [0, 1, 2, 3, 4, 5, 11, 12]
-        tts_audio = None
-        tts_audio_base64 = None  # 초기화
         od_classes = []
         seg_classes = []
 
@@ -245,35 +253,51 @@ class ImageUploadView(View):
                         od_classes.append(names[cls])
                     elif i == 1:  # Segmentation
                         seg_classes.append(names[cls])
-                    if (cls in _obstacles) and i == 1:
-                        if cls == 2:
-                            base_url = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result"
-                            params = {"lat": latitude, "lon": longitude, "coordType": "WGS84GEO", "addressType": "A10"}
-                            headers = {"appKey": env("TMAP_API_KEY")}
-                            response = requests.get(base_url, params=params, headers=headers)
+                    if cls == 2:
+                        base_url = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result"
+                        params = {"lat": latitude, "lon": longitude, "coordType": "WGS84GEO", "addressType": "A10"}
+                        headers = {"appKey": env("TMAP_API_KEY")}
+                        response = requests.get(base_url, params=params, headers=headers)
 
-                            if response.status_code == 200:
-                                data = response.json()
-                                address = data["addressInfo"]["fullAddress"].split(",")[2]
-                            else:
-                                print("Failed to connect to Nominatim API")
-                                address = None
-
-                            _, buffer = cv2.imencode(".jpg", img)
-                            complain_img = base64.b64encode(buffer).decode("utf-8")
-
-                            # 민원 정보 추가
-                            complaints = {"address": address, "img": complain_img}
+                        if response.status_code == 200:
+                            data = response.json()
+                            address = data["addressInfo"]["fullAddress"].split(",")[2]
                         else:
-                            continue
+                            print("Failed to connect to Nominatim API")
+                            address = None
 
-                    detected_obstacle = True
+                        _, buffer = cv2.imencode(".jpg", img)
+                        complain_img = base64.b64encode(buffer).decode("utf-8")
+
+                        # 민원 정보 추가
+                        complaints = {"address": address, "img": complain_img}
+                        continue
+
                     x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
                     x_loc = get_x_loc(x1, w)
                     y_loc = get_y_loc(y1, h, threshold=4)
-                    distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
 
-                    if y_loc == "near":  # 수직 방향이 near인 경우에만 객체 알림
+                    # 현재 걷고 있 노면은 무엇인가?
+                    if (
+                        (cls in [0, 1, 2, 3, 4, 5, 9, 11, 12])
+                        and (x_loc == 12)
+                        and (i == 1)
+                        and (y_loc == "supernear")
+                        and (ImageUploadView.frame_cnt % frame_per_audio == 0)
+                    ):
+                        print(names_kr[cls])
+                        if self.current_cls != cls:
+                            current_update = True
+                            self.current_cls = cls
+                    if (cls in _obstacles) and i == 1:
+                        continue
+
+                    detected_obstacle = True
+                    distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
+                    print(cls)
+                    print(type(cls))
+
+                    if y_loc != "far":  # 수직 방향이 near인 경우에만 객체 알림
                         # annotator.box_label(box, label=f"{names[int(cls)]}_{track_id}", color=colors(int(cls)))
                         annotator.box_label(
                             box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc,x_loc-12][x_loc>12]}시", color=colors(cls)
@@ -288,17 +312,26 @@ class ImageUploadView(View):
                         # 음성안내를 위한 객체 정보 추가
                         history.append({"dist": distance, "dir": x_loc, "cls": names_kr[cls]})
 
+        if current_update:
+            msg = f"{names_kr[self.current_cls]}위를 걷고 있습니다!"
+            tts_audio.append(naver_tts(msg))
+
+        # if current_update_brail and self.stun>=0:
+        #     msg = f"점자블럭이 {x_loc}시 방향에 있습니다!"
+        #     tts_audio.append(naver_tts(msg))
+
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
             print(ImageUploadView.frame_cnt)
             history = pd.DataFrame(history)
             tmp = history["dist"]
             history["dist"] = np.where(tmp > 20, 20, np.where(tmp > 15, 15, np.where(tmp > 10, 10, np.where(tmp > 5, 5, tmp.astype(int)))))
             msg = make_caption(history)
-            tts_audio = naver_tts(msg)
-        if tts_audio:
-            tts_audio_base64 = base64.b64encode(tts_audio).decode("utf-8")
+            tts_audio.append(naver_tts(msg))
+        if tts_audio != []:
+            for i in tts_audio:
+                tts_audio_base64.append(base64.b64encode(i).decode("utf-8"))
 
         ImageUploadView.frame_cnt += 1
         annotated_image = annotator.result() if detected_obstacle else None
-
+        current_update = False
         return od_classes, seg_classes, tts_audio_base64, annotated_image, complaints
