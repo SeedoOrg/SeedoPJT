@@ -11,6 +11,12 @@
       아이디 |
       <span class="userID">{{ user.email|email_username }}</span>
     </div>
+    {% if request.user.is_superuser %}
+    <div class="superUser">
+      관리자페이지로 이동 ㅣ
+      <a href="/admin/" id="mypage" class="material-symbols-outlined">supervisor_account</a>
+    </div>
+    {% endif %}
 
     <div class="partner">
       동반자 |
