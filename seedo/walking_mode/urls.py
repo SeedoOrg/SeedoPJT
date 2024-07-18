@@ -1,3 +1,4 @@
+from common.decorators import token_required
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
@@ -6,9 +7,9 @@ from django.urls import path
 from .views import ImageUploadView
 
 
-# @token_required
+@token_required
 def index(request):
-    return render(request, "walking_mode/index.html")
+    return render(request, "walking_mode/index.html", {"MEDIA_URL": settings.MEDIA_URL})
 
 
 app_name = "walking_mode"

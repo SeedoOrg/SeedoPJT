@@ -58,6 +58,17 @@ async function sendCameraImage(imageData) {
         }),
       });
       const save_break_result = await save_break_response.json();
+
+      if (save_break_result.status === "success") {
+        const brokenInformElement = document.getElementById("broken_inform");
+
+        if (brokenInformElement) {
+          brokenInformElement.play().catch((error) => {
+            console.log("Audio play failed:", error);
+          });
+        }
+      }
+
       console.log(save_break_result);
     }
 
@@ -126,7 +137,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const frameRate = 1; // frames per second
   let video = document.getElementById("video");
   let canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
 
   let mediaRecorder;
   let recordedChunks = [];
@@ -135,6 +145,39 @@ document.addEventListener("DOMContentLoaded", function () {
   let lastSaveTime = 0;
   const saveInterval = 1000 * 60; // milliseconds
   var csrftoken = getCookie("csrftoken");
+
+  const cameraSelect = document.getElementById("cameraSelect");
+  let deviceId = localStorage.getItem("cameraId");
+  if (!deviceId) {
+    deviceId = cameraSelect.value;
+  }
+  // 카메라 장치를 나열하고 선택 목록을 업데이트
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    devices.forEach((device) => {
+      if (device.kind === "videoinput") {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.text = device.label || `Camera ${cameraSelect.length + 1}`;
+        cameraSelect.appendChild(option);
+
+        // 로컬 스토리지에서 불러온 deviceId와 일치하면 해당 옵션을 선택
+        if (device.deviceId === deviceId) {
+          option.selected = true;
+        }
+      }
+    });
+  });
+  cameraSelect.addEventListener("change", () => {
+    if (video.srcObject) {
+      stopRecording();
+      deviceId = cameraSelect.value;
+      localStorage.setItem("cameraId", deviceId);
+      startRecording(deviceId);
+    } else {
+      deviceId = cameraSelect.value;
+      localStorage.setItem("cameraId", deviceId);
+    }
+  });
 
   var walking_mode = localStorage.getItem("walking_mode");
   if (walking_mode === "true") {
@@ -153,20 +196,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  const cameraSelect = document.getElementById("cameraSelect");
-  let deviceId = cameraSelect.value;
-  // 카메라 장치를 나열하고 선택 목록을 업데이트
-  navigator.mediaDevices.enumerateDevices().then((devices) => {
-    devices.forEach((device) => {
-      if (device.kind === "videoinput") {
-        const option = document.createElement("option");
-        option.value = device.deviceId;
-        option.text = device.label || `Camera ${cameraSelect.length + 1}`;
-        cameraSelect.appendChild(option);
-      }
-    });
-  });
-
   function startRecording(deviceId) {
     recording = true;
     recordedChunks = [];
@@ -174,70 +203,46 @@ document.addEventListener("DOMContentLoaded", function () {
     if (recordingStatusElement) {
       recordingStatusElement.textContent = "Recording...";
     }
+
+    if (walking_mode !== "true") {
+      const onWalkingElement = document.getElementById("on_walking");
+
+      if (onWalkingElement) {
+        onWalkingElement.play().catch((error) => {
+          console.log("Audio play failed:", error);
+        });
+      }
+    }
+
     setWalkingModeToLocalStorage(recording);
     navigator.mediaDevices
       .getUserMedia({
-        // width: { ideal: 1280 },
-        // height: { ideal: 720 },
-        video: { deviceId: deviceId ? { exact: deviceId } : undefined },
+        width: { ideal: 640 },
+        video: { facingMode: "environment", deviceId: deviceId },
         frameRate: { ideal: streamFrameRate, max: streamFrameRate },
       })
       .then(function (stream) {
         video.srcObject = stream;
         video.play();
 
-        cameraSelect.addEventListener("change", () => {
-          if (video.srcObject) {
-            video.srcObject.getTracks().forEach((track) => {
-              track.stop();
-            });
-          }
-          deviceId = cameraSelect.value;
-          startRecording(deviceId);
+        const imgElement = document.getElementById("annotated-image");
+        video.addEventListener("loadedmetadata", () => {
+          const videoWidth = video.videoWidth;
+          const videoHeight = video.videoHeight;
+          resizeCanvas(videoWidth, videoHeight);
         });
+        // 창 크기가 변경될 때마다 캔버스 크기를 조정
+        window.addEventListener("resize", () => {
+          if (video.videoWidth && video.videoHeight) {
+            resizeCanvas(video.videoWidth, video.videoHeight);
+          }
+        });
+        function resizeCanvas(videoWidth, videoHeight) {
+          const aspectRatio = videoWidth / videoHeight;
 
-        //동영상이 재생되면 인터벌함수를 통해 캔버스에 putImage를 해 줍니다.
-        video.addEventListener(
-          "play",
-          () => {
-            setInterval(() => {
-              const videoWidth = video.videoWidth;
-              const videoHeight = video.videoHeight;
-              resizeCanvas(videoWidth, videoHeight);
-
-              // 창 크기가 변경될 때마다 캔버스 크기를 조정
-              window.addEventListener("resize", () => {
-                if (video.videoWidth && video.videoHeight) {
-                  resizeCanvas(video.videoWidth, video.videoHeight);
-                }
-              });
-              function resizeCanvas() {
-                const aspectRatio = videoWidth / videoHeight;
-                canvas.width = window.innerWidth * 0.75;
-                canvas.height = canvas.width / aspectRatio;
-                draw();
-              }
-
-              function draw() {
-                //초기화
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.save();
-                ctx.beginPath();
-                ctx.strokeStyle = "red";
-                ctx.lineWidth = 4;
-                //비디오 이미지 먼저 그려줍니다.
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                //4각형을 한번 그려 봅니다.
-                ctx.strokeRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2);
-                ctx.stroke();
-                ctx.closePath();
-                ctx.restore();
-              }
-            }, 1);
-          },
-          false,
-        );
+          imgElement.width = window.innerWidth * 0.75;
+          imgElement.height = imgElement.width / aspectRatio;
+        }
 
         // Set up MediaRecorder
         mediaRecorder = new MediaRecorder(stream);
@@ -272,6 +277,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
+
     // setInterval(handlePrediction, 1000 * 6);
   }
 
@@ -282,6 +288,13 @@ document.addEventListener("DOMContentLoaded", function () {
     video.pause();
     video.srcObject.getTracks().forEach((track) => track.stop());
     mediaRecorder.stop();
+    const offWalkingElement = document.getElementById("off_walking");
+
+    if (offWalkingElement) {
+      offWalkingElement.play().catch((error) => {
+        console.log("Audio play failed:", error);
+      });
+    }
   }
 
   function handlePrediction() {
@@ -383,6 +396,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (data.status === "success") {
           console.log("Recorded chunk saved successfully");
+          const fallingInformElement = document.getElementById("falling_inform");
+
+          if (fallingInformElement) {
+            fallingInformElement.play().catch((error) => {
+              console.log("Audio play failed:", error);
+            });
+          }
         } else {
           console.error("Error saving recorded chunk");
         }

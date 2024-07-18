@@ -70,9 +70,9 @@ function initMap() {
 
     markerLatLng = event.latLng;
     if (!routeSearchStarted) {
-      var content = `<div style='width: 120px'>
-                       <div onclick='addMarker("start")'>출발지 설정</div>
-                       <div onclick='addMarker("end")'>목적지 설정</div>
+      var content = `<div class="infoWindow">
+                       <div class="infoStart" onclick='addMarker("start")'>출발지 설정</div>
+                       <div class="infoEnd" onclick='addMarker("end")'>목적지 설정</div>
                      </div>`;
       //Popup 객체 생성.
       infoWindow = new Tmapv2.InfoWindow({
@@ -568,7 +568,7 @@ function findRoute() {
   setInterval(function () {
     getCurrentLocation();
     console.log("현재 위치 업데이트");
-  }, 1000);
+  }, 5000);
   // 경로 체크
   setInterval(function () {
     checkRoute(currentMarker.getPosition());
@@ -785,7 +785,7 @@ function loadRouteFromLocalStorage() {
         setInterval(function () {
           getCurrentLocation();
           console.log("현재 위치 업데이트");
-        }, 1000);
+        }, 5000);
 
         setInterval(function () {
           checkRoute(currentMarker.getPosition());
