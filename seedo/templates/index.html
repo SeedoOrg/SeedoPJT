@@ -89,16 +89,7 @@
       }
     });
   </script>
-  <div style="display: none">
-    <div id="map" style="height: 400px"></div>
-    <p id="location" style="display: none">Location: Loading...</p>
-    <p id="accelerometer" style="display: none">Accelerometer: Loading...</p>
-    <p id="gyroscope" style="display: none">Gyroscope: Loading...</p>
-    <p id="fall_recognition" style="display: none">fall_recognition: Loading...</p>
-    <video id="video" width="640" height="480" style="display: none"></video>
-    <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
-  </div>
-
+  <div class="fallenRedScreen"></div>
   <div class="preload">
     <img src="{% static 'images/seedo_preloading.png' %}" alt="Preload Image" style="width: 360px" />
     <audio id="welcome" src="media/audios/welcome_voice.mp3"></audio>
