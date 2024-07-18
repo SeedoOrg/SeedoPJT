@@ -127,6 +127,7 @@ main {
   margin: 0 auto;
   border-radius: 12px;
   overflow: scroll;
+  -webkit-overflow-scrolling: touch;
   background-color: ghostwhite;
   border-radius: 12px;
   opacity: 0;
