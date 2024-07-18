@@ -110,3 +110,39 @@ header .logo img {
     0px -1px #000000;
   font-weight: 700;
 }
+
+/* 천천히 나타났다 사라지는 애니메이션 정의 */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* fallenRedScreen 요소의 애니메이션 스타일 정의 */
+.fallenRedScreen.fade {
+  animation: fadeInOut 1.5s ease-in-out; /* 2초 동안 애니메이션 실행 */
+}
+
+.fallenRedScreen {
+  height: 100%;
+  width: 100%;
+  z-index: 500;
+  position: fixed; /* fixed로 설정하여 화면에 고정 */
+  top: 0;
+  left: 0;
+  background-color: #e01b4290; /* 배경색을 red로 설정 */
+  display: none; /* 초기에는 화면에 보이지 않도록 함 */
+  opacity: 0; /* 초기 opacity 값을 0으로 설정 */
+}

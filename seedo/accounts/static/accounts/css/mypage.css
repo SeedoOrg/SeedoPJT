@@ -15,7 +15,7 @@ main {
   padding: 0 34px;
   min-height: 100vh;
   box-sizing: border-box;
-  gap: 34px;
+  gap: 20px;
 }
 
 .layout div {
@@ -27,7 +27,8 @@ main {
   width: 100%;
 }
 
-.userName {
+.userName,
+.superUser {
   display: flex;
   align-items: center;
   white-space: nowrap; /* 한 줄로 유지 */
@@ -44,6 +45,20 @@ main {
 
 .userID:hover {
   overflow-x: auto;
+}
+
+.material-symbols-outlined {
+  color: #183b08;
+  vertical-align: middle;
+  font-size: 30px;
+  text-decoration-line: none;
+  flex-shrink: 0;
+  padding: 0px 15px;
+  cursor: pointer;
+}
+.material-symbols-outlined:hover {
+  color: #337614;
+  font-weight: bold;
 }
 
 .partner button {

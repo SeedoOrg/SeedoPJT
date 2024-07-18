@@ -167,8 +167,16 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  var walking_mode = localStorage.getItem("walking_mode");
+  if (walking_mode === "true") {
+    startRecording(deviceId);
+    console.log("보행모드를 시작합니다.", walking_mode);
+  } else {
+    console.log("보행모드가 중지상태입니다.");
+  }
   cameraSelect.addEventListener("change", () => {
-    if (video.srcObject) {
+    if (walking_mode === "true") {
       stopRecording();
       deviceId = cameraSelect.value;
       localStorage.setItem("cameraId", deviceId);
@@ -178,14 +186,6 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.setItem("cameraId", deviceId);
     }
   });
-
-  var walking_mode = localStorage.getItem("walking_mode");
-  if (walking_mode === "true") {
-    startRecording(deviceId);
-    console.log("보행모드를 시작합니다.", walking_mode);
-  } else {
-    console.log("보행모드가 중지상태입니다.");
-  }
 
   async function maybeSendCameraImage() {
     if (recording && activeRequests < MAX_CONCURRENT_REQUESTS) {
@@ -312,10 +312,27 @@ document.addEventListener("DOMContentLoaded", function () {
       subtree: true,
     };
 
+    const fallenRedScreen = document.querySelector(".fallenRedScreen");
+
+    function catchFallen(currentText) {
+      if (currentText === "Prediction: 1") {
+        // .fallenRedScreen 요소를 보이게 하고 fade 클래스를 추가하여 나타나게 함
+        fallenRedScreen.style.display = "block";
+        fallenRedScreen.classList.add("fade");
+
+        // 2초 후에 fade 클래스를 제거하여 사라지게 함
+        setTimeout(() => {
+          fallenRedScreen.classList.remove("fade");
+          fallenRedScreen.style.display = "none";
+        }, 1500); // 애니메이션 시간과 동일하게 설정
+      }
+    }
+
     const callback = function (mutationsList) {
       for (let mutation of mutationsList) {
         if (mutation.type === "childList" || mutation.type === "characterData") {
-          const currentText = targetNode.textContent;
+          const currentText = targetNode.textContent.trim();
+          catchFallen(currentText);
 
           if (currentText === "Prediction: 1") {
             const currentTime = Date.now();
@@ -345,6 +362,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const observer = new MutationObserver(callback);
     observer.observe(targetNode, config);
+
+    // 초기 실행 (페이지 로드 시 현재 텍스트 확인)
+    const initialText = targetNode.textContent.trim();
+    catchFallen(initialText);
   }
 
   function constraintRecordedChunks() {
