@@ -314,25 +314,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const fallenRedScreen = document.querySelector(".fallenRedScreen");
 
-    function catchFallen(currentText) {
-      if (currentText === "Prediction: 1") {
-        // .fallenRedScreen 요소를 보이게 하고 fade 클래스를 추가하여 나타나게 함
-        fallenRedScreen.style.display = "block";
-        fallenRedScreen.classList.add("fade");
-
-        // 2초 후에 fade 클래스를 제거하여 사라지게 함
-        setTimeout(() => {
-          fallenRedScreen.classList.remove("fade");
-          fallenRedScreen.style.display = "none";
-        }, 1500); // 애니메이션 시간과 동일하게 설정
-      }
+    function catchFallen() {
+      // .fallenRedScreen 요소를 보이게 하고 fade 클래스를 추가하여 나타나게 함
+      fallenRedScreen.style.display = "block";
+      fallenRedScreen.classList.add("fade");
+      // 2초 후에 fade 클래스를 제거하여 사라지게 함
+      setTimeout(() => {
+        fallenRedScreen.classList.remove("fade");
+        fallenRedScreen.style.display = "none";
+      }, 1500); // 애니메이션 시간과 동일하게 설정
     }
 
     const callback = function (mutationsList) {
       for (let mutation of mutationsList) {
         if (mutation.type === "childList" || mutation.type === "characterData") {
           const currentText = targetNode.textContent.trim();
-          catchFallen(currentText);
 
           if (currentText === "Prediction: 1") {
             const currentTime = Date.now();
@@ -340,6 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
               lastSaveTime = currentTime;
               new Promise((resolve, reject) => {
                 try {
+                  catchFallen();
                   constraintRecordedChunks();
                   setTimeout(() => {
                     resolve();
