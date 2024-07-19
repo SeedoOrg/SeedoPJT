@@ -359,7 +359,7 @@ function errorCallback(error) {
 
 function addMarker(type) {
   if (type === "start") {
-    if (startMarker !== null) {
+    if (startMarker) {
       startMarker.setMap(null);
     }
     startLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
@@ -370,7 +370,7 @@ function addMarker(type) {
       title: "출발지",
     });
   } else {
-    if (endMarker !== null) {
+    if (endMarker) {
       endMarker.setMap(null);
     }
     endLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
@@ -531,7 +531,7 @@ function setStart(lat, lon) {
   });
   clearMarkers();
 
-  if (startMarker !== null) {
+  if (startMarker) {
     startMarker.setMap(null);
   }
 
@@ -552,7 +552,7 @@ function setEnd(lat, lon) {
   });
   clearMarkers();
 
-  if (endMarker !== null) {
+  if (endMarker) {
     endMarker.setMap(null);
   }
 
