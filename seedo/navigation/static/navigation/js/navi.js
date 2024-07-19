@@ -359,6 +359,9 @@ function errorCallback(error) {
 
 function addMarker(type) {
   if (type === "start") {
+    if (startMarker !== null) {
+      startMarker = null;
+    }
     startLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
     startMarker = new Tmapv2.Marker({
       position: startLocation,
@@ -526,7 +529,7 @@ function setStart(lat, lon) {
   clearMarkers();
 
   if (startMarker !== null) {
-    startMarker.clearMarkers();
+    startMarker.setMap(null);
   }
 
   startLocation = new Tmapv2.LatLng(lat, lon);
@@ -547,7 +550,7 @@ function setEnd(lat, lon) {
   clearMarkers();
 
   if (endMarker !== null) {
-    endMarker.clearMarkers();
+    endMarker.setMap(null);
   }
 
   endLocation = new Tmapv2.LatLng(lat, lon);
