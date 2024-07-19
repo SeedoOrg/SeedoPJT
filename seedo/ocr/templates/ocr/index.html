@@ -27,13 +27,39 @@
 
   <script>
   // ios 환경인지 여부 확인후 필요한 스타일 적용
+
   document.addEventListener('DOMContentLoaded', function () {
-    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    var userAgent = navigator.userAgent;
+    console.log(userAgent);
+    var isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    var isWindows = /Windows NT/.test(userAgent);
     if (isIOS) {
         // document.getElementById('camera_view').classList.add('ios-scroll');
         document.getElementById('result').classList.add('ios-scroll');
     }
+    if (isWindows) {
+      var style = document.createElement('style');
+      style.type = 'text/css';
+      style.innerHTML = `
+          @media (max-height: 735px) {
+              main {
+                  height: 660px;
+                  width: calc(660px * (480 / 743.6));
+              }
+
+              #camera_view {
+                  height: calc(100% - 108px);
+              }
+
+              #result {
+                  height: calc(100% - 108px);
+              }
+          }
+      `;
+      document.head.appendChild(style);
+    }
   });
+    
 
 
 
