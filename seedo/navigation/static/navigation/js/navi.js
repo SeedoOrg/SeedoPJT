@@ -92,9 +92,9 @@ function initMap() {
 
     markerLatLng = event.latLng;
     if (!routeSearchStarted) {
-      var content = `<div style='width: 120px'>
-                       <div ontouchstart='addMarker("start")'>출발지 설정</div>
-                       <div ontouchstart='addMarker("end")'>목적지 설정</div>
+      var content = `<div class="infoWindow">
+                       <div class="infoStart" ontouchstart='addMarker("start")'>출발지 설정</div>
+                       <div class="infoEnd" ontouchstart='addMarker("end")'>목적지 설정</div>
                      </div>`;
       //Popup 객체 생성.
       infoWindow = new Tmapv2.InfoWindow({
@@ -136,9 +136,9 @@ function successCallback(position) {
 
   currentMarker.addListener("click", function () {
     if (!routeSearchStarted) {
-      var content = `<div style='width: 120px'>
-                       <div onclick='addMarker("start")'>출발지 설정</div>
-                       <div onclick='addMarker("end")'>목적지 설정</div>
+      var content = `<div class="infoWindow">
+                       <div class="infoStart" onclick='addMarker("start")'>출발지 설정</div>
+                       <div class="infoEnd" onclick='addMarker("end")'>목적지 설정</div>
                      </div>`;
       //Popup 객체 생성.
       infoWindow = new Tmapv2.InfoWindow({
@@ -153,9 +153,9 @@ function successCallback(position) {
 
   currentMarker.addListener("touchstart", function () {
     if (!routeSearchStarted) {
-      var content = `<div style='width: 120px'>
-                       <div ontouchstart='addMarker("start")'>출발지 설정</div>
-                       <div ontouchstart='addMarker("end")'>목적지 설정</div>
+      var content = `<div class="infoWindow">
+                       <div class="infoStart" ontouchstart='addMarker("start")'>출발지 설정</div>
+                       <div class="infoEnd" ontouchstart='addMarker("end")'>목적지 설정</div>
                      </div>`;
       //Popup 객체 생성.
       infoWindow = new Tmapv2.InfoWindow({

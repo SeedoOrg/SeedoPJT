@@ -20,9 +20,9 @@ class QnAListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            queryset = QnA.objects.all()
+            queryset = QnA.objects.all().order_by("-created_at")
         else:
-            queryset = QnA.objects.filter(Q(author=self.request.user) | Q(author__is_superuser=True))
+            queryset = QnA.objects.filter(Q(author=self.request.user) | Q(author__is_superuser=True)).order_by("-created_at")
 
         filter_type = self.request.GET.get("filter")
         if filter_type == "answered":
