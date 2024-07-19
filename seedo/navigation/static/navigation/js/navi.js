@@ -360,7 +360,7 @@ function errorCallback(error) {
 function addMarker(type) {
   if (type === "start") {
     if (startMarker !== null) {
-      startMarker = null;
+      startMarker.setMap(null);
     }
     startLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
     startMarker = new Tmapv2.Marker({
@@ -370,6 +370,9 @@ function addMarker(type) {
       title: "출발지",
     });
   } else {
+    if (endMarker !== null) {
+      endMarker.setMap(null);
+    }
     endLocation = new Tmapv2.LatLng(markerLatLng.lat(), markerLatLng.lng());
     endMarker = new Tmapv2.Marker({
       position: endLocation,
@@ -540,7 +543,7 @@ function setStart(lat, lon) {
     title: "출발지",
   });
   map.setCenter(startLocation);
-  map.setZoom(8);
+  map.setZoom(15);
 }
 function setEnd(lat, lon) {
   $("#searchResult").html("");
@@ -561,7 +564,7 @@ function setEnd(lat, lon) {
     title: "목적지",
   });
   map.setCenter(endLocation);
-  map.setZoom(8);
+  map.setZoom(15);
 }
 
 function clearMarkers() {
