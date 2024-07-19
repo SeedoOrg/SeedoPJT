@@ -9,10 +9,17 @@
 <main>
   <div style="display: none">
     <div id="map" style="height: 400px"></div>
-    <p id="location" style="display: none">Location: Loading...</p>
-    <p id="accelerometer" style="display: none">Accelerometer: Loading...</p>
-    <p id="gyroscope" style="display: none">Gyroscope: Loading...</p>
-    <p id="fall_recognition" style="display: none">fall_recognition: Loading...</p>
+    <p id="object_detection">Detection: Loading...</p>
+    <p id="recording-status">Recording status: Not recording</p>
+    <p id="sensoring-status">Secording status: Not sensoring</p>
+    <p id="location">Location: Loading...</p>
+    <p id="accelerometer">Accelerometer: Loading...</p>
+    <p id="gyroscope">Gyroscope: Loading...</p>
+    <p id="fall_recognition">fall_recognition: Loading...</p>
+    <audio id="falling_inform" src="{{ MEDIA_URL }}audios/falling_inform_voice.mp3"></audio>
+    <audio id="broken_inform" src="{{ MEDIA_URL }}audios/broken_inform_voice.mp3"></audio>
+    <audio id="on_walking" src="{{ MEDIA_URL }}audios/on_walking.mp3"></audio>
+    <audio id="off_walking" src="{{ MEDIA_URL }}audios/off_walking.mp3"></audio>
     <video id="video" width="640" height="480" style="display: none"></video>
     <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
     <select id="cameraSelect"></select>
