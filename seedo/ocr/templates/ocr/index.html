@@ -26,9 +26,22 @@
   </div>
 
   <script>
+  // ios 환경인지 여부 확인후 필요한 스타일 적용
+  document.addEventListener('DOMContentLoaded', function () {
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+        // document.getElementById('camera_view').classList.add('ios-scroll');
+        document.getElementById('result').classList.add('ios-scroll');
+    }
+  });
+
+
+
+
     var fadeVisible = document.querySelectorAll(".fadeVisible");
     var fade = document.querySelectorAll(".fade");
 
+    const camera_view = document.getElementById('camera_view');
     const video = document.getElementById("video"); // 비디오 요소를 가져옵니다.
     const canvas = document.getElementById("canvas"); // 캔버스 요소를 가져옵니다.
     const capturedImage = document.getElementById("captured-image"); // 캡처된 이미지를 표시할 요소를 가져옵니다.

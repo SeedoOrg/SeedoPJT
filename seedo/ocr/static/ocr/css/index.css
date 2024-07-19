@@ -37,6 +37,13 @@
   }
 }
 
+
+/*ios에서만 적용시킬 스타일*/
+.ios-scroll {
+  height: 67.3vh; /* 화면 크기에 따라 유동적으로 설정 */
+  -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+}
+
 main {
   position: absolute;
   left: 50%;
