@@ -59,7 +59,7 @@ main {
 }
 
 /* 화면 높이에 따라 가로 크기를 조정하는 미디어 쿼리 */
-@media (max-height: 735px) {
+/*@media (max-height: 735px) {
   main {
       height: 660px;
       width: calc(660px * (480 / 743.6));
@@ -73,7 +73,7 @@ main {
     height: calc(100% - 108px);
   }
 
-}
+}*/
 
 #text {
   display: flex;
@@ -152,7 +152,6 @@ main {
   margin: 0 auto;
   border-radius: 12px;
   overflow: scroll;
-  -webkit-overflow-scrolling: touch;
   background-color: ghostwhite;
   border-radius: 12px;
   opacity: 0;
