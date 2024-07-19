@@ -120,7 +120,7 @@ def save_accident_view(request):
         for user_request in user_requests:
             recipient = user_request.requester if user_request.recipient == user else user_request.recipient
             subject = "사고 알림"
-            message = f"{user.username} 님의 사고영상이 저장되었습니다."
+            message = f"{user.email.split('@')[0]} 님의 사고영상이 저장되었습니다."
             from_email = settings.EMAIL_HOST_USER
             recipient_list = [recipient.email]
 
