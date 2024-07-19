@@ -312,19 +312,6 @@ document.addEventListener("DOMContentLoaded", function () {
       subtree: true,
     };
 
-    const fallenRedScreen = document.querySelector(".fallenRedScreen");
-
-    function catchFallen() {
-      // .fallenRedScreen 요소를 보이게 하고 fade 클래스를 추가하여 나타나게 함
-      fallenRedScreen.style.display = "block";
-      fallenRedScreen.classList.add("fade");
-      // 2초 후에 fade 클래스를 제거하여 사라지게 함
-      setTimeout(() => {
-        fallenRedScreen.classList.remove("fade");
-        fallenRedScreen.style.display = "none";
-      }, 1500); // 애니메이션 시간과 동일하게 설정
-    }
-
     const callback = function (mutationsList) {
       for (let mutation of mutationsList) {
         if (mutation.type === "childList" || mutation.type === "characterData") {
@@ -336,7 +323,6 @@ document.addEventListener("DOMContentLoaded", function () {
               lastSaveTime = currentTime;
               new Promise((resolve, reject) => {
                 try {
-                  catchFallen();
                   constraintRecordedChunks();
                   setTimeout(() => {
                     resolve();
@@ -359,10 +345,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const observer = new MutationObserver(callback);
     observer.observe(targetNode, config);
-
-    // 초기 실행 (페이지 로드 시 현재 텍스트 확인)
-    const initialText = targetNode.textContent.trim();
-    catchFallen(initialText);
   }
 
   function constraintRecordedChunks() {
@@ -415,6 +397,19 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.status === "success") {
           console.log("Recorded chunk saved successfully");
           const fallingInformElement = document.getElementById("falling_inform");
+          const fallenRedScreen = document.querySelector(".fallenRedScreen");
+
+          function catchFallen() {
+            // .fallenRedScreen 요소를 보이게 하고 fade 클래스를 추가하여 나타나게 함
+            fallenRedScreen.style.display = "block";
+            fallenRedScreen.classList.add("fade");
+            // 2초 후에 fade 클래스를 제거하여 사라지게 함
+            setTimeout(() => {
+              fallenRedScreen.classList.remove("fade");
+              fallenRedScreen.style.display = "none";
+            }, 1500); // 애니메이션 시간과 동일하게 설정
+          }
+          catchFallen();
 
           if (fallingInformElement) {
             fallingInformElement.play().catch((error) => {
