@@ -22,8 +22,6 @@ async function sendCameraImage(imageData) {
     var latitude = parseFloat(matches[1]);
     var longitude = parseFloat(matches[2]);
 
-    console.log("Latitude:", latitude);
-    console.log("Longitude:", longitude);
   } else {
     console.error("Could not parse location string.");
   }
@@ -44,7 +42,6 @@ async function sendCameraImage(imageData) {
     });
 
     const result = await response.json();
-    console.log(result);
     if (result.complaints != null) {
       const save_break_response = await fetch("/record/break/save_break/", {
         method: "POST",
@@ -69,7 +66,6 @@ async function sendCameraImage(imageData) {
         }
       }
 
-      console.log(save_break_result);
     }
 
     // 탐지된 객체 정보를 HTML에 표시
@@ -380,7 +376,6 @@ document.addEventListener("DOMContentLoaded", function () {
       formData.append("video_file", videoFile);
 
       for (let [key, value] of formData.entries()) {
-        console.log(key, value);
       }
 
       try {
@@ -395,7 +390,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = await response.json();
 
         if (data.status === "success") {
-          console.log("Recorded chunk saved successfully");
           const fallingInformElement = document.getElementById("falling_inform");
           const fallenRedScreen = document.querySelector(".fallenRedScreen");
 
