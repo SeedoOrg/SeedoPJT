@@ -35,14 +35,16 @@ async function ttsAlert(text) {
 
     const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioUrl);
+    // const audio = new Audio(audioUrl);
+    const audioData = audioUrl;
 
-    try {
-      await audio.play();
-      console.log("음성 재생 성공");
-    } catch (error) {
-      console.error("음성 재생 중 오류 발생:", error);
-    }
+    // try {
+    //   await audio.play();
+    //   console.log('음성 재생 성공');
+    // } catch (error) {
+    //   console.error('음성 재생 중 오류 발생:', error);
+    // }
+    addToQueue(audioData);
   } catch (error) {
     console.error("TTS 변환 중 오류 발생:", error);
   }

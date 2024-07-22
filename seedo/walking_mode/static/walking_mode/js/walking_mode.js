@@ -1,7 +1,7 @@
 const MAX_CONCURRENT_REQUESTS = 1; // 동시에 처리될 수 있는 최대 요청 수.,,,
 let activeRequests = 0; // 현재 처리 중인 요청 수``
-let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐,
-let isPlaying = false; // 현재 오디오가 재생 중인지 여부,
+// let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐,
+// let isPlaying = false; // 현재 오디오가 재생 중인지 여부,
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -62,10 +62,15 @@ async function sendCameraImage(imageData) {
       if (save_break_result.status === "success") {
         const brokenInformElement = document.getElementById("broken_inform");
 
+        // if (brokenInformElement) {
+        //   brokenInformElement.play().catch((error) => {
+        //     console.log('Audio play failed:', error);
+        //   });
+        // }
+
         if (brokenInformElement) {
-          brokenInformElement.play().catch((error) => {
-            console.log("Audio play failed:", error);
-          });
+          const audioSrc = brokenInformElement.src;
+          addToQueue(audioSrc);
         }
       }
 
@@ -93,13 +98,15 @@ async function sendCameraImage(imageData) {
     if (Array.isArray(result.tts_audio_base64)) {
       result.tts_audio_base64.forEach((audioBase64) => {
         const audioData = `data:audio/mpeg;base64,${audioBase64}`;
-        soundQueue.push(audioData);
+        addToQueue(audioData);
+        // soundQueue.push(audioData);
       });
-      playNextInQueue();
+      // playNextInQueue();
     } else {
       const audioData = `data:audio/mpeg;base64,${result.tts_audio_base64}`;
-      soundQueue.push(audioData);
-      playNextInQueue();
+      // soundQueue.push(audioData);
+      // playNextInQueue();
+      addToQueue(audioData);
     }
   } catch (error) {
     console.error("Error sending camera image:", error);
@@ -207,10 +214,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (walking_mode !== "true") {
       const onWalkingElement = document.getElementById("on_walking");
 
+      // if (onWalkingElement) {
+      //   onWalkingElement.play().catch((error) => {
+      //     console.log('Audio play failed:', error);
+      //   });
+      // }
       if (onWalkingElement) {
-        onWalkingElement.play().catch((error) => {
-          console.log("Audio play failed:", error);
-        });
+        const audioSrc = onWalkingElement.src;
+        addToQueue(audioSrc);
       }
     }
 
@@ -290,10 +301,14 @@ document.addEventListener("DOMContentLoaded", function () {
     mediaRecorder.stop();
     const offWalkingElement = document.getElementById("off_walking");
 
+    // if (offWalkingElement) {
+    //   offWalkingElement.play().catch((error) => {
+    //     console.log('Audio play failed:', error);
+    //   });
+    // }
     if (offWalkingElement) {
-      offWalkingElement.play().catch((error) => {
-        console.log("Audio play failed:", error);
-      });
+      const audioSrc = offWalkingElement.src;
+      addToQueue(audioSrc);
     }
   }
 
@@ -411,10 +426,14 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           catchFallen();
 
+          // if (fallingInformElement) {
+          //   fallingInformElement.play().catch((error) => {
+          //     console.log('Audio play failed:', error);
+          //   });
+          // }
           if (fallingInformElement) {
-            fallingInformElement.play().catch((error) => {
-              console.log("Audio play failed:", error);
-            });
+            const audioSrc = fallingInformElement.src;
+            addToQueue(audioSrc);
           }
         } else {
           console.error("Error saving recorded chunk");
