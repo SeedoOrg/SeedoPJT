@@ -26,21 +26,21 @@
   </div>
 
   <script>
-  // ios 환경인지 여부 확인후 필요한 스타일 적용
+    // ios 환경인지 여부 확인후 필요한 스타일 적용
 
-  document.addEventListener('DOMContentLoaded', function () {
-    var userAgent = navigator.userAgent;
-    console.log(userAgent);
-    var isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-    var isWindows = /Windows NT/.test(userAgent);
-    if (isIOS) {
+    document.addEventListener("DOMContentLoaded", function () {
+      var userAgent = navigator.userAgent;
+      console.log(userAgent);
+      var isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+      var isWindows = /Windows NT/.test(userAgent);
+      if (isIOS) {
         // document.getElementById('camera_view').classList.add('ios-scroll');
-        document.getElementById('result').classList.add('ios-scroll');
-    }
-    if (isWindows) {
-      var style = document.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = `
+        document.getElementById("result").classList.add("ios-scroll");
+      }
+      if (isWindows) {
+        var style = document.createElement("style");
+        style.type = "text/css";
+        style.innerHTML = `
           @media (max-height: 735px) {
               main {
                   height: 660px;
@@ -56,18 +56,14 @@
               }
           }
       `;
-      document.head.appendChild(style);
-    }
-  });
-    
-
-
-
+        document.head.appendChild(style);
+      }
+    });
 
     var fadeVisible = document.querySelectorAll(".fadeVisible");
     var fade = document.querySelectorAll(".fade");
 
-    const camera_view = document.getElementById('camera_view');
+    const camera_view = document.getElementById("camera_view");
     const video = document.getElementById("video"); // 비디오 요소를 가져옵니다.
     const canvas = document.getElementById("canvas"); // 캔버스 요소를 가져옵니다.
     const capturedImage = document.getElementById("captured-image"); // 캡처된 이미지를 표시할 요소를 가져옵니다.
