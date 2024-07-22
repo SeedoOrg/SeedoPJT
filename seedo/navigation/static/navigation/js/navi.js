@@ -39,7 +39,6 @@ async function ttsAlert(text) {
 
     try {
       await audio.play();
-      console.log("음성 재생 성공");
     } catch (error) {
       console.error("음성 재생 중 오류 발생:", error);
     }
@@ -244,7 +243,6 @@ function displayRoute(directionsData) {
   if (currentRouteData.start && currentRouteData.destination) {
     updateRouteStorage(); // Polyline 업데이트 시 로컬 스토리지 업데이트
   } else {
-    console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
   }
 }
 
@@ -255,12 +253,9 @@ async function checkRoute(currentLocation) {
   }
 
   var distanceToPolyline = getDistanceToPolyline(currentLocation, pathCoordinates);
-  console.log("Polyline Distance: ", distanceToPolyline);
 
   if (distanceToPolyline > 60) {
-    console.log("경로이탈");
     var endLocation = endMarker.getPosition();
-    console.log(endLocation);
     ttsAlert("경로를 벗어났습니다.경로를 재탐색 합니다.");
     await delay(6000);
     updateRouteStorageforoutway(currentLocation, endLocation);
@@ -289,7 +284,6 @@ async function checkRoute(currentLocation) {
 
   if (endMarker) {
     var distanceToDestination = getDistance(currentLocation, endMarker.getPosition());
-    console.log(distanceToDestination);
     if (distanceToDestination < 15) {
       ttsAlert("도착 지점 근처에 도착했습니다. 경로 안내를 종료합니다.");
       await delay(6000);
@@ -589,7 +583,6 @@ function findRoute() {
   // 5초마다 현재 위치 업데이트
   setInterval(function () {
     getCurrentLocation();
-    console.log("현재 위치 업데이트");
   }, 5000);
   // 경로 체크
   setInterval(function () {
@@ -733,7 +726,6 @@ function getCurrentLocation2() {
 function updateRouteStorage() {
   // currentRouteData 초기화 확인
   if (!currentRouteData.start || !currentRouteData.destination) {
-    console.log("currentRouteData가 올바르게 초기화되지 않았습니다.");
     return;
   }
 
@@ -806,7 +798,6 @@ function loadRouteFromLocalStorage() {
 
         setInterval(function () {
           getCurrentLocation();
-          console.log("현재 위치 업데이트");
         }, 5000);
 
         setInterval(function () {
