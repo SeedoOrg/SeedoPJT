@@ -34,10 +34,10 @@ function getCookie(name) {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(";").shift();
 }
-document.getElementById('logout-link').addEventListener('click', function(event) {
-  event.preventDefault(); 
-  localStorage.removeItem('walking_mode');
-  localStorage.removeItem('routeData');
+document.getElementById("logout-link").addEventListener("click", function (event) {
+  event.preventDefault();
+  localStorage.removeItem("walking_mode");
+  localStorage.removeItem("routeData");
   window.location.href = "/accounts/logout/";
 });
 // 이메일 검색 및 사용자 목록 표시

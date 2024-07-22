@@ -47,13 +47,12 @@ class CustomUserCreationForm(UserCreationForm):
             regex = r"^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
             if not re.match(regex, email):
                 raise ValidationError("올바른 이메일을 입력해주세요.")
-        
-        # 이미 존재하는 이메일인지 확인
+
+            # 이미 존재하는 이메일인지 확인
             if CustomUser.objects.filter(email=email).exists():
                 raise ValidationError("이미 가입된 이메일입니다.")
-        
-        return email
 
+        return email
 
     def clean_phonenumber(self):
         phonenumber = self.cleaned_data.get("phonenumber")

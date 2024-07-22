@@ -1,4 +1,7 @@
 let previousPrediction = 0;
+let activeSendorRequests = 0;
+const MAX_CONCURRENT_SENSOR_REQUESTS = 2;
+
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -24,6 +27,8 @@ async function sendSensorData(sensorData) {
     document.getElementById("fall_recognition").textContent = `Prediction: ${result.prediction}`;
   } catch (error) {
     console.error("Error sending sensor data:", error);
+  } finally {
+    activeSendorRequests--;
   }
 }
 
@@ -64,10 +69,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function maybeSendSensorData() {
-    if (sensorDataBuffer.getBuffer().length >= 29) {
-      const sensorData = sensorDataBuffer.getBuffer();
-      if (frameticks % 10 === 0) {
-        sendSensorData(sensorData);
+    if (activeSendorRequests < MAX_CONCURRENT_SENSOR_REQUESTS) {
+      if (sensorDataBuffer.getBuffer().length >= 29) {
+        const sensorData = sensorDataBuffer.getBuffer();
+        if (frameticks % 15 === 0) {
+          activeSendorRequests++;
+          sendSensorData(sensorData);
+        }
       }
     }
   }
