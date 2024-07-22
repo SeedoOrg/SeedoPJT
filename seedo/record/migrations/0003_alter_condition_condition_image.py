@@ -5,14 +5,8 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("record", "0002_alter_accident_accident_video"),
-    ]
+    dependencies = [("record", "0002_alter_accident_accident_video")]
 
     operations = [
-        migrations.AlterField(
-            model_name="condition",
-            name="condition_image",
-            field=models.ImageField(upload_to=record.models.upload_to_img),
-        ),
+        migrations.AlterField(model_name="condition", name="condition_image", field=models.ImageField(upload_to=record.models.upload_to_img))
     ]
