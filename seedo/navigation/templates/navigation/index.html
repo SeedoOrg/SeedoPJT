@@ -1,14 +1,12 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" href="{% static 'navigation/css/navi.css' %}" />
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
 <script>
   var startIcon = "{% static 'navigation/img/startIcon.webp' %}";
   var endIcon = "{% static 'navigation/img/endIcon.webp' %}";
 </script>
-<script defer src="{% static 'navigation/js/navi.js' %}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-<script src="{% static 'js/audio_queue.js' %}"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+<script defer src="{% static 'js/audio_queue.js' %}"></script>
 {% endblock extra_head %} {% block content %}
 <main>
   <div class="infoContainer">
@@ -48,4 +46,6 @@
   </div>
   <div id="route-info"></div>
 </main>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script src="{% static 'navigation/js/navi.js' %}"></script>
 {% endblock content %}
