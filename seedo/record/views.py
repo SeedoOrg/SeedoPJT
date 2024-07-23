@@ -152,11 +152,11 @@ def save_broken_view(request):
         # Step 3: Decode the NumPy array to an OpenCV image
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        # Step 4: Encode the image to PNG format
-        _, buffer = cv2.imencode(".png", img)
+        # Step 4: Encode the image to webp format
+        _, buffer = cv2.imencode(".webp", img)
 
         # Step 5: Create a ContentFile from the image data
-        image_file = ContentFile(buffer.tobytes(), name="broken_image.png")
+        image_file = ContentFile(buffer.tobytes(), name="broken_image.webp")
 
         user = User.objects.get(id=user_id)
 

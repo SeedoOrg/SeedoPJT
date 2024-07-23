@@ -81,7 +81,7 @@ async function sendCameraImage(imageData) {
     const imgElement = document.getElementById("annotated-image");
     if (imgElement) {
       if (result.annotated_image) {
-        imgElement.src = `data:image/jpeg;base64,${result.annotated_image}`;
+        imgElement.src = `data:image/webp;base64,${result.annotated_image}`;
         imgElement.style.display = "block";
       } else {
         imgElement.style.display = "none";
@@ -130,7 +130,7 @@ function playNextInQueue() {
 function captureImage(video, canvas) {
   const context = canvas.getContext("2d");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/png");
+  return canvas.toDataURL("image/webp");
 }
 
 document.addEventListener("DOMContentLoaded", function () {

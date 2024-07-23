@@ -193,10 +193,10 @@ class ImageUploadView(View):
             return JsonResponse({"error": "Invalid content type"}, status=400)
 
         if annotated_image is not None:
-            _, buffer = cv2.imencode(".jpg", annotated_image)
+            _, buffer = cv2.imencode(".webp", annotated_image)
             img_base64 = base64.b64encode(buffer).decode("utf-8")
         else:
-            _, buffer = cv2.imencode(".jpg", img)
+            _, buffer = cv2.imencode(".webp", img)
             img_base64 = base64.b64encode(buffer).decode("utf-8")
 
         response_data = {
@@ -255,7 +255,7 @@ class ImageUploadView(View):
                             print("Failed to connect to Nominatim API")
                             address = None
 
-                        _, buffer = cv2.imencode(".jpg", img)
+                        _, buffer = cv2.imencode(".webp", img)
                         complain_img = base64.b64encode(buffer).decode("utf-8")
 
                         # 민원 정보 추가

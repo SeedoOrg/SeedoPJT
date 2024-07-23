@@ -25,7 +25,7 @@
       <p class="contentText">{{ question.content|linebreaksbr }}</p>
       {% comment %} 파일 확장자 확인 {% endcomment %}
       <!--주석기능 찾음 오예-->
-      {% if question.file_upload %} {% with file_extension=question.file_upload.name|extension_name %} {% if file_extension|in_list:"jpg,png,gif,jpeg" %}
+      {% if question.file_upload %} {% with file_extension=question.file_upload.name|extension_name %} {% if file_extension|in_list:"jpg,png,gif,jpeg,webp" %}
       <img class="embededImg" src="{{ question.file_upload.url }}" />
       {% else %}
       <p class="embededFile">

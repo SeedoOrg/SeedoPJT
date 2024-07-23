@@ -31,7 +31,7 @@
           // 이미지 표시
           const imgElement = document.getElementById("annotated-image");
           if (result.annotated_image) {
-            imgElement.src = `data:image/jpeg;base64,${result.annotated_image}`;
+            imgElement.src = `data:image/webp;base64,${result.annotated_image}`;
             imgElement.style.display = "block";
           } else {
             imgElement.style.display = "none";
@@ -71,7 +71,7 @@
       function captureImage(video, canvas) {
         const context = canvas.getContext("2d");
         context.drawImage(video, 0, 0, 640, 480); // 해상도를 640x480으로 설정
-        return canvas.toDataURL("image/jpeg", 1.0); // 이미지 포맷과 품질 설정
+        return canvas.toDataURL("image/webp", 1.0); // 이미지 포맷과 품질 설정
       }
 
       document.addEventListener("DOMContentLoaded", function () {
