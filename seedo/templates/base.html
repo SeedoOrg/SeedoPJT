@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}" />
     <link rel="icon" href="{% static 'images/favicon.ico' %}" />
     <script>
-      var startIcon = "{% static 'images/startIcon.png' %}";
-      var endIcon = "{% static 'images/endIcon.png' %}";
+      var startIcon = "{% static 'images/startIcon.webp' %}";
+      var endIcon = "{% static 'images/endIcon.webp' %}";
     </script>
     <title>Seedo</title>
     {% block extra_head %}
@@ -24,13 +24,13 @@
         {% get_user_notifications %}
       </div>
       <a href="/" class="logo">
-        <img src="{% static 'images/seedo_logo.png' %} " alt="seedo_logo" width="25px" height="25px" />
+        <img src="{% static 'images/seedo_logo.webp' %} " alt="seedo_logo" width="25px" height="25px" />
         Seedo
       </a>
       <a href="/accounts/" id="mypage" class="material-symbols-outlined">person</a>
       {% else %}
       <a href="/" class="logo">
-        <img src="{% static 'images/seedo_logo.png' %} " alt="seedo_logo" width="25px" height="25px" />
+        <img src="{% static 'images/seedo_logo.webp' %} " alt="seedo_logo" width="25px" height="25px" />
         Seedo
       </a>
       {% endif %}

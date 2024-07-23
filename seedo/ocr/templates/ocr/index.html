@@ -126,7 +126,7 @@
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // 캔버스에서 이미지 데이터를 가져옵니다.
-        const imageData = canvas.toDataURL("image/jpeg");
+        const imageData = canvas.toDataURL("image/webp");
 
         // 이미지 데이터를 서버로 전송합니다.
         fetch("/ocr/capture/", {

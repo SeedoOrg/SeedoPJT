@@ -73,7 +73,7 @@ def capture(request):
                                                 11. 글자가 있다면 글자가 없다고 말하고 주변환경을 설명하지 마세요.
                                                 12. 돈이 보인다면 반드시 다음 양식으로만 대답해라 " X원 화폐 X개,X원 화폐 X개... 총 X원 입니다. 금액이 정화하지 않을 수 있으니 반드시 다시 확인하세요." """,
                     },
-                    {"role": "user", "content": [{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}}]},
+                    {"role": "user", "content": [{"type": "image_url", "image_url": {"url": f"data:image/webp;base64,{image_base64}"}}]},
                 ],
                 temperature=0.0,
                 top_p=0.65,
