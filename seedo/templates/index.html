@@ -1,8 +1,6 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/landing.css' %}" />
-<script defer src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
-<script defer src="{% static 'navigation/js/navi.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script defer src="{% static 'walking_mode/js/walking_mode.js' %}"></script>
 <script defer src="{% static 'sensor/js/sensor.js' %}"></script>
 <script defer src="{% static 'js/audio_queue.js' %}"></script>
@@ -132,4 +130,6 @@
     <a class="qna_service" href="/qna/">문의 게시판</a>
   </div>
 </main>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script src="{% static 'navigation/js/navi.js' %}"></script>
 {% endblock content %}
