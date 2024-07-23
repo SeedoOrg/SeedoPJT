@@ -66,13 +66,22 @@ class CustomUserCreationForm(UserCreationForm):
         return phonenumber
 
     def clean_password2(self):
+
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
+
+        if not password2:
+            raise ValidationError("비밀번호 확인을 입력해주세요.")
         if password1 and password2:
             if password1 != password2:
                 raise ValidationError("비밀번호가 일치하지 않습니다.")
             if len(password2) < 8:
                 raise ValidationError("비밀번호는 8자 이상이어야 합니다.")
+
+            # Check for similarity of 6 or more consecutive characters
+            if self.has_similar_sequence(password1, password2, 6):
+                raise ValidationError("비밀번호가 이메일과 너무 유사합니다.")
+
             try:
                 validate_password(password2)
             except ValidationError as e:
@@ -83,6 +92,12 @@ class CustomUserCreationForm(UserCreationForm):
         if not password1:
             raise ValidationError("")
         return password2
+
+    def has_similar_sequence(self, password1, password2, length):
+        for i in range(len(password1) - length + 1):
+            if password1[i : i + length] in password2:
+                return True
+        return False
 
 
 class CustomAuthenticationForm(AuthenticationForm):

@@ -1,5 +1,22 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/accounts.css' %}" />
+<script>
+  function formatPhoneNumber(input) {
+    // Remove non-numeric characters
+    let cleaned = ("" + input.value).replace(/\D/g, "");
+
+    // Ensure the cleaned value does not exceed 11 digits
+    cleaned = cleaned.substring(0, 11);
+
+    // Split the cleaned value into parts
+    let match = cleaned.match(/^(\d{0,3})(\d{0,4})(\d{0,4})$/);
+
+    if (match) {
+      let formattedNumber = [match[1], match[2], match[3]].filter((val) => val).join("-");
+      input.value = formattedNumber;
+    }
+  }
+</script>
 {% endblock %} {% block content %}
 <div class="layout">
   <div class="content-wrapper">
@@ -27,6 +44,7 @@
             id="phonenumber"
             placeholder="올바른 형식) 000-0000-0000"
             value="{{ form.phonenumber.value|default_if_none:'' }}"
+            oninput="formatPhoneNumber(this)"
           />
         </div>
         <div class="error-message">
@@ -60,7 +78,7 @@
           <p>❗️{{ error }}</p>
           {% endfor %}
         </div>
-        <div class="form-group {% if form.password2.errors %}error{% endif %}">
+        <div class="form-group {% for error in form.password2.errors %}{% if error %}error{%endif%}{% endfor %}">
           <label for="password2">비밀번호 확인:</label>
           <input
             type="password"
@@ -83,21 +101,21 @@
         </div>
         <div class="error-message">
           {% for error in form.password2.errors %}
-          <p>❗️{{ error }}</p>
+          <p>{% if error %}❗️{%endif%}{{ error }}</p>
           {% endfor %}
         </div>
       </div>
       <div class="button-wrapper">
         <button type="submit" class="button-link">완료</button>
       </div>
-      <a class="hover-text" href="{% url 'accounts:login' %}"
-        ><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#183b08">
+      <p class="hover-text">
+        <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#183b08">
           <path
             d="M280-200v-80h284q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l104 104-56 56-200-200 200-200 56 56-104 104h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H280Z"
           />
         </svg>
-        로그인</a
-      >
+        <a class="hover-text" href="{% url 'accounts:login' %}">로그인</a>
+      </p>
     </form>
   </div>
 </div>
