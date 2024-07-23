@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% load static %} {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/landing.css' %}" />
 <script defer src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script defer src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
 <script defer src="{% static 'navigation/js/navi.js' %}"></script>
 <script defer src="{% static 'walking_mode/js/walking_mode.js' %}"></script>
 <script defer src="{% static 'sensor/js/sensor.js' %}"></script>
@@ -18,10 +18,10 @@
     <p id="accelerometer">Accelerometer: Loading...</p>
     <p id="gyroscope">Gyroscope: Loading...</p>
     <p id="fall_recognition">fall_recognition: Loading...</p>
-    <audio id="falling_inform" src="{{ MEDIA_URL }}audios/falling_inform_voice.mp3"></audio>
-    <audio id="broken_inform" src="{{ MEDIA_URL }}audios/broken_inform_voice.mp3"></audio>
-    <audio id="on_walking" src="{{ MEDIA_URL }}audios/on_walking.mp3"></audio>
-    <audio id="off_walking" src="{{ MEDIA_URL }}audios/off_walking.mp3"></audio>
+    <audio id="falling_inform" src="{% static '/audios/falling_inform_voice.mp3' %}"></audio>
+    <audio id="broken_inform" src="{% static '/audios/broken_inform_voice.mp3' %}"></audio>
+    <audio id="on_walking" src="{% static '/audios/on_walking.mp3' %}"></audio>
+    <audio id="off_walking" src="{% static '/audios/off_walking.mp3' %}"></audio>
     <video id="video" width="640" height="480" style="display: none"></video>
     <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
     <select id="cameraSelect"></select>
@@ -101,7 +101,7 @@
   <div class="fallenRedScreen"></div>
   <div class="preload">
     <img src="{% static 'images/seedo_preloading.webp' %}" alt="Preload Image" style="width: 360px" />
-    <audio id="welcome" src="{{ MEDIA_URL }}audios/welcome_voice.mp3"></audio>
+    <audio id="welcome" src="{% static '/audios/welcome_voice.mp3' %}"></audio>
   </div>
   <div class="later">
     <div class="wrapper_main_service">
