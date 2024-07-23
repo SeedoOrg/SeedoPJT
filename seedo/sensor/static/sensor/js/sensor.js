@@ -56,7 +56,7 @@ class CircularBuffer {
 
 document.addEventListener("DOMContentLoaded", function () {
   let sensoring = false;
-  let sensorDataBuffer = new CircularBuffer(29);
+  let sensorDataBuffer = new CircularBuffer(30);
   const frameRate = 30; // frames per second
   let frameticks = 0;
 
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function maybeSendSensorData() {
     if (activeSendorRequests < MAX_CONCURRENT_SENSOR_REQUESTS) {
-      if (sensorDataBuffer.getBuffer().length >= 29) {
+      if (sensorDataBuffer.getBuffer().length >= 30) {
         const sensorData = sensorDataBuffer.getBuffer();
         if (frameticks % 15 === 0) {
           activeSendorRequests++;
@@ -108,17 +108,21 @@ document.addEventListener("DOMContentLoaded", function () {
               y: accel.y || 0,
               z: accel.z || 0,
             };
-            document.getElementById("accelerometer").textContent = `Accelerometer: x=${accel.x}, y=${accel.y}, z=${accel.z}`;
+            document.getElementById("accelerometer").textContent = `Accelerometer: x=${accel.x.toFixed(2)}, y=${accel.y.toFixed(2)}, z=${accel.z.toFixed(2)}`;
           } else {
             const lastItem = sensorDataBuffer.getLastItem();
             frame.acc = lastItem ? lastItem.acc : { x: 0, y: 0, z: 0 };
-            document.getElementById("accelerometer").textContent = `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
+            document.getElementById("accelerometer").textContent = `Accelerometer: x=${frame.acc.x.toFixed(
+              2,
+            )}, y=${frame.acc.y.toFixed(2)}, z=${frame.acc.z.toFixed(2)}`;
           }
         } catch (error) {
           //console.error('Error updating accelerometer data:', error);
           const lastItem = sensorDataBuffer.getLastItem();
           frame.acc = lastItem ? lastItem.acc : { x: 0, y: 0, z: 0 };
-          document.getElementById("accelerometer").textContent = `Accelerometer: x=${frame.acc.x}, y=${frame.acc.y}, z=${frame.acc.z}`;
+          document.getElementById("accelerometer").textContent = `Accelerometer: x=${frame.acc.x.toFixed(
+            2,
+          )}, y=${frame.acc.y.toFixed(2)}, z=${frame.acc.z.toFixed(2)}`;
         }
 
         // Update Gyroscope
@@ -129,17 +133,23 @@ document.addEventListener("DOMContentLoaded", function () {
               beta: event.beta || 0,
               gamma: event.gamma || 0,
             };
-            document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${event.alpha}, beta=${event.beta}, gamma=${event.gamma}`;
+            document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${event.alpha.toFixed(
+              2,
+            )}, beta=${event.beta.toFixed(2)}, gamma=${event.gamma.toFixed(2)}`;
           } else {
             const lastItem = sensorDataBuffer.getLastItem();
             frame.gyro = lastItem ? lastItem.gyro : { alpha: 0, beta: 0, gamma: 0 };
-            document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
+            document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${frame.gyro.alpha.toFixed(2)}, beta=${frame.gyro.beta.toFixed(
+              2,
+            )}, gamma=${frame.gyro.gamma.toFixed(2)}`;
           }
         } catch (error) {
           //console.error('Error updating gyroscope data:', error);
           const lastItem = sensorDataBuffer.getLastItem();
           frame.gyro = lastItem ? lastItem.gyro : { alpha: 0, beta: 0, gamma: 0 };
-          document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${frame.gyro.alpha}, beta=${frame.gyro.beta}, gamma=${frame.gyro.gamma}`;
+          document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${frame.gyro.alpha.toFixed(2)}, beta=${frame.gyro.beta.toFixed(
+            2,
+          )}, gamma=${frame.gyro.gamma.toFixed(2)}`;
         }
 
         sensorDataBuffer.push(frame);
