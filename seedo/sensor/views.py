@@ -27,7 +27,6 @@ def fall_recognition(request):
     if request.method == "POST":
         data = json.loads(request.body)
         df = process_sensor_data(data)
-        print(df.shape)
         scaler = load("sensor/ml_models/sensor/scaler/scaler_gyro.joblib")
         X_test = df
         X_test_normalized = scaler.transform(X_test)
@@ -161,15 +160,7 @@ def process_sensor_data(data):
     )
 
     # Select only the required columns
-    drop_cols = [
-        "Time(s)",
-        # "acc_x(g)",
-        # "acc_y(g)",
-        # "acc_z(g)",
-        # "gyr_x(deg/s)",
-        # "gyr_y(deg/s)",
-        # "gyr_z(deg/s)",
-    ]
+    drop_cols = ["Time(s)"]
 
     df.dropna(inplace=True)
     df.drop(columns=drop_cols, inplace=True)
