@@ -39,10 +39,10 @@
     <button id="stop-sensor">Stop sensor</button>
     <button id="start-camera">Start Camera</button>
     <button id="stop-camera">Stop Camera</button>
-    <audio id="falling_inform" src="{{ MEDIA_URL }}audios/falling_inform_voice.mp3"></audio>
-    <audio id="broken_inform" src="{{ MEDIA_URL }}audios/broken_inform_voice.mp3"></audio>
-    <audio id="on_walking" src="{{ MEDIA_URL }}audios/on_walking.mp3"></audio>
-    <audio id="off_walking" src="{{ MEDIA_URL }}audios/off_walking.mp3"></audio>
+    <audio id="falling_inform" src="{% static '/audios/falling_inform_voice.mp3' %}"></audio>
+    <audio id="broken_inform" src="{% static '/audios/broken_inform_voice.mp3' %}"></audio>
+    <audio id="on_walking" src="{% static '/audios/on_walking.mp3' %}"></audio>
+    <audio id="off_walking" src="{% static '/audios/off_walking.mp3' %}"></audio>
     <h2>Video</h2>
     <video id="video" width="640" height="480" style="display: none"></video>
     <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
