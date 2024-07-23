@@ -55,6 +55,8 @@ main {
   flex-shrink: 0;
   padding: 0px 15px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 .material-symbols-outlined:hover {
   color: #337614;
