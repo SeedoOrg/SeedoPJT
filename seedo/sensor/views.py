@@ -105,7 +105,7 @@ def process_sensor_data(data):
         gyr_y = updateBeta(previousBeta, currentBeta) / deltaTime
         gyr_z = updateGamma(previousGamma, currentGamma) / deltaTime
 
-        SVM_acc = np.sqrt(acc_x**2 + acc_y**2 + acc_z**2) * 0.55
+        SVM_acc = np.sqrt(acc_x**2 + acc_y**2 + acc_z**2)
         SVM_gyro = np.sqrt(gyr_x**2 + gyr_y**2 + gyr_z**2)
 
         # Append row to the list
