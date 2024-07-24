@@ -7,6 +7,47 @@ var sendRequestForm = document.getElementById("sendRequestForm");
 var verifyRequestForm = document.getElementById("verifyRequestForm");
 var partnerList = document.querySelector(".partnerList");
 
+
+async function ttsAlert(text) {
+  var csrftoken = getCookie("csrftoken");
+  try {
+    const response = await fetch("/nav/tts/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    // const audio = new Audio(audioUrl);
+    const audioData = audioUrl;
+
+    // try {
+    //   await audio.play();
+    //   console.log('음성 재생 성공');
+    // } catch (error) {
+    //   console.error('음성 재생 중 오류 발생:', error);
+    // }
+    addToQueue(audioData);
+  } catch (error) {
+    console.error("TTS 변환 중 오류 발생:", error);
+  }
+}
+
+// 기존 alert 함수를 불러올때 ttsAlert 함수 호출
+window.alert = function (text) {
+  ttsAlert(text); // TTS 변환 함수 호출
+  window.alert = ttsAlert; // alert 함수를 다시 TTS 함수로 설정하여 중복 호출 방지
+};
+
+
 addPartnerBtn.addEventListener("click", function () {
   addPartnerModal.style.display = "block";
 });
