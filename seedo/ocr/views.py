@@ -3,18 +3,17 @@ import urllib.parse
 import urllib.request
 from io import BytesIO
 from pathlib import Path
-
+from common.decorators import token_required
 import environ
 import openai
 from django.http import JsonResponse
 from django.shortcuts import render
 from PIL import Image
 
+#환경변수 호출
 BASE_DIR = Path(__file__).resolve().parent.parent
 env_path = BASE_DIR.parent / ".env"
-# API 가져오기
 env = environ.Env(
-    # set casting, default value
     DEBUG=(bool, False)
 )
 env_path = BASE_DIR.parent / ".env"
@@ -27,9 +26,7 @@ SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
 # openapi 정의
 client = openai.OpenAI()
 
-# Create your views here.
-
-
+@token_required
 def index(request):
     return render(request, "ocr/index.html")
 
