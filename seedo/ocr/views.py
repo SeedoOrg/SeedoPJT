@@ -3,19 +3,18 @@ import urllib.parse
 import urllib.request
 from io import BytesIO
 from pathlib import Path
-from common.decorators import token_required
+
 import environ
 import openai
+from common.decorators import token_required
 from django.http import JsonResponse
 from django.shortcuts import render
 from PIL import Image
 
-#환경변수 호출
+# 환경변수 호출
 BASE_DIR = Path(__file__).resolve().parent.parent
 env_path = BASE_DIR.parent / ".env"
-env = environ.Env(
-    DEBUG=(bool, False)
-)
+env = environ.Env(DEBUG=(bool, False))
 env_path = BASE_DIR.parent / ".env"
 environ.Env.read_env(env_file=env_path)
 
@@ -25,6 +24,7 @@ SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
 
 # openapi 정의
 client = openai.OpenAI()
+
 
 @token_required
 def index(request):
