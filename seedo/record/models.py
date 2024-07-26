@@ -7,15 +7,13 @@ from django.dispatch import receiver
 
 User = get_user_model()
 
-# Create your models here.
 
-
+# 사고기록을 스토리지 내에서 저장해둘 경로
 def upload_to(instance, filename):
-    # Split the file name and extension
+    # 파일 이름과 확장자 분리
     base, ext = os.path.splitext(filename)
 
-    print(base, ext)
-    # Generate the new file name with the primary key
+    # 기본 키를 사용하여 새로운 파일 이름 생성
     if instance.id:
         new_filename = f"{base}_{instance.id}{ext}"
     else:
@@ -23,11 +21,12 @@ def upload_to(instance, filename):
     return os.path.join("record/videos/", new_filename)
 
 
+# 파손기록을 스토리지 내에서 저장해둘 경로
 def upload_to_img(instance, filename):
-    # Split the file name and extension
-
+    # 파일 이름과 확장자 분리
     base, ext = os.path.splitext(filename)
-    # Generate the new file name with the primary key
+
+    # 기본 키를 사용하여 새로운 파일 이름 생성
     if instance.id:
         new_filename = f"{base}_{instance.id}{ext}"
     else:
@@ -35,6 +34,7 @@ def upload_to_img(instance, filename):
     return os.path.join("record/images/", new_filename)
 
 
+# 파손된 점자블록 저장할 DB 테이블
 class Condition(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     condition_date = models.DateField(auto_now_add=True)
@@ -43,21 +43,26 @@ class Condition(models.Model):
     condition_location = models.TextField(null=False)
 
     def save(self, *args, **kwargs):
+        # 인스턴스가 새 객체인지 id로 확인
         is_new = self._state.adding
         temp_image_file = self.condition_image
 
+        # 파일을 임시 위치에 저장
         self.condition_image = None
         super().save(*args, **kwargs)
 
         if is_new:
+            # 기본 키로 파일 이름 변경
             new_file_name = upload_to_img(self, temp_image_file.name)
             self.condition_image = temp_image_file
             self.condition_image.name = new_file_name
+            # 파일 경로를 업데이트하기 위해 다시 저장
             super().save(update_fields=["condition_image"])
         else:
             super().save(*args, **kwargs)
 
 
+# 낙상 사고기록 저장할 DB 테이블
 class Accident(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     accident_date = models.DateField(auto_now_add=True)
@@ -66,26 +71,27 @@ class Accident(models.Model):
     accident_location = models.TextField(null=False)
 
     def save(self, *args, **kwargs):
-        # Check if the instance is new by checking if it has an id
+        # 인스턴스가 새 객체인지 id로 확인
         is_new = self._state.adding
         temp_video_file = self.accident_video
 
-        # Temporarily save the file to a temporary location
+        # 파일을 임시 위치에 저장
         self.accident_video = None
         super().save(*args, **kwargs)
 
         if is_new:
-            # Rename the file with the primary key
+            # 기본 키로 파일 이름 변경
             new_file_name = upload_to(self, temp_video_file.name)
             self.accident_video = temp_video_file
             self.accident_video.name = new_file_name
-            # Save again to update the file path
+            # 파일 경로를 업데이트하기 위해 다시 저장
             super().save(update_fields=["accident_video"])
         else:
             super().save(*args, **kwargs)
 
 
 # Signal handlers
+# 기존 파일이 수정되거나, 삭제될 경우 실제 스토리지에서도 삭제하는 부분
 
 
 @receiver(pre_save, sender=Condition)
