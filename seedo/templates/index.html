@@ -54,7 +54,7 @@
       // Check if preload should be shown today
       function shouldShowPreload() {
         const lastShown = getCookie("preloadLastShown");
-        const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
+        const today = new Date().toISOString().split("T")[0];
         return lastShown !== today;
       }
 
