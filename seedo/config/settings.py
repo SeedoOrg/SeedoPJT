@@ -87,16 +87,23 @@ JWT_ALGORITHM = "HS256"
 JWT_ACCESS_TOKEN_EXPIRATION = timedelta(minutes=1)
 JWT_REFRESH_TOKEN_EXPIRATION = timedelta(days=30)
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",  # 고정
-        "NAME": env("DATABASE_NAME"),  # DB 이름
-        "USER": env("DATABASE_USER"),  # 계정
-        "PASSWORD": env("DATABASE_PW"),  # 암호
-        "HOST": env("DATABASE_HOST"),  # IP
-        "PORT": "3306",  # default
+# 개발 환경 설정
+DJANGO_ENVIRONMENT = env("DJANGO_ENVIRONMENT")
+
+if DJANGO_ENVIRONMENT == "development":
+    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
+
+else :
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",  # 고정
+            "NAME": env("DATABASE_NAME"),  # DB 이름
+            "USER": env("DATABASE_USER"),  # 계정
+            "PASSWORD": env("DATABASE_PW"),  # 암호
+            "HOST": env("DATABASE_HOST"),  # IP
+            "PORT": "3306",  # default
+        }
     }
-}
 
 
 # Password validation
@@ -120,10 +127,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
-# AWS S3 configurations
-DJANGO_ENVIRONMENT = env("DJANGO_ENVIRONMENT")
-
 
 if DJANGO_ENVIRONMENT == "development":
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
