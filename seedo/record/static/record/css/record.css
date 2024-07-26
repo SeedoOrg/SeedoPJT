@@ -4,7 +4,7 @@ main {
   min-height: 100vh;
   align-items: center;
   flex-direction: column;
-  gap: 34px; /* Gap between buttons */
+  gap: 34px;
   padding: 50px 0px 20px;
 }
 
@@ -102,10 +102,6 @@ video {
 }
 
 #pagination {
-  /* position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%); */
   display: flex;
   justify-content: center;
   margin-top: 10px;
