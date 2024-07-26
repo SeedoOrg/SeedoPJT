@@ -26,7 +26,6 @@
   </div>
 
   <script>
-
     // 환경에 따른 css 적용
     document.addEventListener("DOMContentLoaded", function () {
       var userAgent = navigator.userAgent;
@@ -60,7 +59,6 @@
       }
     });
 
-
     /* 객체 변수 정의 */
     var fadeVisible = document.querySelectorAll(".fadeVisible");
     var fade = document.querySelectorAll(".fade");
@@ -79,8 +77,6 @@
     let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐
     let isPlaying = false; // 현재 재생여부
     let isCapturing = true; // 현재 상태를 추적 플래그
-
-
 
     /* 카메라를 시작 */
     function startOcr() {
@@ -109,7 +105,6 @@
           console.error("Error accessing the camera: ", err); // 카메라 접근 오류를 처리합니다.
         });
     }
-
 
     /* 버튼 클릭 이벤트 */
     captureButton.addEventListener("click", () => {
@@ -158,7 +153,7 @@
         capturedImage.src = imageData;
         capturedImage.style.display = "block";
         video.style.display = "none";
-        captureButton.innerText = "다시 찍기"; 
+        captureButton.innerText = "다시 찍기";
         captureButton.style.backgroundColor = "#e01b41";
         isCapturing = false; // 상태 플래그를 업데이트
 

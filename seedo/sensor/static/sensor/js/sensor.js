@@ -7,6 +7,7 @@ function getCookie(name) {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(";").shift();
 }
+
 async function sendSensorData(sensorData) {
   var csrftoken = getCookie("csrftoken");
   try {
@@ -20,7 +21,6 @@ async function sendSensorData(sensorData) {
     });
 
     const result = await response.json();
-    //console.log('Prediction:', result.prediction);
 
     previousPrediction = result.prediction;
 
@@ -63,11 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var walking_mode = localStorage.getItem("walking_mode");
   if (walking_mode === "true") {
     startSensoring();
-    console.log("낙상감지를 시작합니다.", walking_mode);
-  } else {
-    console.log("낙상김지가 중지상태입니다.");
   }
 
+  // frame 구간별 센서 데이터 전송
   function maybeSendSensorData() {
     if (activeSendorRequests < MAX_CONCURRENT_SENSOR_REQUESTS) {
       if (sensorDataBuffer.getBuffer().length >= 30) {
@@ -117,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
             )}, y=${frame.acc.y.toFixed(2)}, z=${frame.acc.z.toFixed(2)}`;
           }
         } catch (error) {
-          //console.error('Error updating accelerometer data:', error);
           const lastItem = sensorDataBuffer.getLastItem();
           frame.acc = lastItem ? lastItem.acc : { x: 0, y: 0, z: 0 };
           document.getElementById("accelerometer").textContent = `Accelerometer: x=${frame.acc.x.toFixed(
@@ -144,7 +141,6 @@ document.addEventListener("DOMContentLoaded", function () {
             )}, gamma=${frame.gyro.gamma.toFixed(2)}`;
           }
         } catch (error) {
-          //console.error('Error updating gyroscope data:', error);
           const lastItem = sensorDataBuffer.getLastItem();
           frame.gyro = lastItem ? lastItem.gyro : { alpha: 0, beta: 0, gamma: 0 };
           document.getElementById("gyroscope").textContent = `Gyroscope: alpha=${frame.gyro.alpha.toFixed(2)}, beta=${frame.gyro.beta.toFixed(
@@ -173,7 +169,6 @@ document.addEventListener("DOMContentLoaded", function () {
             resolve();
           },
           function (error) {
-            console.error("Error accessing GPS:", error);
             frame.gps = { latitude: 0, longitude: 0 };
             document.getElementById("location").textContent = `Location: Latitude 0, Longitude 0`;
             resolve();
