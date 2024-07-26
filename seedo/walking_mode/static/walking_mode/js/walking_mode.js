@@ -1,7 +1,5 @@
-const MAX_CONCURRENT_REQUESTS = 1; // 동시에 처리될 수 있는 최대 요청 수.,,,
-let activeRequests = 0; // 현재 처리 중인 요청 수``
-// let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐,
-// let isPlaying = false; // 현재 오디오가 재생 중인지 여부,
+const MAX_CONCURRENT_REQUESTS = 1; // 동시에 처리될 수 있는 최대 요청 수
+let activeRequests = 0; // 현재 처리 중인 요청 수
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -14,6 +12,7 @@ function setWalkingModeToLocalStorage(walking_mode) {
 }
 
 async function sendCameraImage(imageData) {
+  // response된 location 정보 처리
   var location = document.getElementById("location").textContent;
   var regex = /Latitude\s([-\d.]+),\sLongitude\s([-\d.]+)/;
   var matches = location.match(regex);
@@ -26,6 +25,7 @@ async function sendCameraImage(imageData) {
   }
 
   var csrf_token = getCookie("csrftoken");
+  // 비동기 방식으로 현재 프레임의 이미지에 대한 디텍션 모델링 요청을 보냄
   try {
     const response = await fetch("/walking_mode/test/", {
       method: "POST",
@@ -39,8 +39,10 @@ async function sendCameraImage(imageData) {
         longitude: longitude,
       }),
     });
-
+    //response 된 결과 저장
     const result = await response.json();
+
+    //민원정보가 있을 때는 저장요청 보내기
     if (result.complaints != null) {
       const save_break_response = await fetch("/record/break/save_break/", {
         method: "POST",
@@ -58,12 +60,7 @@ async function sendCameraImage(imageData) {
       if (save_break_result.status === "success") {
         const brokenInformElement = document.getElementById("broken_inform");
 
-        // if (brokenInformElement) {
-        //   brokenInformElement.play().catch((error) => {
-        //     console.log('Audio play failed:', error);
-        //   });
-        // }
-
+        // 사운드 queue에 민원정보 저장알림 사운드 추가
         if (brokenInformElement) {
           const audioSrc = brokenInformElement.src;
           addToQueue(audioSrc);
@@ -93,13 +90,9 @@ async function sendCameraImage(imageData) {
       result.tts_audio_base64.forEach((audioBase64) => {
         const audioData = `data:audio/mpeg;base64,${audioBase64}`;
         addToQueue(audioData);
-        // soundQueue.push(audioData);
       });
-      // playNextInQueue();
     } else {
       const audioData = `data:audio/mpeg;base64,${result.tts_audio_base64}`;
-      // soundQueue.push(audioData);
-      // playNextInQueue();
       addToQueue(audioData);
     }
   } catch (error) {
@@ -190,7 +183,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function maybeSendCameraImage() {
     if (recording && activeRequests < MAX_CONCURRENT_REQUESTS) {
-      //console.log(activeRequests);
       activeRequests++; // 새로운 요청을 시작하기 전에 activeRequests를 증가
       const imageData = captureImage(video, canvas);
       sendCameraImage(imageData);
@@ -208,11 +200,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (walking_mode !== "true") {
       const onWalkingElement = document.getElementById("on_walking");
 
-      // if (onWalkingElement) {
-      //   onWalkingElement.play().catch((error) => {
-      //     console.log('Audio play failed:', error);
-      //   });
-      // }
       if (onWalkingElement) {
         const audioSrc = onWalkingElement.src;
         addToQueue(audioSrc);
@@ -282,8 +269,6 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
-
-    // setInterval(handlePrediction, 1000 * 6);
   }
 
   function stopRecording() {
@@ -295,11 +280,6 @@ document.addEventListener("DOMContentLoaded", function () {
     mediaRecorder.stop();
     const offWalkingElement = document.getElementById("off_walking");
 
-    // if (offWalkingElement) {
-    //   offWalkingElement.play().catch((error) => {
-    //     console.log('Audio play failed:', error);
-    //   });
-    // }
     if (offWalkingElement) {
       const audioSrc = offWalkingElement.src;
       addToQueue(audioSrc);
@@ -418,11 +398,6 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           catchFallen();
 
-          // if (fallingInformElement) {
-          //   fallingInformElement.play().catch((error) => {
-          //     console.log('Audio play failed:', error);
-          //   });
-          // }
           if (fallingInformElement) {
             const audioSrc = fallingInformElement.src;
             addToQueue(audioSrc);
