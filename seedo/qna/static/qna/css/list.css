@@ -36,7 +36,6 @@ main {
   gap: 10px;
 }
 
-/* 반응형 디자인: 화면이 좁아질 때 */
 @media (max-width: 500px) {
   .qnaheader {
     justify-content: space-between;
@@ -76,21 +75,20 @@ main {
 }
 
 .question_list {
-  position: relative; /* 위치 조정을 위해 relative 속성을 추가합니다 */
+  position: relative;
   width: 100%;
   max-width: 768px;
-  height: 430px; /* 최대 높이 설정 */
+  height: 430px;
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
   background-color: #fff;
-  /* display: flex; */
   flex-direction: column;
   justify-content: center;
   align-items: center;
   box-shadow: 2px 2px 5px #00000080;
   gap: 5px;
-  overflow-y: auto; /* 스크롤 추가 */
+  overflow-y: auto;
 }
 
 .question_list > * {
@@ -103,14 +101,14 @@ main {
   color: #193b08;
   cursor: pointer;
   font-weight: 700;
-  width: 100%; /* 부모 요소의 최대 너비 설정 */
-  overflow: hidden; /* 넘치는 텍스트 숨기기 */
+  width: 100%;
+  overflow: hidden;
 }
 .eachQtitle {
-  width: 100%; /* 부모 요소의 최대 너비 설정 */
-  white-space: nowrap; /* 한 줄로 표시 */
-  overflow: hidden; /* 넘치는 텍스트 숨기기 */
-  text-overflow: ellipsis; /* 말줄임표로 표시 */
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .eachQ:hover {
   color: #337614;
@@ -154,10 +152,10 @@ main {
 }
 
 #pagination {
-  position: absolute; /* 부모 요소인 .question_list를 기준으로 위치를 고정합니다 */
-  bottom: 10px; /* 아래쪽에서 10px 위로 */
-  left: 50%; /* 좌우 중앙 정렬 */
-  transform: translateX(-50%); /* 중앙 정렬 보정 */
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   justify-content: center;
   margin-top: 10px;

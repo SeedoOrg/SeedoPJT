@@ -12,6 +12,7 @@ from .forms import CommentForm, QnAForm
 from .models import QnA
 
 
+# 문의내용들을 최신순으로 나열해서 전달하는 view
 @method_decorator(token_required, name="dispatch")
 class QnAListView(LoginRequiredMixin, ListView):
     model = QnA
@@ -39,6 +40,7 @@ class QnAListView(LoginRequiredMixin, ListView):
         return context
 
 
+# 문의에 대한 정보를 전부 갖고와서, post 방식으로 전달하는 view
 @method_decorator(token_required, name="dispatch")
 class QnADetailView(View):
 
@@ -62,6 +64,7 @@ class QnADetailView(View):
         return redirect("qna:qna-detail", pk=pk)
 
 
+# 댓글 폼에 작성되면 내용 전달해주는 함수
 @token_required
 def comment_update(request, pk):
     question = get_object_or_404(QnA, pk=pk)
@@ -74,6 +77,7 @@ def comment_update(request, pk):
     return redirect("qna:qna-detail", pk=pk)
 
 
+# 댓글 삭제 요청을 처리하는 함수
 @token_required
 def comment_delete(request, pk):
     question = get_object_or_404(QnA, pk=pk)
@@ -86,6 +90,7 @@ def comment_delete(request, pk):
     return redirect("qna:qna-detail", pk=pk)
 
 
+# 문의 내용 작성 폼을 처리하는 view
 @method_decorator(token_required, name="dispatch")
 class QnACreateView(LoginRequiredMixin, CreateView):
     model = QnA
@@ -103,6 +108,7 @@ class QnACreateView(LoginRequiredMixin, CreateView):
         return context
 
 
+# 문의 내용 수정 요청을 처리하는 view
 @method_decorator(token_required, name="dispatch")
 class QnAUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = QnA
@@ -120,6 +126,7 @@ class QnAUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return context
 
 
+# 문의 내용에 대해 삭제요청을 처리하는 view
 @method_decorator(token_required, name="dispatch")
 class QnADeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = QnA
@@ -130,6 +137,7 @@ class QnADeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user.is_superuser or self.request.user == question.author
 
 
+# 댓글작성을 처리하는 view
 @method_decorator(token_required, name="dispatch")
 class CommentCreateView(FormView):
     template_name = "qna/qna_detail.html"

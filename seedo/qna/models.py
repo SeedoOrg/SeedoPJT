@@ -6,6 +6,7 @@ from django.dispatch import receiver
 User = get_user_model()
 
 
+# 문의게시판 DB 테이블 생성
 class QnA(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
@@ -20,8 +21,7 @@ class QnA(models.Model):
 
 
 # Signal handlers
-
-
+# 기존 파일이 수정되거나, 삭제될 경우 실제 스토리지에서도 삭제하는 부분
 @receiver(pre_save, sender=QnA)
 def delete_old_qna_file(sender, instance, **kwargs):
     if instance.pk:

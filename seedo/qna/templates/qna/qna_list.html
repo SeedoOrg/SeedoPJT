@@ -8,6 +8,7 @@
   <div id="map"></div>
   <div class="qnaheader">
     <p class="title">Q&A List</p>
+    <!-- 답변 여부에 따라서 조회하기 위한 필터 -->
     <form class="filter" method="GET" action="{% url 'qna:qna-list' %}">
       <select id="filter" name="filter">
         <option class="filterOpt" value="" {% if filter_type|is_q_list_option:1 %}selected{% endif %}>전체</option>
@@ -40,6 +41,7 @@
 </main>
 
 <script>
+  // 문의내용이 많을 경우 페이지네이션으로 처리하는 코드
   $(document).ready(function () {
     var itemsPerPage = 6;
     var $items = $(".question_list .eachQ");
