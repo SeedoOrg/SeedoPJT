@@ -1,6 +1,3 @@
-# accounts/views.py
-
-
 import jwt
 from common.decorators import token_required
 from common.utils import generate_tokens

@@ -51,7 +51,7 @@ document.querySelectorAll(".acceptBtn").forEach(function (button) {
   });
 });
 
-// Close modals
+// 모달 닫기
 var modals = document.querySelectorAll(".modal");
 modals.forEach((modal) => {
   modal.addEventListener("click", function (event) {

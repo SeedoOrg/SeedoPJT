@@ -1,5 +1,3 @@
-/* myapp/static/css/sample.css */
-
 h2 {
   color: #193b08;
   text-align: center;
@@ -11,9 +9,9 @@ form {
 }
 .form-wrapper {
   display: flex;
-  flex-direction: column; /* Arrange buttons vertically */
-  gap: 0px; /* Gap between buttons */
-  width: 100%; /* Ensure it takes full width */
+  flex-direction: column;
+  gap: 0px;
+  width: 100%;
   margin-top: 20px;
 }
 
@@ -24,7 +22,7 @@ form {
 }
 
 .form-group.error {
-  border-color: #e01b41; /* Red color */
+  border-color: #e01b41;
 }
 
 .error-message {
@@ -56,10 +54,9 @@ input {
 
 .button-wrapper {
   display: flex;
-  flex-direction: column; /* Arrange buttons vertically */
-  gap: 20px; /* Gap between buttons */
-  width: 100%; /* Ensure it takes full width */
-  /* margin-top: 10px; */
+  flex-direction: column; 
+  gap: 20px; 
+  width: 100%;
 }
 
 .button-link {
@@ -80,24 +77,23 @@ input {
   background-color: #337614;
 }
 
-/* Centering layout */
 .layout {
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  min-height: calc(100vh - 56px); /* Ensure it takes at least full viewport height */
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 56px);
   margin-top: 56px;
-  box-sizing: border-box; /* Include padding in height calculation */
+  box-sizing: border-box;
 }
 
 .content-wrapper {
   display: flex;
-  flex-direction: column; /* Arrange children vertically */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center;
   width: 360px;
   padding: 17px 34px;
-  box-sizing: border-box; /* Include padding in height calculation */
+  box-sizing: border-box; 
 }
 
 .hover-text {
@@ -113,7 +109,7 @@ input {
 }
 
 .hover-text:hover {
-  color: #539534; /* Change this to your desired hover color */
+  color: #539534;
 }
 .spinner {
   display: none;
