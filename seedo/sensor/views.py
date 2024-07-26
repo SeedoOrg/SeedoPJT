@@ -32,12 +32,10 @@ def fall_recognition(request):
         X_test_normalized = scaler.transform(X_test)
         time_steps = 15
 
-        # Ensure the number of samples is divisible by time_steps
         num_test_samples = (X_test_normalized.shape[0] // time_steps) * time_steps
 
         X_test_final = X_test_normalized[:num_test_samples]
 
-        # Reshape data for LSTM [samples, time steps, features]
         X_test_final = X_test_final.reshape((num_test_samples // time_steps, time_steps, X_test_final.shape[1]))
 
         y_pred = model.predict(X_test_final)
@@ -47,7 +45,6 @@ def fall_recognition(request):
 
 
 def process_sensor_data(data):
-    # Define the column titles
     columns = [
         "Time(s)",
         "acc_x(g)",
@@ -74,18 +71,15 @@ def process_sensor_data(data):
 
     rows = []
 
-    # Initialize previous values
     previousAlpha, previousBeta, previousGamma = None, None, None
     previousTime = None
-    # Create a DataFrame from the JSON data
     sensor_datas = data["sensor_data"]
 
     for sensor_data in sensor_datas:
-        time = sensor_data["timestamp"] / 1000  # Convert timestamp to seconds
+        time = sensor_data["timestamp"] / 1000
         acc = sensor_data["acc"]
         gyro = sensor_data["gyro"]
 
-        # Calculate the additional metrics
         acc_x = acc["x"]
         acc_y = acc["y"]
         acc_z = acc["z"]
@@ -93,7 +87,6 @@ def process_sensor_data(data):
         currentBeta = gyro["beta"]
         currentGamma = gyro["gamma"]
 
-        # Initialize previous values if not set
         if previousAlpha is None:
             previousAlpha, previousBeta, previousGamma = (currentAlpha, currentBeta, currentGamma)
             previousTime = time
@@ -108,7 +101,6 @@ def process_sensor_data(data):
         SVM_acc = np.sqrt(acc_x**2 + acc_y**2 + acc_z**2)
         SVM_gyro = np.sqrt(gyr_x**2 + gyr_y**2 + gyr_z**2)
 
-        # Append row to the list
         rows.append(
             {
                 "Time(s)": time,
@@ -125,8 +117,9 @@ def process_sensor_data(data):
 
     df = pd.DataFrame(rows, columns=columns)
 
-    # Calculate additional metrics
-    window_size = 15  # Adjust the window size as needed for 1-second windows
+    # 새로운 컬럼 피처 엔지니어링
+    # LSTM 윈도우 사이즈: 1/30초 * 15(window_size) > 0.5초 구간간격으로 넘어짐 판단
+    window_size = 15
     df["SVM_acc(g)_mean"] = df["SVM_acc(g)"].rolling(window=window_size).mean()
     df["SVM_acc(g)_std"] = df["SVM_acc(g)"].rolling(window=window_size).std()
     df["SVM_acc(g)_median"] = df["SVM_acc(g)"].rolling(window=window_size).median()
@@ -137,14 +130,12 @@ def process_sensor_data(data):
     df["SVM_gyro(g)_median"] = df["SVM_gyro(g)"].rolling(window=window_size).median()
     df["SVM_gyro(g)_mad"] = df["SVM_gyro(g)"].rolling(window=window_size).apply(median_abs_deviation)
 
-    # Calculate FFT-based features for a specified window size
     def calculate_fft_features(signal):
-        signal = np.array(signal)  # Convert Series to numpy array
+        signal = np.array(signal)
         fft_values = fft(signal)
         fft_magnitude = np.abs(fft_values)
         return np.mean(fft_magnitude), np.std(fft_magnitude)
 
-    # Apply FFT feature calculation on rolling windows
     df["SVM_acc(g)_fft_mean"] = (
         df["SVM_acc(g)"].rolling(window=window_size).apply(lambda x: calculate_fft_features(x)[0] if len(x) == window_size else np.nan)
     )
@@ -159,7 +150,6 @@ def process_sensor_data(data):
         df["SVM_gyro(g)"].rolling(window=window_size).apply(lambda x: calculate_fft_features(x)[1] if len(x) == window_size else np.nan)
     )
 
-    # Select only the required columns
     drop_cols = ["Time(s)"]
 
     df.dropna(inplace=True)

@@ -57,7 +57,7 @@ class CircularBuffer {
 document.addEventListener("DOMContentLoaded", function () {
   let sensoring = false;
   let sensorDataBuffer = new CircularBuffer(30);
-  const frameRate = 30; // frames per second
+  const frameRate = 30;
   let frameticks = 0;
 
   var walking_mode = localStorage.getItem("walking_mode");
@@ -91,13 +91,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (sensoring) {
       frameticks++;
       const frame = createNewFrame();
-      try {
-        await Promise.all([
-          updateGPS(frame),
-          Promise.resolve(frame), // Ensure GPS promise is part of all promises
-        ]);
 
-        // Update Accelerometer
+      try {
+        await Promise.all([updateGPS(frame), Promise.resolve(frame)]);
+
+        // 가속도 센서값 업데이트
         try {
           if (event.acceleration && event.acceleration !== undefined) {
             let accel = event.acceleration;
@@ -122,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
           )}, y=${frame.acc.y.toFixed(2)}, z=${frame.acc.z.toFixed(2)}`;
         }
 
-        // Update Gyroscope
+        // 자이로 센서값 업데이트
         try {
           if (event.alpha !== null && event.alpha !== undefined) {
             frame.gyro = {
