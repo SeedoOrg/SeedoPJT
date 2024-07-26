@@ -103,14 +103,17 @@ async function sendCameraImage(imageData) {
 }
 
 function playNextInQueue() {
+  // 중복 재생 방지
   if (isPlaying || soundQueue.length === 0) return;
 
   const audioData = soundQueue.shift();
+  // howler 라이브러리
   const sound = new Howl({
     src: [audioData],
     format: ["mp3"],
     autoplay: true,
     onend: function () {
+      // 한 안내가 끝나면 다음 안내가 되는 방식
       isPlaying = false;
       playNextInQueue();
     },
@@ -120,6 +123,7 @@ function playNextInQueue() {
   sound.play();
 }
 
+//비디오에서 프레임 추출
 function captureImage(video, canvas) {
   const context = canvas.getContext("2d");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -181,6 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // 실제 요청을 보내기 전, 최대 요청 수 및 카메라 실행 상태 확인
   async function maybeSendCameraImage() {
     if (recording && activeRequests < MAX_CONCURRENT_REQUESTS) {
       activeRequests++; // 새로운 요청을 시작하기 전에 activeRequests를 증가
@@ -236,13 +241,13 @@ document.addEventListener("DOMContentLoaded", function () {
           imgElement.height = imgElement.width / aspectRatio;
         }
 
-        // Set up MediaRecorder
+        // MediaRecorder 설정
         mediaRecorder = new MediaRecorder(stream);
         mediaRecorder.ondataavailable = function (event) {
           return new Promise((resolve, reject) => {
             if (event.data.size > 0) {
               recordedChunks.push(event.data);
-              // Remove older chunks if exceeding the maxChunks limit
+              // maxChunks 초과 시 이전 chunks 삭제
               if (recordedChunks.length > maxChunks) {
                 recordedChunks.splice(0, recordedChunks.length - maxChunks);
               }
@@ -362,14 +367,11 @@ document.addEventListener("DOMContentLoaded", function () {
         type: "video/mp4",
       });
 
-      // Prepare form data
+      // formdata 형식으로 사고 영상 정보관리
       const formData = new FormData();
-      formData.append("latitude", latitude); // Replace with actual location data
-      formData.append("longitude", longitude); // Replace with actual location data
+      formData.append("latitude", latitude);
+      formData.append("longitude", longitude);
       formData.append("video_file", videoFile);
-
-      for (let [key, value] of formData.entries()) {
-      }
 
       try {
         const response = await fetch("../record/accident/save_accident/", {
@@ -411,6 +413,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // 테스트용 HTML element 요소
   var startCameraButton = document.getElementById("start-camera");
   if (startCameraButton) {
     startCameraButton.addEventListener("click", () => startRecording(deviceId));

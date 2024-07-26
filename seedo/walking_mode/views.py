@@ -162,7 +162,7 @@ def make_caption(history):
 
 # 모델 동작 요청을 받았을 때 동작하는 View
 class ImageUploadView(View):
-    template_name = "test2.html"
+    template_name = "index.html"
     current_cls = 99  # 노면변화 감지용 변수
     frame_cnt = 0
     model_od = YOLO(yolo_od_pt)  #
