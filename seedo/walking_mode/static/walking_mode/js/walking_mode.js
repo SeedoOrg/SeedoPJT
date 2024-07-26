@@ -1,7 +1,5 @@
-const MAX_CONCURRENT_REQUESTS = 1; // 동시에 처리될 수 있는 최대 요청 수.,,,
-let activeRequests = 0; // 현재 처리 중인 요청 수``
-// let soundQueue = []; // 재생할 오디오 파일을 저장하는 큐,
-// let isPlaying = false; // 현재 오디오가 재생 중인지 여부,
+const MAX_CONCURRENT_REQUESTS = 1; // 동시에 처리될 수 있는 최대 요청 수
+let activeRequests = 0; // 현재 처리 중인 요청 수
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -14,6 +12,7 @@ function setWalkingModeToLocalStorage(walking_mode) {
 }
 
 async function sendCameraImage(imageData) {
+  // response된 location 정보 처리
   var location = document.getElementById("location").textContent;
   var regex = /Latitude\s([-\d.]+),\sLongitude\s([-\d.]+)/;
   var matches = location.match(regex);
@@ -26,6 +25,7 @@ async function sendCameraImage(imageData) {
   }
 
   var csrf_token = getCookie("csrftoken");
+  // 비동기 방식으로 현재 프레임의 이미지에 대한 디텍션 모델링 요청을 보냄
   try {
     const response = await fetch("/walking_mode/test/", {
       method: "POST",
@@ -39,8 +39,10 @@ async function sendCameraImage(imageData) {
         longitude: longitude,
       }),
     });
-
+    //response 된 결과 저장
     const result = await response.json();
+
+    //민원정보가 있을 때는 저장요청 보내기
     if (result.complaints != null) {
       const save_break_response = await fetch("/record/break/save_break/", {
         method: "POST",
@@ -58,12 +60,7 @@ async function sendCameraImage(imageData) {
       if (save_break_result.status === "success") {
         const brokenInformElement = document.getElementById("broken_inform");
 
-        // if (brokenInformElement) {
-        //   brokenInformElement.play().catch((error) => {
-        //     console.log('Audio play failed:', error);
-        //   });
-        // }
-
+        // 사운드 queue에 민원정보 저장알림 사운드 추가
         if (brokenInformElement) {
           const audioSrc = brokenInformElement.src;
           addToQueue(audioSrc);
@@ -93,13 +90,9 @@ async function sendCameraImage(imageData) {
       result.tts_audio_base64.forEach((audioBase64) => {
         const audioData = `data:audio/mpeg;base64,${audioBase64}`;
         addToQueue(audioData);
-        // soundQueue.push(audioData);
       });
-      // playNextInQueue();
     } else {
       const audioData = `data:audio/mpeg;base64,${result.tts_audio_base64}`;
-      // soundQueue.push(audioData);
-      // playNextInQueue();
       addToQueue(audioData);
     }
   } catch (error) {
@@ -110,14 +103,17 @@ async function sendCameraImage(imageData) {
 }
 
 function playNextInQueue() {
+  // 중복 재생 방지
   if (isPlaying || soundQueue.length === 0) return;
 
   const audioData = soundQueue.shift();
+  // howler 라이브러리
   const sound = new Howl({
     src: [audioData],
     format: ["mp3"],
     autoplay: true,
     onend: function () {
+      // 한 안내가 끝나면 다음 안내가 되는 방식
       isPlaying = false;
       playNextInQueue();
     },
@@ -127,6 +123,7 @@ function playNextInQueue() {
   sound.play();
 }
 
+//비디오에서 프레임 추출
 function captureImage(video, canvas) {
   const context = canvas.getContext("2d");
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -188,9 +185,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  // 실제 요청을 보내기 전, 최대 요청 수 및 카메라 실행 상태 확인
   async function maybeSendCameraImage() {
     if (recording && activeRequests < MAX_CONCURRENT_REQUESTS) {
-      //console.log(activeRequests);
       activeRequests++; // 새로운 요청을 시작하기 전에 activeRequests를 증가
       const imageData = captureImage(video, canvas);
       sendCameraImage(imageData);
@@ -208,11 +205,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (walking_mode !== "true") {
       const onWalkingElement = document.getElementById("on_walking");
 
-      // if (onWalkingElement) {
-      //   onWalkingElement.play().catch((error) => {
-      //     console.log('Audio play failed:', error);
-      //   });
-      // }
       if (onWalkingElement) {
         const audioSrc = onWalkingElement.src;
         addToQueue(audioSrc);
@@ -249,13 +241,13 @@ document.addEventListener("DOMContentLoaded", function () {
           imgElement.height = imgElement.width / aspectRatio;
         }
 
-        // Set up MediaRecorder
+        // MediaRecorder 설정
         mediaRecorder = new MediaRecorder(stream);
         mediaRecorder.ondataavailable = function (event) {
           return new Promise((resolve, reject) => {
             if (event.data.size > 0) {
               recordedChunks.push(event.data);
-              // Remove older chunks if exceeding the maxChunks limit
+              // maxChunks 초과 시 이전 chunks 삭제
               if (recordedChunks.length > maxChunks) {
                 recordedChunks.splice(0, recordedChunks.length - maxChunks);
               }
@@ -282,8 +274,6 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(maybeSendCameraImage, 1000 / frameRate);
     setInterval(constraintRecordedChunks, (1000 / frameRate) * 30);
     setInterval(observePredictionChange, 1000 / streamFrameRate);
-
-    // setInterval(handlePrediction, 1000 * 6);
   }
 
   function stopRecording() {
@@ -295,11 +285,6 @@ document.addEventListener("DOMContentLoaded", function () {
     mediaRecorder.stop();
     const offWalkingElement = document.getElementById("off_walking");
 
-    // if (offWalkingElement) {
-    //   offWalkingElement.play().catch((error) => {
-    //     console.log('Audio play failed:', error);
-    //   });
-    // }
     if (offWalkingElement) {
       const audioSrc = offWalkingElement.src;
       addToQueue(audioSrc);
@@ -382,14 +367,11 @@ document.addEventListener("DOMContentLoaded", function () {
         type: "video/mp4",
       });
 
-      // Prepare form data
+      // formdata 형식으로 사고 영상 정보관리
       const formData = new FormData();
-      formData.append("latitude", latitude); // Replace with actual location data
-      formData.append("longitude", longitude); // Replace with actual location data
+      formData.append("latitude", latitude);
+      formData.append("longitude", longitude);
       formData.append("video_file", videoFile);
-
-      for (let [key, value] of formData.entries()) {
-      }
 
       try {
         const response = await fetch("../record/accident/save_accident/", {
@@ -418,11 +400,6 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           catchFallen();
 
-          // if (fallingInformElement) {
-          //   fallingInformElement.play().catch((error) => {
-          //     console.log('Audio play failed:', error);
-          //   });
-          // }
           if (fallingInformElement) {
             const audioSrc = fallingInformElement.src;
             addToQueue(audioSrc);
@@ -436,6 +413,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // 테스트용 HTML element 요소
   var startCameraButton = document.getElementById("start-camera");
   if (startCameraButton) {
     startCameraButton.addEventListener("click", () => startRecording(deviceId));
