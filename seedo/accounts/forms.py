@@ -78,14 +78,14 @@ class CustomUserCreationForm(UserCreationForm):
             if len(password2) < 8:
                 raise ValidationError("비밀번호는 8자 이상이어야 합니다.")
 
-            # Check for similarity of 6 or more consecutive characters
+            # 6개 이상의 연속된 문자가 있는지 확인
             if self.has_similar_sequence(password1, password2, 6):
                 raise ValidationError("비밀번호가 이메일과 너무 유사합니다.")
 
             try:
                 validate_password(password2)
             except ValidationError as e:
-                # Customize the error message for "This password is too common"
+                # "이 비밀번호는 너무 흔합니다"라는 오류 메시지를 커스트마이즈함
                 if "This password is too common." in e.messages:
                     raise ValidationError("이 비밀번호는 너무 흔합니다.")
                 raise e
@@ -116,7 +116,7 @@ class CustomAuthenticationForm(AuthenticationForm):
     def clean_username(self):
         username = self.cleaned_data.get("username")
         if username:
-            # Regular expression for validating an Email
+            # 이메일 유효성을 검사하는 정규 표현식
             regex = r"^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
             if not re.match(regex, username):
                 raise ValidationError("올바른 이메일를 입력해주세요.")
@@ -129,7 +129,7 @@ class CustomAuthenticationForm(AuthenticationForm):
         if username and password:
             try:
                 user = User.objects.get(email=username)
-                # User exists, now authenticate to check the password
+                # 유저가 존재하면, 유저의 비밀번호를 체크합니다.
                 if not user.check_password(password):
                     raise ValidationError("비밀번호가 올바르지 않습니다.")
             except User.DoesNotExist:
