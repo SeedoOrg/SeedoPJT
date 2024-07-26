@@ -18,7 +18,6 @@ from matching.models import UserRequest
 
 from .models import Accident, Condition
 
-# Create your views here.
 User = get_user_model()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +30,7 @@ env_path = BASE_DIR.parent / ".env"
 environ.Env.read_env(env_file=env_path)
 
 
+# 파손기록 페이지 접근 시 전달해주는 함수
 @token_required
 def broken_view(request, request_id):
     user = request.user
@@ -60,6 +60,7 @@ def broken_view(request, request_id):
     return render(request, "record/break.html", context)
 
 
+# 사고기록 페이지 접근 시 전달해주는 함수
 @token_required
 def accident_view(request, request_id):
     user = request.user
@@ -89,6 +90,7 @@ def accident_view(request, request_id):
     return render(request, "record/accident.html", context)
 
 
+# 낙상 감지 시 해당 사고기록을 DB에 저장하는 함수
 @token_required
 def save_accident_view(request):
     if request.method == "POST":
@@ -131,6 +133,7 @@ def save_accident_view(request):
     return JsonResponse({"status": "error"}, status=400)
 
 
+# 파손된 점자블록 감지 시 해당 파손기록을 DB에 저장하는 함수
 @token_required
 def save_broken_view(request):
     if request.method == "POST":
@@ -143,19 +146,19 @@ def save_broken_view(request):
 
         broken_img = data.get("broken_img", "")
 
-        # Step 1: Decode the base64 encoded image to binary data
+        # 단계 1: base64로 인코딩된 이미지를 바이너리 데이터로 디코드
         img_data = base64.b64decode(broken_img)
 
-        # Step 2: Convert the binary data to a NumPy array
+        # 단계 2: 바이너리 데이터를 NumPy 배열로 변환
         nparr = np.frombuffer(img_data, np.uint8)
 
-        # Step 3: Decode the NumPy array to an OpenCV image
+        # 단계 3: NumPy 배열을 OpenCV 이미지로 디코드
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        # Step 4: Encode the image to webp format
+        # 단계 4: 이미지를 webp 형식으로 인코딩
         _, buffer = cv2.imencode(".webp", img)
 
-        # Step 5: Create a ContentFile from the image data
+        # 단계 5: 이미지 데이터로 ContentFile 생성
         image_file = ContentFile(buffer.tobytes(), name="broken_image.webp")
 
         user = User.objects.get(id=user_id)

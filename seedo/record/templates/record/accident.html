@@ -7,6 +7,7 @@
 <main>
   <div id="map"></div>
   <div class="layout">
+    <!-- 매칭된 동반자 목록을 드롭다운으로 보여주고, 클릭 시 해당 동반자 페이지로 이동 -->
     <div class="dropdown">
       <div class="userName">{{ selected_user.email|email_username }} 님의 사고 기록</div>
       <div class="dropUser">
@@ -15,7 +16,7 @@
         {% endfor %}
       </div>
     </div>
-
+    <!-- DB에서 전달받은 사고 기록을 보여주며, 클릭 시 상세내용 확인 가능 -->
     <div class="recordList">
       {% for recorded in accident_list %}
       <div class="recorded">
@@ -24,7 +25,6 @@
           {{recorded.accident_time|time:"H시 i분"}} 기록<br />
         </div>
         <div class="dropRecord">
-          <!-- DB에서 이미지 받아와야함 / DB의 이미지 path는 record/images/파일명 으로 저장되야 함 -->
           <video src="{{ recorded.accident_video.url }}" controls></video>
           <p class="recordedLocation">{{recorded.accident_location}}</p>
         </div>
@@ -37,6 +37,7 @@
 </main>
 
 <script>
+  // 각 사고기록에 대해 제목 클릭 시 상세내용이 나타나도록 작성한 부분
   document.addEventListener("DOMContentLoaded", function () {
     const listTitles = document.querySelectorAll(".recordedTitle");
 
@@ -52,6 +53,7 @@
       });
     });
   });
+  // 사고기록이 많을 경우, 한 페이지에 4개씩만 띄우고 페이지네이션으로 넘어가도록 구현
   $(document).ready(function () {
     var itemsPerPage = 4;
     var $items = $(".recordList .recorded");

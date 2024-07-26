@@ -26,7 +26,7 @@
   </div>
 
   <script>
-    // ios 환경인지 여부 확인후 필요한 스타일 적용
+    // 환경에 따른 css 적용
 
     document.addEventListener("DOMContentLoaded", function () {
       var userAgent = navigator.userAgent;
@@ -77,16 +77,6 @@
     let isPlaying = false; // 현재 오디오가 재생 중인지 여부
 
     let isCapturing = true; // 현재 상태를 추적하기 위한 플래그
-
-    //결과를 동적으로 출력하기 위한 고드
-    function setMarqueeAnimation() {
-      const resultP = resultDiv.querySelector("p");
-      const textLength = resultP.textContent.length;
-      const baseSpeed = 500; // 기본 속도 (길이에 따른 비율)
-      const animationDuration = textLength * baseSpeed; // 애니메이션 지속 시간 계산
-
-      resultP.style.animation = `marquee ${animationDuration}ms linear infinite`;
-    }
 
     // 디바이스 카메라에 접근하여 비디오 요소에 스트림을 전달합니다.
     function startOcr() {
@@ -143,7 +133,6 @@
               resultDiv.innerHTML = `<p>${data.answer}</p>`; // 서버 응답을 결과 영역에 표시합니다.
               resultDiv.style.display = "flex";
               resultDiv.style.opacity = 0.9;
-              setMarqueeAnimation(); // 애니메이션 설정 함수 호출
               // 오디오를 재생목록에 추가하고 재생
               if (data.tts_audio_base64) {
                 const audioData = `data:audio/mpeg;base64,${data.tts_audio_base64}`;
@@ -152,33 +141,33 @@
               }
             } else {
               resultDiv.innerHTML = `<p>Error: ${data.error}</p>`; // 오류 메시지를 표시합니다.
-              setMarqueeAnimation(); // 애니메이션 설정 함수 호출
             }
           })
           .catch((err) => {
-            console.error("Error:", err); // 요청 오류를 처리합니다.
+            console.error("Error:", err); // 요청 오류를 처리
           });
 
-        // 캡처된 이미지를 화면에 표시합니다.
+        // 캡처된 이미지를 화면에 표시
         capturedImage.src = imageData;
         capturedImage.style.display = "block";
-        video.style.display = "none"; // 비디오를 숨깁니다.
-        captureButton.innerText = "다시 찍기"; // 버튼 텍스트를 변경합니다.
+        video.style.display = "none"; // 비디오를 숨김
+        captureButton.innerText = "다시 찍기"; // 버튼 텍스트를 변경
         captureButton.style.backgroundColor = "#e01b41";
-        isCapturing = false; // 상태 플래그를 업데이트합니다.
+        isCapturing = false; // 상태 플래그를 업데이트
       } else {
-        // 비디오를 다시 표시합니다.
-        capturedImage.style.display = "none"; // 캡처된 이미지를 숨깁니다.
+        // 비디오를 다시 표시
+        capturedImage.style.display = "none"; // 캡처된 이미지를 숨김
         resultDiv.style.display = "none";
         resultDiv.style.opacity = 0;
-        video.style.display = "block"; // 비디오를 다시 표시합니다.
-        captureButton.innerText = "글 탐색"; // 버튼 텍스트를 변경합니다.
+        video.style.display = "block"; // 비디오를 다시 표시
+        captureButton.innerText = "글 탐색"; // 버튼 텍스트를 변경
         captureButton.style.backgroundColor = "#a0ce8a";
-        resultDiv.innerHTML = ""; // 이전 결과를 지웁니다.
-        isCapturing = true; // 상태 플래그를 업데이트합니다.
+        resultDiv.innerHTML = ""; // 이전 결과를 지움
+        isCapturing = true; // 상태 플래그를 업데이트
       }
     });
 
+    // 오디오 실행 함수
     function playNextInQueue() {
       if (isPlaying || soundQueue.length === 0) return;
 
