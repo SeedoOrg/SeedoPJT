@@ -1,3 +1,4 @@
+# 필요한 라이브러리 import
 import base64
 import json
 import math
@@ -37,6 +38,7 @@ SEG_CLS_KR = [
     "횡단보도",
 ]
 
+# base 경로지정
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # pt 파일가져오기
@@ -55,7 +57,7 @@ CLIENT_ID = env("NAVER_TTS_CLIENT_ID")
 SECRETE_KEY = env("NAVER_TTS_CLIENT_SECRETE_KEY")
 
 
-# 한글 폰트
+# 한글 폰트 가져오기
 font_file = os.path.join(BASE_DIR, "walking_mode/static/walking_mode/fonts/NanumGothic.ttf")
 FONT = ImageFont.truetype(font_file)
 
@@ -115,7 +117,7 @@ def get_x_loc(x_center, frame_width):
     return direction
 
 
-# 장애물 수직 방향 위치 결정 함수; near인 경우에 대해서만 기능 작동
+# 장애물 수직 방향 위치 결정 함수; near인 경우(not far)에 대해서만 음성안내 기능 작동
 def get_y_loc(y_center, frame_height, threshold=4):
     if y_center < frame_height / threshold:  # threshold가 작을수록 시야가 좁아짐
         direction = "far"
@@ -158,13 +160,14 @@ def make_caption(history):
     return " ".join(result)
 
 
+# 모델 동작 요청을 받았을 때 동작하는 View
 class ImageUploadView(View):
-    template_name = "test2.html"
-    current_cls = 99
+    template_name = "index.html"
+    current_cls = 99  # 노면변화 감지용 변수
     frame_cnt = 0
-    model_od = YOLO(yolo_od_pt)
+    model_od = YOLO(yolo_od_pt)  #
     model_seg = YOLO(yolo_seg_pt)
-    Annotator.visioneye_pil = visioneye_pil
+    Annotator.visioneye_pil = visioneye_pil  # 라벨생성 Annotator
 
     def get(self, request):
         return render(request, self.template_name)
@@ -172,11 +175,11 @@ class ImageUploadView(View):
     def post(self, request):
         od_classes = []
         seg_classes = []
-        history = []
-        pixel_per_meter = 120
+        history = []  # 한 프레임에 대해 묶어서 안내하기 위한 리스트
+        pixel_per_meter = 120  # 거리 측정 민감도 파라미터
 
-        # 카메라에서 불러오는 방식
         if request.content_type == "application/json":
+            # base64 이미지 디코딩
             data = json.loads(request.body)
             image_data = data.get("image_data")
             longitude = data.get("longitude")
@@ -186,12 +189,14 @@ class ImageUploadView(View):
             image_data = ContentFile(base64.b64decode(imgstr), name="temp." + ext)
             nparr = np.frombuffer(image_data.read(), np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            # 디텍션 모델 실행
             od_classes, seg_classes, tts_audio_base64, annotated_image, complaints = self.process_image(
                 img, self.model_od, self.model_seg, history, pixel_per_meter, longitude, latitude
             )
         else:
             return JsonResponse({"error": "Invalid content type"}, status=400)
 
+        # 탐지결과 이미지 인코딩
         if annotated_image is not None:
             _, buffer = cv2.imencode(".webp", annotated_image)
             img_base64 = base64.b64encode(buffer).decode("utf-8")
@@ -199,6 +204,7 @@ class ImageUploadView(View):
             _, buffer = cv2.imencode(".webp", img)
             img_base64 = base64.b64encode(buffer).decode("utf-8")
 
+        # 응답 요소 구성 (class정보, 모델, 음성, 이미지, 민원정보)
         response_data = {
             "od_classes": od_classes,
             "seg_classes": seg_classes,
@@ -211,26 +217,27 @@ class ImageUploadView(View):
 
     @classmethod
     def process_image(self, img, model_od, model_seg, history, pixel_per_meter, longitude, latitude):
-        current_update = False
-        print(self.current_cls)
+        current_update = False  # 노면 변화 탐지용 flag
+        detected_obstacle = False  # 객체가 탐지되었는지 확인하는 flag
         complaints = None
+
+        od_classes = []
+        seg_classes = []
         tts_audio = []
         tts_audio_base64 = []
-        frame_per_audio = 5
+
         w, h = img.shape[1], img.shape[0]
         start_point = (w // 2, h + pixel_per_meter * 2)
         _obstacles = [0, 1, 2, 3, 4, 5, 11, 12]
-        od_classes = []
-        seg_classes = []
 
-        detected_obstacle = False  # 객체가 탐지되었는지 확인하는 플래그
+        frame_per_audio = 5  # 음성 안내 주기
 
-        # 모델 2개 순회
+        # 1프레임에 대해 2개의 디텍션 모델 예측 수행
         for i, model in enumerate([model_od, model_seg]):
 
             names = model.model.names
             names_kr = [OD_CLS_KR, SEG_CLS_KR][i]
-            results = model.track(img, persist=True)
+            results = model.track(img, persist=True)  # 객체 추적기능 도입
             boxes = results[0].boxes.xyxy.cpu()
             clss = results[0].boxes.cls.int().cpu().tolist()
 
@@ -242,7 +249,9 @@ class ImageUploadView(View):
                         od_classes.append(names[cls])
                     elif i == 1:  # Segmentation
                         seg_classes.append(names[cls])
-                    if cls == 2:
+
+                    # 파손 점자블록 탐지 시 민원신고 기능
+                    if cls == 2 and i == 1:
                         base_url = "https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&format=json&callback=result"
                         params = {"lat": latitude, "lon": longitude, "coordType": "WGS84GEO", "addressType": "A10"}
                         headers = {"appKey": env("TMAP_API_KEY")}
@@ -252,7 +261,7 @@ class ImageUploadView(View):
                             data = response.json()
                             address = data["addressInfo"]["fullAddress"].split(",")[2]
                         else:
-                            print("Failed to connect to Nominatim API")
+                            print("Failed to connect API")
                             address = None
 
                         _, buffer = cv2.imencode(".webp", img)
@@ -262,21 +271,21 @@ class ImageUploadView(View):
                         complaints = {"address": address, "img": complain_img}
                         continue
 
-                    # 위치 정보 구하기
-                    x1, y1 = int((box[0] + box[2]) // 2), int(box[3])
-                    x_loc = get_x_loc(x1, w)
+                    # 장애물 위치 정보 구하기
+                    x1, y1 = int((box[0] + box[2]) // 2), int(box[3])  # label 표시용 위치
+                    x_loc = get_x_loc(x1, w)  # 장애물 x,y위치 결정
                     y_loc = get_y_loc(y1, h, threshold=4)
 
-                    # 현재 걷고 있 노면은 무엇인가?
+                    # 현재 걷고 있는 노면은 무엇인가?
+                    # 노면이고, 12시방향이고, 발 밑에 있다면
                     if (
                         (cls in [0, 1, 2, 3, 4, 5, 9, 11, 12])
                         and (x_loc == 12)
                         and (i == 1)
                         and (y_loc == "supernear")
-                        and (ImageUploadView.frame_cnt % frame_per_audio == 0)
+                        and (ImageUploadView.frame_cnt % frame_per_audio == 0)  # 잦은 check 방지
                     ):
-                        print(names_kr[cls])
-                        if self.current_cls != cls:
+                        if self.current_cls != cls:  # 노면 정보가 바뀐 거라면 현재 노면 정보 업데이트
                             current_update = True
                             self.current_cls = cls
 
@@ -284,11 +293,14 @@ class ImageUploadView(View):
                     if (cls in _obstacles) and i == 1:
                         continue
 
+                    # 여기까지 분기되지 않은 장애물들은 안내가 필요함.
                     annotator = Annotator(
                         img, line_width=3, example=str("가나다"), font=font_file
                     )  # 한글(유니코드) 사용; 내부적으로 cv2가 아닌 PIL로 처리
                     annotator.tf = max(annotator.lw - 1, 1)
                     detected_obstacle = True
+
+                    # 유클리드 거리측정
                     distance = math.sqrt((x1 - start_point[0]) ** 2 + (y1 - start_point[1]) ** 2) / pixel_per_meter
 
                     if y_loc != "far":  # 수직 방향이 near인 경우에만 객체 알림
@@ -305,13 +317,16 @@ class ImageUploadView(View):
             msg = f"{names_kr[self.current_cls]}위를 걷고 있습니다!"
             tts_audio.append(naver_tts(msg))
 
+        # 설정한 안내주기가 도달했을 때, history기반 음성안내
         if history and (ImageUploadView.frame_cnt % frame_per_audio == 0):
             history = pd.DataFrame(history)
             tmp = history["dist"]
+            # 거리 양자화
             history["dist"] = np.where(tmp > 20, 20, np.where(tmp > 15, 15, np.where(tmp > 10, 10, np.where(tmp > 5, 5, tmp.astype(int)))))
             msg = make_caption(history)
             tts_audio.append(naver_tts(msg))
 
+        # 생성된 오디오가 있다면, base64인코딩해서 리스트에 추가
         if tts_audio != []:
             for i in tts_audio:
                 tts_audio_base64.append(base64.b64encode(i).decode("utf-8"))
