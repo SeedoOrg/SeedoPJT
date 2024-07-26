@@ -23,8 +23,7 @@
     </div>
     <div class="content">
       <p class="contentText">{{ question.content|linebreaksbr }}</p>
-      {% comment %} 파일 확장자 확인 {% endcomment %}
-      <!--주석기능 찾음 오예-->
+      <!-- 파일 확장자 확인 -->
       {% if question.file_upload %} {% with file_extension=question.file_upload.name|extension_name %} {% if file_extension|in_list:"jpg,png,gif,jpeg,webp" %}
       <img class="embededImg" src="{{ question.file_upload.url }}" />
       {% else %}
@@ -72,18 +71,19 @@
 </main>
 
 <script type="text/javascript">
+  // 삭제 경고문구
   function confirmDelete(event) {
     if (!confirm("정말 삭제하시겠습니까?")) {
       event.preventDefault();
     }
   }
-
+  // 댓글 창 안보이게 바꾸면서, 댓글 수정 폼 보이게 설정
   function showEditForm() {
     document.getElementById("comment-display").style.display = "none";
     document.getElementById("edit-button").style.display = "none";
     document.getElementById("comment-edit-form").style.display = "block";
   }
-
+  // 댓글 작성 폼에 아무것도 작성 안하고 등록하려고 할 경우 알람
   function validateCommentForm(event) {
     var content = document.getElementById("comment-content").value;
     if (content.trim() === "") {
