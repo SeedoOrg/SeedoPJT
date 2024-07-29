@@ -1,5 +1,27 @@
 # Seedo
 
+# 📗 프로젝트 소개
+
+## 🔍 당신의 눈이 되려는 시도(Seedo)
+
+<img src="docimage/AI 13조 썸네일.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/AI 13조 1P 설명서.jpg" alt="Company Logo" width="640px"/>
+
+<img src="docimage/slide/2.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/25.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/26.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/27.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/28.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/29.jpg" alt="Company Logo" width="640px"/>
+
+<img src="docimage/slide/22.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/23.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/24.jpg" alt="Company Logo" width="640px"/>
+
+<img src="docimage/slide/19.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/20.jpg" alt="Company Logo" width="640px"/>
+<img src="docimage/slide/21.jpg" alt="Company Logo" width="640px"/>
+
 ## 🔍 백엔드 초기 환경세팅
 
 ### • 라이브러리 설치
