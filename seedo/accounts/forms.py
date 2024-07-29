@@ -56,7 +56,6 @@ class CustomUserCreationForm(UserCreationForm):
 
     def clean_phonenumber(self):
         phonenumber = self.cleaned_data.get("phonenumber")
-        print(phonenumber)
         if phonenumber:
             regex = r"^\d{3}-\d{4}-\d{4}$"
             if not re.match(regex, phonenumber):
@@ -69,7 +68,10 @@ class CustomUserCreationForm(UserCreationForm):
 
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
+        email = self.cleaned_data.get("email")
 
+        if not password1:
+            raise ValidationError("")
         if not password2:
             raise ValidationError("비밀번호 확인을 입력해주세요.")
         if password1 and password2:
@@ -79,7 +81,7 @@ class CustomUserCreationForm(UserCreationForm):
                 raise ValidationError("비밀번호는 8자 이상이어야 합니다.")
 
             # 6개 이상의 연속된 문자가 있는지 확인
-            if self.has_similar_sequence(self.cleaned_data.get("email"), password2, 6):
+            if email and self.has_similar_sequence(email, password2, 6):
                 raise ValidationError("비밀번호가 이메일과 너무 유사합니다.")
 
             try:
@@ -89,8 +91,7 @@ class CustomUserCreationForm(UserCreationForm):
                 if "This password is too common." in e.messages:
                     raise ValidationError("이 비밀번호는 너무 흔합니다.")
                 raise e
-        if not password1:
-            raise ValidationError("")
+
         return password2
 
     def has_similar_sequence(self, password1, password2, length):

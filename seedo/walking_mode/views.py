@@ -153,7 +153,7 @@ def make_caption(history):
                 cls_str = cls
                 cls_cnt = len(cls_group)
                 if cls_cnt > 1:
-                    cls_str += f" {cls_cnt}{['개','마리'][cls=='강아지']}"
+                    cls_str += f" {cls_cnt}{['개', '마리'][cls == '강아지']}"
                 dir_result.append(cls_str)
             dist_result.append(f"{dir_str} " + " ".join(dir_result))
         result.append(f"{dist_str} " + " ".join(dist_result))
@@ -305,7 +305,7 @@ class ImageUploadView(View):
 
                     if y_loc != "far":  # 수직 방향이 near인 경우에만 객체 알림
                         annotator.box_label(
-                            box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc,x_loc-12][x_loc>12]}시", color=colors(cls)
+                            box, label=f"{names_kr[cls]}{track_id}_{int(distance)}m_{[x_loc, x_loc-12][x_loc > 12]}시", color=colors(cls)
                         )
                         annotator.visioneye_pil(box, start_point)
 
