@@ -93,7 +93,7 @@ DJANGO_ENVIRONMENT = env("DJANGO_ENVIRONMENT")
 if DJANGO_ENVIRONMENT == "development":
     DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
 
-else :
+else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",  # 고정

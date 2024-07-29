@@ -79,7 +79,7 @@ class CustomUserCreationForm(UserCreationForm):
                 raise ValidationError("비밀번호는 8자 이상이어야 합니다.")
 
             # 6개 이상의 연속된 문자가 있는지 확인
-            if self.has_similar_sequence(password1, password2, 6):
+            if self.has_similar_sequence(self.cleaned_data.get("email"), password2, 6):
                 raise ValidationError("비밀번호가 이메일과 너무 유사합니다.")
 
             try:

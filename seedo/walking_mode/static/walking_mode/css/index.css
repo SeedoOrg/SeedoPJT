@@ -77,10 +77,10 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-  transform: translateX(78px); 
+  transform: translateX(78px);
 }
 .slider.round:before {
-  border-radius: 50%; 
+  border-radius: 50%;
 }
 
 #canvas,

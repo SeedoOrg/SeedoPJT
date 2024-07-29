@@ -54,8 +54,8 @@ input {
 
 .button-wrapper {
   display: flex;
-  flex-direction: column; 
-  gap: 20px; 
+  flex-direction: column;
+  gap: 20px;
   width: 100%;
 }
 
@@ -88,12 +88,12 @@ input {
 
 .content-wrapper {
   display: flex;
-  flex-direction: column; 
-  justify-content: center; 
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   width: 360px;
   padding: 17px 34px;
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 
 .hover-text {
