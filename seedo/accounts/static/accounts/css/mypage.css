@@ -1,0 +1,294 @@
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 360px;
+  padding: 0 34px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  gap: 20px;
+}
+
+.layout div {
+  font-size: 24px;
+  color: #183b08;
+  border-radius: 4px;
+  text-align: left;
+  font-weight: 700;
+  width: 100%;
+}
+
+.userName,
+.superUser {
+  display: flex;
+  align-items: center;
+  white-space: nowrap; /* 한 줄로 유지 */
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.userID {
+  font-size: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-left: 5px;
+}
+
+.userID:hover {
+  overflow-x: auto;
+}
+
+.material-symbols-outlined {
+  color: #183b08;
+  vertical-align: middle;
+  font-size: 30px;
+  text-decoration-line: none;
+  flex-shrink: 0;
+  padding: 0px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.material-symbols-outlined:hover {
+  color: #337614;
+  font-weight: bold;
+}
+
+.partner button {
+  font-size: 20px;
+  color: #fff;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+  padding: 1px 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.partner .addPartner {
+  background-color: #193b08;
+}
+.addPartner:hover {
+  background-color: #337614;
+}
+
+.partner .delPartner {
+  background-color: #e01b41;
+}
+.delPartner:hover {
+  background-color: #eb6a84;
+}
+
+.partnerList {
+  width: 100%;
+  height: 296px; /* 최대 높이 설정 */
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #fff;
+  /* display: flex; */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 5px #00000080;
+  gap: 5px;
+  overflow-y: auto; /* 스크롤 추가 */
+}
+
+.eachPartner {
+  display: flex;
+  align-items: center;
+  white-space: nowrap; /* 한 줄로 유지 */
+  overflow: hidden;
+  width: 100%;
+  gap: 5px;
+}
+
+.left {
+  display: flex;
+  gap: 5px;
+  max-width: calc(100% - 124px);
+  overflow: hidden;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.partnerName {
+  max-width: 100%;
+  font-size: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.partnerName:hover {
+  overflow-x: auto;
+}
+
+.pBreakLog,
+.pAccidentLog {
+  width: 53px;
+  height: 32px;
+  background-color: #193b08;
+  color: #fff;
+  padding: 1px 3px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.pBreakLog:hover,
+.pAccidentLog:hover {
+  background-color: #337614;
+}
+
+.acceptBtn {
+  width: 111px;
+  height: 32px;
+  background-color: #c2c2c2;
+  color: #000;
+  padding: 1px 3px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+.acceptBtn:hover {
+  background-color: #6e6e6e;
+}
+
+.requestBtn {
+  width: 111px;
+  height: 32px;
+  background-color: #c2c2c2;
+  color: #fff;
+  padding: 1px 3px;
+  border: none;
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.button-link {
+  width: 100%;
+  height: 52px;
+  background-color: #193b08;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.button-link:hover {
+  background-color: #337614;
+}
+
+/* 모달 스타일 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 20% auto;
+  padding: 10px;
+  border: 4px solid #888;
+  width: 292px;
+  position: relative;
+}
+
+#searchResults > * {
+  margin-left: 30px;
+  color: #193b08;
+  padding: 1px 0;
+  cursor: pointer;
+}
+
+#searchResults > *:hover {
+  color: #337614;
+  font-weight: 700;
+}
+
+#sendRequestForm {
+  display: flex;
+  justify-content: space-between; /* 요소를 양쪽 끝으로 정렬 */
+  align-items: center;
+  width: 100%;
+}
+
+#sendRequestForm > label,
+#verifyRequestForm > div > label {
+  color: #183b08;
+  text-align: left;
+  font-weight: 700;
+}
+
+#sendRequestForm > input {
+  color: #183b08;
+  text-align: left;
+  width: 190px;
+}
+
+#verifyRequestForm > div > input {
+  color: #183b08;
+  text-align: left;
+  width: 170px;
+}
+
+#verifyRequestForm {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#verifyRequestForm > div {
+  display: flex;
+  justify-content: space-between; /* 요소를 양쪽 끝으로 정렬 */
+  align-items: center;
+  width: 100%;
+}
+#verifyRequestForm > button {
+  align-self: flex-end; /* 버튼을 오른쪽 정렬 */
+  background-color: #c2c2c2;
+  color: #000;
+  font-size: 20px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+  padding: 1px 5px;
+  border: none;
+  cursor: pointer;
+}
+#verifyRequestForm > button:hover {
+  background-color: #6e6e6e;
+}

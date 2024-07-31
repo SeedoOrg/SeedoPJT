@@ -1,0 +1,85 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'qna/css/list.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script defer src="{% static 'navigation/js/navi.js' %}"></script>
+{% endblock extra_head %} {% block content %} {% load custom_filters %}
+<main>
+  <div id="map"></div>
+  <div class="qnaheader">
+    <p class="title">Q&A List</p>
+    <!-- 답변 여부에 따라서 조회하기 위한 필터 -->
+    <form class="filter" method="GET" action="{% url 'qna:qna-list' %}">
+      <select id="filter" name="filter">
+        <option class="filterOpt" value="" {% if filter_type|is_q_list_option:1 %}selected{% endif %}>전체</option>
+        <option class="filterOpt" value="answered" {% if filter_type|is_q_list_option:2 %}selected{% endif %}>답변 완료</option>
+        <option class="filterOpt" value="unanswered" {% if filter_type|is_q_list_option:3 %}selected{% endif %}>미답변</option>
+      </select>
+      <button class="acpbtn" type="submit">적용</button>
+    </form>
+  </div>
+
+  <ul class="question_list">
+    {% for question in questions %}
+    <a class="eachQ" href="{% url 'qna:qna-detail' question.pk %}">
+      <span class="eachQtitle">{{ question.title }}</span>
+      <span class="eachQunder"
+        >by. {{ question.author.email|email_username }} 님 {% if question.comments %}<span style="color: green">답변 완료</span> {% else %}<span
+          style="color: red"
+          >미답변</span
+        >{% endif %}</span
+      >
+      <hr />
+    </a>
+    {% empty %}
+    <p>등록된 문의가 없습니다.</p>
+    {% endfor %}
+    <div id="pagination"></div>
+  </ul>
+
+  <a class="createQ" href="{% url 'qna:qna-create' %}">문의하기</a>
+</main>
+
+<script>
+  // 문의내용이 많을 경우 페이지네이션으로 처리하는 코드
+  $(document).ready(function () {
+    var itemsPerPage = 6;
+    var $items = $(".question_list .eachQ");
+    var numItems = $items.length;
+    var numPages = Math.ceil(numItems / itemsPerPage);
+
+    function showPage(page) {
+      $items.hide();
+      $items.slice((page - 1) * itemsPerPage, page * itemsPerPage).show();
+      updatePagination(page);
+    }
+
+    function updatePagination(currentPage) {
+      $("#pagination").empty();
+      var startPage = Math.max(1, currentPage - 2);
+      var endPage = Math.min(numPages, currentPage + 2);
+
+      if (currentPage <= 3) {
+        startPage = 1;
+        endPage = Math.min(5, numPages);
+      } else if (currentPage >= numPages - 2) {
+        startPage = Math.max(1, numPages - 4);
+        endPage = numPages;
+      }
+
+      for (var i = startPage; i <= endPage; i++) {
+        $("#pagination").append('<button data-page="' + i + '"' + (i === currentPage ? ' class="active"' : "") + ">" + i + "</button>");
+      }
+
+      $("#pagination button").click(function () {
+        var page = $(this).data("page");
+        showPage(page);
+      });
+    }
+
+    // 초기 페이지 표시
+    showPage(1);
+  });
+</script>
+
+{% endblock content %}

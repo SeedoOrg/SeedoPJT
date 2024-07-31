@@ -1,0 +1,212 @@
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 56px); /* Ensure it takes at least full viewport height */
+  margin-top: 56px;
+  align-items: center;
+  flex-direction: column; /* Arrange buttons vertically */
+  gap: 34px; /* Gap between buttons */
+  padding: 30px;
+}
+
+.main_service {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 36px;
+  color: #f8f9fa;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  border-radius: 13px;
+  text-align: center;
+  font-weight: 700;
+  height: 20%;
+  min-height: 90px;
+  max-height: 120px;
+  width: 200px;
+  background-color: #a0ce8a;
+  transition: width 0.5s ease;
+}
+
+.main_service:hover {
+  width: 292px; /* New width on hover */
+}
+
+.wrapper_main_service {
+  position: relative;
+  height: 100%;
+  display: flex;
+  justify-content: right;
+  border-radius: 16px;
+  width: 292px;
+  background-color: #f8f9fa;
+  box-shadow: 1px 1px 3px 0px rgba(89, 93, 88, 0.5); /* Recommended box shadow */
+}
+
+.wrapper_main_service_img {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90px;
+  width: 92px;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.main_service_img {
+  height: 80px;
+  width: 80px;
+  position: absolute;
+  top: calc(50% - 45px + 5px);
+  left: calc(50% - 46px + 6px);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.wrapper_sub_service {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 13px;
+  width: 292px;
+  background-color: #f8f9fa;
+  padding: 14px;
+  border: 3px solid #337614;
+  box-shadow: 1px 1px 3px 0px rgba(89, 93, 88, 0.5); /* Recommended box shadow */
+  background-color: #a0ce8a;
+}
+
+.wrapper_record {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  width: 100%;
+}
+
+.record_service {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 26px;
+  color: #f8f9fa;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  text-align: center;
+  font-weight: 700;
+  height: 30px;
+  width: 100px;
+  border-bottom: 3px solid #a0ce8a;
+  padding-bottom: 2px;
+  transition: border-bottom 0.5s ease;
+}
+
+.record_service:hover {
+  padding-bottom: 2px;
+  border-bottom: 3px solid #337614;
+}
+
+.title_record {
+  font-size: 20px;
+  color: #f8f9fa;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+}
+.qna_service {
+  display: flex;
+  width: 292px;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 36px;
+  color: #f8f9fa;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  border: 3px solid #337614;
+  border-radius: 13px;
+  text-align: center;
+  font-weight: 700;
+  height: 20%;
+  min-height: 90px;
+  max-height: 120px;
+  background-color: #a0ce8a;
+  transition: background-color 0.5s ease;
+}
+
+.qna_service:hover {
+  background-color: #337614;
+}
+
+main .walk.active,
+main .navi.active {
+  background-color: #337614;
+  color: #f8f9fa;
+}
+main .walk,
+main .navi {
+  background-color: #e01b41;
+}
+#map {
+  display: none;
+}
+
+.preload {
+  position: absolute;
+  height: calc(100vh - 56px);
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 34px; /* Gap between buttons */
+}
+
+.later {
+  position: relative;
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  align-items: center;
+  gap: 34px; /* Gap between buttons */
+  z-index: 2;
+}
+
+.later {
+  transition-delay: 1s;
+}
+
+.preload.visible,
+.later.visible {
+  opacity: 1;
+}
+
+.disable-click {
+  pointer-events: none;
+}

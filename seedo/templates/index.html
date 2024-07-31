@@ -1,0 +1,135 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/landing.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script defer src="{% static 'walking_mode/js/walking_mode.js' %}"></script>
+<script defer src="{% static 'sensor/js/sensor.js' %}"></script>
+<script defer src="{% static 'js/audio_queue.js' %}"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+{% endblock extra_head %} {% block content %}
+<main>
+  <div style="display: none">
+    <div id="map" style="height: 400px"></div>
+    <p id="object_detection">Detection: Loading...</p>
+    <p id="recording-status">Recording status: Not recording</p>
+    <p id="sensoring-status">Secording status: Not sensoring</p>
+    <p id="location">Location: Loading...</p>
+    <p id="accelerometer">Accelerometer: Loading...</p>
+    <p id="gyroscope">Gyroscope: Loading...</p>
+    <p id="fall_recognition">fall_recognition: Loading...</p>
+    <audio id="falling_inform" src="{% static '/audios/falling_inform_voice.mp3' %}"></audio>
+    <audio id="broken_inform" src="{% static '/audios/broken_inform_voice.mp3' %}"></audio>
+    <audio id="on_walking" src="{% static '/audios/on_walking.mp3' %}"></audio>
+    <audio id="off_walking" src="{% static '/audios/off_walking.mp3' %}"></audio>
+    <video id="video" width="640" height="480" style="display: none"></video>
+    <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
+    <select id="cameraSelect"></select>
+    <img id="annotated-image" width="640" height="480" style="display: none" />
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var routeData = localStorage.getItem("routeData");
+      if (routeData) {
+        var walkLink = document.querySelector(".navi");
+        if (walkLink) {
+          walkLink.classList.add("active");
+        }
+      }
+
+      var walking_mode = localStorage.getItem("walking_mode");
+      if (walking_mode === "true") {
+        var walkstatus = document.querySelector(".walk");
+        if (walkstatus) {
+          walkstatus.classList.add("active");
+        }
+      }
+
+      // Function to set a cookie
+      function setCookie(name, value, days) {
+        let date = new Date();
+        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+        let expires = "expires=" + date.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+      }
+
+      // Check if preload should be shown today
+      function shouldShowPreload() {
+        const lastShown = getCookie("preloadLastShown");
+        const today = new Date().toISOString().split("T")[0];
+        return lastShown !== today;
+      }
+
+      // Function to set the preload shown date to today
+      function setPreloadShown() {
+        const today = new Date().toISOString().split("T")[0];
+        setCookie("preloadLastShown", today, 1); // cookie valid for 1 day
+      }
+      const preloadElement = document.querySelector(".preload");
+      const laterElements = document.querySelectorAll(".later");
+      const welcomeElement = document.getElementById("welcome");
+      // Check if preload should be shown
+      if (shouldShowPreload()) {
+        if (preloadElement) {
+          preloadElement.classList.add("visible");
+          laterElements.forEach(function (element) {
+            element.classList.add("disable-click");
+          });
+          // Set autoplay attribute if preload is active
+          welcomeElement.play().catch((error) => {
+            console.log("Audio play failed:", error);
+          });
+
+          setTimeout(function () {
+            preloadElement.classList.remove("visible");
+            laterElements.forEach(function (element) {
+              element.classList.remove("disable-click");
+              element.classList.add("visible");
+            });
+            setPreloadShown();
+          }, 3500); // Show preload for 3.5 seconds
+        }
+      } else {
+        setTimeout(function () {
+          laterElements.forEach(function (element) {
+            element.classList.add("visible");
+          });
+        }, 0); // Make .later elements visible immediately
+      }
+    });
+  </script>
+  <div class="fallenRedScreen"></div>
+  <div class="preload">
+    <img src="{% static 'images/seedo_preloading.webp' %}" alt="Preload Image" style="width: 360px" />
+    <audio id="welcome" src="{% static '/audios/welcome_voice.mp3' %}"></audio>
+  </div>
+  <div class="later">
+    <div class="wrapper_main_service">
+      <div class="wrapper_main_service_img">
+        <img class="main_service_img" src="{% static 'images/walking_mode.webp' %}" alt="Preload Image" />
+      </div>
+      <a class="main_service walk" , href="/walking_mode/">보행 모드</a>
+    </div>
+    <div class="wrapper_main_service">
+      <div class="wrapper_main_service_img">
+        <img class="main_service_img" src="{% static 'images/navigation.webp' %}" alt="Preload Image" style="height: 80px" />
+      </div>
+      <a class="main_service navi" href="/nav/">길 안내</a>
+    </div>
+    <div class="wrapper_main_service">
+      <div class="wrapper_main_service_img">
+        <img class="main_service_img" src="{% static 'images/ocr.webp' %}" alt="Preload Image" style="height: 80px" />
+      </div>
+      <a class="main_service navi" href="/ocr/" style="background-color: gold">글 읽기</a>
+    </div>
+    <div class="wrapper_sub_service">
+      <h2 class="title_record" style="width: 100%">기록</h2>
+      <div class="wrapper_record">
+        <a class="record_service" href="/record/break/{{user.id}}">시설 파손</a>
+        <a class="record_service" href="/record/accident/{{user.id}}">사고 영상</a>
+      </div>
+    </div>
+    <a class="qna_service" href="/qna/">문의 게시판</a>
+  </div>
+</main>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script src="{% static 'navigation/js/navi.js' %}"></script>
+{% endblock content %}

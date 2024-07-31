@@ -1,0 +1,189 @@
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 20px;
+  padding: 70px 34px 20px;
+  overflow: hidden;
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 768px;
+  gap: 5px;
+}
+
+.form-container {
+  width: 100%;
+  height: 140px; /* 최대 높이 설정 */
+  padding: 3px 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: #fff;
+  /* display: flex; */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 5px #00000080;
+  gap: 5px;
+  overflow-y: auto; /* 스크롤 추가 */
+  color: #193b08;
+}
+
+.naviBtn {
+  display: flex;
+  width: 100%;
+  gap: 30px;
+}
+.btnInNavi {
+  color: #ffffff;
+  border: transparent;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+
+  padding: 5px;
+  width: 100%;
+  background-color: #a0ce8a;
+  cursor: pointer;
+}
+.btnInNavi:hover {
+  background-color: #76b559;
+}
+
+.startPoint,
+.endPoint {
+  display: flex;
+  width: 100%;
+  max-width: 768px;
+  align-items: center; /* 요소들을 세로로 중앙 정렬 */
+  gap: 5px; /* 입력 필드와 버튼 사이의 간격 설정 */
+  box-sizing: border-box; /* 패딩 포함한 너비와 높이 계산 */
+}
+.text_custom {
+  flex: 1; /* 입력 필드가 가용한 너비를 최대한 차지하도록 설정 */
+  padding: 5px; /* 패딩을 추가하여 입력 필드 높이 조절 */
+  box-sizing: border-box; /* 패딩 포함한 너비와 높이 계산 */
+  min-width: 0; /* flex-grow와 함께 사용하여 요소가 초과되지 않도록 설정 */
+}
+#startBtn,
+#endBtn {
+  flex-shrink: 0; /* 버튼이 축소되지 않도록 설정 */
+  white-space: nowrap; /* 버튼 내부 텍스트 줄바꿈 방지 */
+  padding: 5px; /* 텍스트 주변에 패딩 추가 */
+  background-color: #a0ce8a;
+  color: #ffffff;
+  border: transparent;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+#startBtn:hover,
+#endBtn:hover {
+  background-color: #76b559;
+}
+
+#searchResult {
+  width: 100%;
+  max-width: 768px;
+  max-height: 200px; /* 최대 높이 설정 */
+  padding: 3px 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: #fff;
+  /* display: flex; */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 5px #00000080;
+  gap: 5px;
+  overflow-y: auto; /* 스크롤 추가 */
+  color: #193b08;
+}
+#searchResult > * {
+  cursor: pointer;
+}
+#searchResult > *:hover {
+  color: #337614;
+}
+
+.container {
+  width: 100%;
+  max-width: 768px;
+  height: 300px;
+}
+#map {
+  height: 300px;
+}
+
+#route-info {
+  width: 100%;
+  max-width: 768px;
+  max-height: 200px; /* 최대 높이 설정 */
+  padding: 3px 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: #fff;
+  /* display: flex; */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 5px #00000080;
+  gap: 5px;
+  overflow-y: auto; /* 스크롤 추가 */
+  color: #193b08;
+}
+
+.infoWindow {
+  width: 120px;
+  height: 60px;
+  border-radius: 4px;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.infoStart,
+.infoEnd {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.infoStart {
+  color: #fff;
+  background-color: #337614;
+}
+.infoStart:hover {
+  font-weight: 700;
+  background-color: #489c21;
+}
+.infoEnd {
+  color: #fff;
+  background-color: #df1b41;
+}
+.infoEnd:hover {
+  font-weight: 700;
+  background-color: #dd3153;
+}

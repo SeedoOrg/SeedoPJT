@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'navigation/css/navi.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+  var startIcon = "{% static 'navigation/img/startIcon.webp' %}";
+  var endIcon = "{% static 'navigation/img/endIcon.webp' %}";
+</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+<script defer src="{% static 'js/audio_queue.js' %}"></script>
+{% endblock extra_head %} {% block content %}
+<main>
+  <div class="infoContainer">
+    <div class="form-container">
+      <label for="startAddress">출발지</label>
+      <hr />
+      <div id="startAddress"></div>
+    </div>
+
+    <div class="form-container">
+      <label for="endAddress">도착지</label>
+      <hr />
+      <div id="endAddress"></div>
+    </div>
+
+    <div class="naviBtn">
+      <button class="btnInNavi" onclick="findRoute()">경로 찾기</button>
+      <button class="btnInNavi" onclick="stopnavi()">안내 종료</button>
+    </div>
+  </div>
+
+  <!-- 출발지 목적지 검색 시 맵 좌측에 뜨게 or media 적용해서 상단에 뜨도록 하기 -->
+  <div class="startPoint">
+    <input type="text" class="text_custom" id="startKey" name="startKey" placeholder="출발지를 입력해주세요" />
+    <button id="startBtn">출발지 검색</button>
+  </div>
+
+  <div class="endPoint">
+    <input type="text" class="text_custom" id="endKey" name="endKey" placeholder="목적지를 입력해주세요" />
+    <button id="endBtn">목적지 검색</button>
+  </div>
+
+  <ul id="searchResult" name="searchResult"></ul>
+
+  <div class="container">
+    <div id="map"></div>
+  </div>
+  <div id="route-info"></div>
+</main>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script src="{% static 'navigation/js/navi.js' %}"></script>
+{% endblock content %}

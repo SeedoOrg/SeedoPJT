@@ -1,0 +1,128 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/accounts.css' %}" />
+<script>
+  function formatPhoneNumber(input) {
+    // 숫자가 아닌 문자를 제거
+    let cleaned = ("" + input.value).replace(/\D/g, "");
+
+    // 정리된 값이 11자리를 초과하지 않도록 함
+    cleaned = cleaned.substring(0, 11);
+
+    // 정리된 값을 여러 부분으로 나눔
+    let match = cleaned.match(/^(\d{0,3})(\d{0,4})(\d{0,4})$/);
+
+    if (match) {
+      let formattedNumber = [match[1], match[2], match[3]].filter((val) => val).join("-");
+      input.value = formattedNumber;
+    }
+  }
+</script>
+{% endblock %} {% block content %}
+<div class="layout">
+  <div class="content-wrapper">
+    <h2>회원가입</h2>
+    <div class="overlay">
+      <div class="spinner"></div>
+    </div>
+    <form id="signup_form" method="post">
+      {% csrf_token %}
+      <div class="form-wrapper">
+        <div class="form-group {% if form.email.errors %}error{% endif %}">
+          <label for="email">이메일:</label>
+          <input type="text" name="email" id="email" placeholder="이메일을 입력해주세요." value="{{ form.email.value|default_if_none:'' }}" />
+        </div>
+        <div class="error-message">
+          {% for error in form.email.errors %}
+          <p>❗️{{ error }}</p>
+          {% endfor %}
+        </div>
+        <div class="form-group {% if form.phonenumber.errors %}error{% endif %}">
+          <label for="phonenumber">전화번호:</label>
+          <input
+            type="text"
+            name="phonenumber"
+            id="phonenumber"
+            placeholder="올바른 형식) 000-0000-0000"
+            value="{{ form.phonenumber.value|default_if_none:'' }}"
+            oninput="formatPhoneNumber(this)"
+          />
+        </div>
+        <div class="error-message">
+          {% for error in form.phonenumber.errors %}
+          <p>❗️{{ error }}</p>
+          {% endfor %}
+        </div>
+        <div class="form-group {% if form.password1.errors %}error{% endif %}">
+          <label for="password1">비밀번호:</label>
+          <input
+            type="password"
+            name="password1"
+            id="password1"
+            placeholder="비밀번호를 입력해주세요."
+            {%
+            if
+            form.password1.errors
+            %}
+            value=""
+            {%
+            else
+            %}
+            value="{{ form.password1.value|default_if_none:'' }}"
+            {%
+            endif
+            %}
+          />
+        </div>
+        <div class="error-message">
+          {% for error in form.password1.errors %}
+          <p>❗️{{ error }}</p>
+          {% endfor %}
+        </div>
+        <div class="form-group {% for error in form.password2.errors %}{% if error %}error{%endif%}{% endfor %}">
+          <label for="password2">비밀번호 확인:</label>
+          <input
+            type="password"
+            name="password2"
+            id="password2"
+            placeholder="비밀번호를 확인해주세요."
+            {%
+            if
+            form.password2.errors
+            %}
+            value=""
+            {%
+            else
+            %}
+            value="{{ form.password2.value|default_if_none:'' }}"
+            {%
+            endif
+            %}
+          />
+        </div>
+        <div class="error-message">
+          {% for error in form.password2.errors %}
+          <p>{% if error %}❗️{%endif%}{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="button-wrapper">
+        <button type="submit" class="button-link">완료</button>
+      </div>
+      <p class="hover-text">
+        <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="#183b08">
+          <path
+            d="M280-200v-80h284q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l104 104-56 56-200-200 200-200 56 56-104 104h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H280Z"
+          />
+        </svg>
+        <a class="hover-text" href="{% url 'accounts:login' %}">로그인</a>
+      </p>
+    </form>
+  </div>
+</div>
+<script>
+  document.getElementById("signup_form").addEventListener("submit", function () {
+    document.querySelector(".overlay").style.display = "block";
+    document.querySelector(".spinner").style.display = "block";
+  });
+</script>
+{% endblock %}

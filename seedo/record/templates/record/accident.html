@@ -1,0 +1,96 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'record/css/record.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script defer src="{% static 'navigation/js/navi.js' %}"></script>
+{% endblock extra_head %} {% block content %} {% load custom_filters %}
+<main>
+  <div id="map"></div>
+  <div class="layout">
+    <!-- 매칭된 동반자 목록을 드롭다운으로 보여주고, 클릭 시 해당 동반자 페이지로 이동 -->
+    <div class="dropdown">
+      <div class="userName">{{ selected_user.email|email_username }} 님의 사고 기록</div>
+      <div class="dropUser">
+        {% for partner in partner_list %}
+        <a href="/record/accident/{{partner.user.id}}/"> {{partner.user.email|email_username}} 님의 사고 기록</a>
+        {% endfor %}
+      </div>
+    </div>
+    <!-- DB에서 전달받은 사고 기록을 보여주며, 클릭 시 상세내용 확인 가능 -->
+    <div class="recordList">
+      {% for recorded in accident_list %}
+      <div class="recorded">
+        <div class="recordedTitle">
+          {{recorded.accident_date|date:"Y년 m월 d일"}}<br />
+          {{recorded.accident_time|time:"H시 i분"}} 기록<br />
+        </div>
+        <div class="dropRecord">
+          <video src="{{ recorded.accident_video.url }}" controls></video>
+          <p class="recordedLocation">{{recorded.accident_location}}</p>
+        </div>
+        <hr />
+      </div>
+      {% endfor %}
+    </div>
+    <div id="pagination"></div>
+  </div>
+</main>
+
+<script>
+  // 각 사고기록에 대해 제목 클릭 시 상세내용이 나타나도록 작성한 부분
+  document.addEventListener("DOMContentLoaded", function () {
+    const listTitles = document.querySelectorAll(".recordedTitle");
+
+    listTitles.forEach((title) => {
+      title.addEventListener("click", function () {
+        const recorded = this.closest(".recorded");
+        const content = recorded.querySelector(".dropRecord");
+        if (content.style.maxHeight) {
+          content.style.maxHeight = null;
+        } else {
+          content.style.maxHeight = content.scrollHeight + "px";
+        }
+      });
+    });
+  });
+  // 사고기록이 많을 경우, 한 페이지에 4개씩만 띄우고 페이지네이션으로 넘어가도록 구현
+  $(document).ready(function () {
+    var itemsPerPage = 4;
+    var $items = $(".recordList .recorded");
+    var numItems = $items.length;
+    var numPages = Math.ceil(numItems / itemsPerPage);
+
+    function showPage(page) {
+      $items.hide();
+      $items.slice((page - 1) * itemsPerPage, page * itemsPerPage).show();
+      updatePagination(page);
+    }
+
+    function updatePagination(currentPage) {
+      $("#pagination").empty();
+      var startPage = Math.max(1, currentPage - 2);
+      var endPage = Math.min(numPages, currentPage + 2);
+
+      if (currentPage <= 3) {
+        startPage = 1;
+        endPage = Math.min(5, numPages);
+      } else if (currentPage >= numPages - 2) {
+        startPage = Math.max(1, numPages - 4);
+        endPage = numPages;
+      }
+
+      for (var i = startPage; i <= endPage; i++) {
+        $("#pagination").append('<button data-page="' + i + '"' + (i === currentPage ? ' class="active"' : "") + ">" + i + "</button>");
+      }
+
+      $("#pagination button").click(function () {
+        var page = $(this).data("page");
+        showPage(page);
+      });
+    }
+
+    // 초기 페이지 표시
+    showPage(1);
+  });
+</script>
+{% endblock content %}

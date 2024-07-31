@@ -1,0 +1,181 @@
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  flex-direction: column;
+  box-sizing: border-box;
+  gap: 20px;
+  padding: 70px 34px 20px;
+  overflow: hidden;
+}
+
+.qnaheader {
+  display: flex;
+  width: 100%;
+  max-width: 768px;
+  align-items: center;
+  position: relative;
+}
+
+.qnaheader .title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+
+  color: #337614;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.qnaheader .filter {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 10px;
+}
+
+@media (max-width: 500px) {
+  .qnaheader {
+    justify-content: space-between;
+  }
+
+  .qnaheader .title {
+    left: auto;
+    position: static;
+    transform: none;
+  }
+
+  .qnaheader .filter {
+    margin-left: auto;
+  }
+}
+
+.filter > * {
+  height: 30px;
+  color: #337614;
+  font-weight: 700;
+  cursor: pointer;
+}
+#filter {
+  border-color: #337614;
+  border-radius: 4px;
+  border-width: 2px;
+}
+
+.acpbtn {
+  padding: 0px 3px;
+  background-color: #fff;
+  border-color: #337614;
+  border-radius: 4px;
+}
+.acpbtn:hover {
+  background-color: #e6f5df;
+}
+
+.question_list {
+  position: relative;
+  width: 100%;
+  max-width: 768px;
+  height: 430px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #fff;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2px 2px 5px #00000080;
+  gap: 5px;
+  overflow-y: auto;
+}
+
+.question_list > * {
+  color: #193b08;
+}
+.eachQ {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #193b08;
+  cursor: pointer;
+  font-weight: 700;
+  width: 100%;
+  overflow: hidden;
+}
+.eachQtitle {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.eachQ:hover {
+  color: #337614;
+}
+.eachQunder,
+.eachQunder > * {
+  font-size: 15px;
+  text-align: right;
+  font-weight: 400;
+}
+
+.eachQ hr {
+  border-color: #c2c2c2;
+}
+.eachQ:visited hr {
+  border-color: #c2c2c2;
+}
+
+.createQ {
+  text-decoration: none;
+  font-size: 40px;
+  color: #ffffff;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 700;
+
+  padding: 10px 0;
+  width: 100%;
+  max-width: 768px;
+  background-color: #a0ce8a;
+  cursor: pointer;
+}
+.createQ:hover {
+  background-color: #76b559;
+}
+
+#pagination {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+#pagination button {
+  border: 1px solid #337614;
+  background-color: #fff;
+  color: #337614;
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#pagination button.active {
+  background-color: #337614;
+  color: #fff;
+}
+
+#pagination button:hover {
+  background-color: #e6f5df;
+}

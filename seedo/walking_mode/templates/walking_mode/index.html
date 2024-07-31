@@ -1,0 +1,123 @@
+{% extends "base.html" %} {% load static %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'walking_mode/css/index.css' %}" />
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+<script defer src="{% static 'sensor/js/sensor.js' %}"></script>
+<script defer src="{% static 'walking_mode/js/walking_mode.js' %}"></script>
+<script defer src="{% static 'js/audio_queue.js' %}"></script>
+{% endblock extra_head %} {% block content %}
+<main>
+  <div class="switchContainer">
+    <span class="titleTxt">보행모드</span>
+    <div class="switchCondition">
+      <span class="switchTxt switchOff">Off</span>
+      <span class="switchTxt">/</span>
+      <span class="switchTxt switchOn">On</span>
+    </div>
+    <!-- Rounded switch -->
+    <label class="switch">
+      <input type="checkbox" id="toggleSwitch" />
+      <span class="slider round"></span>
+    </label>
+  </div>
+  <select id="cameraSelect"></select>
+  <img id="annotated-image" width="640" height="480" />
+
+  <div style="display: none">
+    <div id="map" style="height: 400px"></div>
+    <h1>Object Detection</h1>
+    <p id="object_detection">Detection: Loading...</p>
+    <p id="recording-status">Recording status: Not recording</p>
+    <p id="sensoring-status">Secording status: Not sensoring</p>
+    <p id="location">Location: Loading...</p>
+    <p id="accelerometer">Accelerometer: Loading...</p>
+    <p id="gyroscope">Gyroscope: Loading...</p>
+    <p id="fall_recognition">fall_recognition: Loading...</p>
+    <button id="start-sensor">Start sensor</button>
+    <button id="stop-sensor">Stop sensor</button>
+    <button id="start-camera">Start Camera</button>
+    <button id="stop-camera">Stop Camera</button>
+    <audio id="falling_inform" src="{% static '/audios/falling_inform_voice.mp3' %}"></audio>
+    <audio id="broken_inform" src="{% static '/audios/broken_inform_voice.mp3' %}"></audio>
+    <audio id="on_walking" src="{% static '/audios/on_walking.mp3' %}"></audio>
+    <audio id="off_walking" src="{% static '/audios/off_walking.mp3' %}"></audio>
+    <h2>Video</h2>
+    <video id="video" width="640" height="480" style="display: none"></video>
+    <canvas id="canvas" width="640" height="480" style="display: none"></canvas>
+
+    <h2>Annotated Image</h2>
+    <img id="annotated-image" width="640" height="480" style="display: none" />
+  </div>
+</main>
+<div class="fallenRedScreen"></div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var routeData = localStorage.getItem("routeData");
+    if (routeData) {
+      var walkLink = document.querySelector(".navi");
+      if (walkLink) {
+        walkLink.classList.add("active");
+      }
+    }
+
+    var walking_mode = localStorage.getItem("walking_mode");
+    if (walking_mode === "true") {
+      var walkstatus = document.querySelector(".walk");
+      document.getElementById("toggleSwitch").checked = true;
+      if (walkstatus) {
+        walkstatus.classList.add("active");
+      }
+    } else {
+      document.getElementById("toggleSwitch").checked = false;
+    }
+
+    function updateTextColor() {
+      const checkbox = document.getElementById("toggleSwitch");
+      const switchOff = document.querySelector(".switchOff");
+      const switchOn = document.querySelector(".switchOn");
+
+      if (checkbox.checked) {
+        switchOff.style.color = "#c2c2c2";
+        switchOn.style.color = "#337614";
+      } else {
+        switchOff.style.color = "#e01b41";
+        switchOn.style.color = "#c2c2c2";
+      }
+    }
+
+    // 함수 정의: 센서 및 카메라 시작
+    function startSensorAndCamera() {
+      document.getElementById("start-sensor").click();
+      document.getElementById("start-camera").click();
+    }
+
+    // 함수 정의: 센서 및 카메라 중지
+    function stopSensorAndCamera() {
+      document.getElementById("stop-sensor").click();
+      document.getElementById("stop-camera").click();
+    }
+
+    // 토글 스위치 상태 변경 이벤트 핸들러
+    function toggleSwitchHandler() {
+      const checkbox = document.getElementById("toggleSwitch");
+      if (checkbox.checked) {
+        startSensorAndCamera();
+      } else {
+        stopSensorAndCamera();
+      }
+    }
+
+    updateTextColor();
+    toggleSwitchHandler();
+
+    // Add event listener for the checkbox
+    const checkbox = document.getElementById("toggleSwitch");
+    checkbox.addEventListener("change", function () {
+      updateTextColor();
+      toggleSwitchHandler();
+    });
+  });
+</script>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=po8JlsJs5W18L7GArJBDK5drZocbgJ116JTpWVN3"></script>
+<script src="{% static 'navigation/js/navi.js' %}"></script>
+{% endblock content %}

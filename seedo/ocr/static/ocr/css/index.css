@@ -1,0 +1,215 @@
+@keyframes shimmer {
+  0% {
+    text-shadow:
+      0 0 5px #ffffff,
+      0 0 10px #ffffff,
+      0 0 20px #ffffff,
+      0 0 40px #00ff00,
+      0 0 80px #00ff00,
+      0 0 90px #00ff00,
+      0 0 100px #00ff00,
+      0 0 150px #00ff00;
+    color: rgb(0, 100, 0);
+  }
+  50% {
+    text-shadow:
+      0 0 10px #ffffff,
+      0 0 20px #ffffff,
+      0 0 30px #00dd00,
+      0 0 40px #00dd00,
+      0 0 50px #00dd00,
+      0 0 60px #00dd00,
+      0 0 70px #00dd00,
+      0 0 80px #00dd00;
+    color: rgb(244, 252, 244);
+  }
+  100% {
+    text-shadow:
+      0 0 5px #ffffff,
+      0 0 10px #ffffff,
+      0 0 20px #ffffff,
+      0 0 40px #00ff00,
+      0 0 80px #00ff00,
+      0 0 90px #00ff00,
+      0 0 100px #00ff00,
+      0 0 150px #00ff00;
+    color: rgb(0, 100, 0);
+  }
+}
+
+/*ios에서만 적용시킬 스타일*/
+.ios-scroll {
+  height: 67.3vh; /* 화면 크기에 따라 유동적으로 설정 */
+  -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+}
+
+main {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 65px;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 480 / 743.6;
+  max-height: 90%;
+  flex-direction: column;
+  justify-content: center; /* 수평 가운데 정렬 */
+  align-items: center;
+}
+
+/* 화면 높이에 따라 가로 크기를 조정하는 미디어 쿼리 */
+/*@media (max-height: 735px) {
+  main {
+      height: 660px;
+      width: calc(660px * (480 / 743.6));
+  }
+  
+  #camera_view {
+    height: calc(100% - 108px);
+  }
+
+  #result {
+    height: calc(100% - 108px);
+  }
+
+}*/
+
+#text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 70vh;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+#touch-start {
+  text-align: center;
+  font-size: 35px;
+  animation: shimmer 3s infinite;
+  text-align: center;
+  margin-top: 20%;
+}
+#camera_view {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 97%;
+  max-width: 480px;
+  aspect-ratio: 3 / 4;
+  max-height: 85%;
+  border-radius: 12px;
+  border: 2px solid #337614;
+  overflow: hidden;
+}
+
+#video {
+  opacity: 0;
+  transition: opacity 10s;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 3 / 4;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+#canvas {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 3 / 4;
+  margin: 0 auto;
+}
+
+#captured-image {
+  display: none;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  margin: auto 0;
+  vertical-align: middle;
+  border-radius: 12px;
+}
+
+#result {
+  display: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0px;
+  justify-content: center;
+  align-items: flex-start;
+  width: 97%;
+  max-width: 480px;
+  aspect-ratio: 3 / 4;
+  max-height: 85%;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: scroll;
+  background-color: ghostwhite;
+  border-radius: 12px;
+  opacity: 0;
+  border: 2px solid #337614;
+  transition: opacity 4s;
+}
+
+#result p {
+  position: relative;
+  line-height: 1.5; /* 텍스트의 줄 간격을 조절합니다 */
+  width: 95%; /* 부모 요소에 맞추도록 너비를 설정 */
+  padding-top: 20%;
+  padding-bottom: 20%;
+  font-size: 42px;
+  font-weight: bold;
+  word-wrap: break-word; /* 텍스트가 넘칠 때 줄 바꿈을 허용합니다 */
+  white-space: normal; /* 기본 줄바꿈 동작을 사용합니다 */
+  text-align: center; /* 텍스트를 중앙 정렬 */
+  margin: 10% auto; /* 위아래 여백을 설정 */
+  overflow: auto; /* 텍스트가 잘리지 않도록 설정 */
+  white-space: pre-wrap;
+}
+
+#button {
+  width: 97%;
+  max-width: 480px;
+  margin: 0 auto;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#capture-button {
+  color: #ffffff;
+  border: transparent;
+  text-shadow:
+    -1px 0px #000000,
+    0px 1px #000000,
+    1px 0px #000000,
+    0px -1px #000000,
+    2px 2px 5px #00000080;
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 3 / 0.7;
+  margin: 0 auto;
+  background-color: #a0ce8a;
+  border-radius: 10px;
+  font-size: 40px;
+}
+
+.fade {
+  opacity: 0;
+  transition: opacity 6s;
+  display: none; /* Initially hidden */
+}
+
+.fadeVisible {
+  display: block; /* Ensure element is displayed */
+  opacity: 1; /* Fully opaque */
+  transition: opacity 4s;
+}
